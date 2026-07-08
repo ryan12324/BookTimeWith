@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#faf8f4;font-family:'Libre Franklin',sans-serif;color:#26221c}
+a{color:#26221c;text-decoration:none}a:hover{color:#8a7a5c}
+</style>
+</helmet>
+
+<!-- NAV -->
+<div style="max-width:1080px;margin:0 auto;padding:26px 40px 0;display:flex;justify-content:space-between;align-items:center">
+  <div style="font:600 17px 'Source Serif 4',serif">booktimewith<span style="color:#a89f90">.com</span></div>
+  <div style="display:flex;gap:26px;align-items:center;font:500 13.5px 'Libre Franklin',sans-serif;color:#6b6357">
+    <a href="#how" style="color:#6b6357">How it works</a>
+    <a href="#pricing" style="color:#6b6357">Pricing</a>
+    <a href="#claim" style="padding:9px 18px;background:#26221c;color:#faf8f4;border-radius:5px;font-weight:600">Get your link</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<div style="max-width:1080px;margin:0 auto;padding:88px 40px 72px;display:grid;grid-template-columns:1.1fr .9fr;gap:64px;align-items:center">
+  <div>
+    <div style="font:400 54px/1.1 'Source Serif 4',serif;letter-spacing:-.015em;text-wrap:balance">The un-software for booking clients.</div>
+    <div style="margin-top:20px;font:400 16.5px/1.65 'Libre Franklin',sans-serif;color:#6b6357;max-width:440px;text-wrap:pretty">One link. Your availability. Clients pick a time and you show up. We deleted everything else on purpose.</div>
+    <div id="claim" style="margin-top:32px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;background:#fff;border:1px solid #ddd5c8;border-radius:6px;padding:13px 15px;font:400 14.5px 'Libre Franklin',sans-serif;color:#a89f90">booktimewith.link/<span style="color:#26221c;font-weight:500">{{ handle }}</span></div>
+      <div style="padding:14px 22px;background:#26221c;color:#faf8f4;border-radius:6px;font:600 14.5px 'Libre Franklin',sans-serif;cursor:pointer" style-hover="background:#3d372e">Claim it</div>
+    </div>
+    <div style="margin-top:10px;font:400 12px 'Libre Franklin',sans-serif;color:#a89f90">Live in 5 minutes · 30 days free, no card needed</div>
+    <div style="margin-top:40px;max-width:420px;border-top:1px solid #e6dfd3;padding-top:22px;font:400 19px/1.75 'Source Serif 4',serif;color:#6b6357;text-wrap:pretty">
+      <span style="color:#26221c;font-weight:600">Five</span> minutes to set up. <span style="color:#26221c;font-weight:600">One</span> settings page. <span style="color:#26221c;font-weight:600">Zero</span> accounts for your clients — and zero features you'll never use.
+    </div>
+  </div>
+  <!-- booking card -->
+  <div style="background:#fff;border:1px solid #e6dfd3;border-radius:10px;box-shadow:0 16px 44px rgba(38,34,28,.09);overflow:hidden">
+    <div style="padding:20px 24px;border-bottom:1px solid #efe9de;display:flex;gap:13px;align-items:center">
+      <div style="width:40px;height:40px;border-radius:50%;background:repeating-linear-gradient(45deg,#e6dfd3,#e6dfd3 3px,#efe9de 3px,#efe9de 6px);flex:none"></div>
+      <div>
+        <div style="font:600 15px 'Source Serif 4',serif">Dana Whitfield, LMFT</div>
+        <div style="font:400 12px 'Libre Franklin',sans-serif;color:#a89f90">Therapy session · 50 min</div>
+      </div>
+    </div>
+    <div style="padding:18px 24px 22px">
+      <div style="font:600 11px 'Libre Franklin',sans-serif;color:#a89f90;text-transform:uppercase;letter-spacing:.08em;margin-bottom:11px">Tuesday, July 14</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+        <sc-for list="{{ heroSlots }}" as="slot" hint-placeholder-count="4">
+          <div onClick="{{ slot.pick }}" style="padding:10px 0;text-align:center;border:1px solid {{ slot.border }};background:{{ slot.bg }};color:{{ slot.color }};border-radius:5px;font:500 13px 'Libre Franklin',sans-serif;cursor:pointer">{{ slot.label }}</div>
+        </sc-for>
+      </div>
+      <div style="margin-top:15px;padding:12px 0;text-align:center;background:#8a7a5c;color:#faf8f4;border-radius:6px;font:600 13.5px 'Libre Franklin',sans-serif;cursor:pointer">{{ heroCta }}</div>
+      <div style="margin-top:10px;text-align:center;font:400 11.5px 'Libre Franklin',sans-serif;color:#a89f90">No account needed. Ever.</div>
+    </div>
+  </div>
+</div>
+
+<!-- WHAT WE DELETED -->
+<div style="background:#26221c;color:#faf8f4">
+  <div style="max-width:1080px;margin:0 auto;padding:72px 40px">
+    <div style="font:400 32px/1.2 'Source Serif 4',serif;letter-spacing:-.01em;max-width:540px;text-wrap:balance">Everything we said no to, so you don't have to.</div>
+    <div style="margin-top:36px;display:grid;grid-template-columns:repeat(3,1fr);gap:2px 40px;font:400 14.5px/2.2 'Libre Franklin',sans-serif;color:#a89f90">
+      <div><span style="color:#6b6357">✕</span> CRM pipelines</div>
+      <div><span style="color:#6b6357">✕</span> AI receptionists</div>
+      <div><span style="color:#6b6357">✕</span> Lead routing</div>
+      <div><span style="color:#6b6357">✕</span> Marketing automations</div>
+      <div><span style="color:#6b6357">✕</span> Gift cards &amp; memberships</div>
+      <div><span style="color:#6b6357">✕</span> 40-question intake forms</div>
+    </div>
+    <div style="margin-top:36px;padding-top:28px;border-top:1px solid #3d372e;display:grid;grid-template-columns:repeat(3,1fr);gap:2px 40px;font:500 14.5px/2.2 'Libre Franklin',sans-serif;color:#faf8f4">
+      <div><span style="color:#8a7a5c">✓</span> Clients book time slots</div>
+      <div><span style="color:#8a7a5c">✓</span> Calendar sync, both ways</div>
+      <div><span style="color:#8a7a5c">✓</span> Reminders that stop no-shows</div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div id="how" style="max-width:1080px;margin:0 auto;padding:80px 40px">
+  <div style="font:400 32px/1.2 'Source Serif 4',serif;letter-spacing:-.01em">Set up in less time than a coffee break.</div>
+  <div style="margin-top:40px;display:grid;grid-template-columns:repeat(3,1fr);gap:40px">
+    <div>
+      <div style="font:600 12px 'Libre Franklin',sans-serif;letter-spacing:.1em;color:#8a7a5c;margin-bottom:12px">01</div>
+      <div style="font:600 17px 'Source Serif 4',serif">Claim your link</div>
+      <div style="margin-top:8px;font:400 14px/1.6 'Libre Franklin',sans-serif;color:#6b6357;text-wrap:pretty">booktimewith.link/you — your own page, on its own domain. Name your service, set the length. That's the "onboarding."</div>
+    </div>
+    <div>
+      <div style="font:600 12px 'Libre Franklin',sans-serif;letter-spacing:.1em;color:#8a7a5c;margin-bottom:12px">02</div>
+      <div style="font:600 17px 'Source Serif 4',serif">Mark when you work</div>
+      <div style="margin-top:8px;font:400 14px/1.6 'Libre Franklin',sans-serif;color:#6b6357;text-wrap:pretty">Paint your weekly hours on one screen. Connect Google or Outlook so busy time blocks itself.</div>
+    </div>
+    <div>
+      <div style="font:600 12px 'Libre Franklin',sans-serif;letter-spacing:.1em;color:#8a7a5c;margin-bottom:12px">03</div>
+      <div style="font:600 17px 'Source Serif 4',serif">Send the link</div>
+      <div style="margin-top:8px;font:400 14px/1.6 'Libre Franklin',sans-serif;color:#6b6357;text-wrap:pretty">Text it, put it in your email signature, tape it to your door. Clients book in three taps, no account.</div>
+    </div>
+  </div>
+</div>
+
+<!-- QUOTE -->
+<div style="max-width:1080px;margin:0 auto;padding:0 40px 80px">
+  <div style="border-top:1px solid #e6dfd3;padding-top:56px;max-width:680px">
+    <div style="font:400 25px/1.45 'Source Serif 4',serif;letter-spacing:-.005em;text-wrap:pretty">"I spent a weekend trying to configure the last one. This took the time between two clients."</div>
+    <div style="margin-top:16px;font:500 13px 'Libre Franklin',sans-serif;color:#6b6357">Marcus Okafor · Leadership coach</div>
+  </div>
+</div>
+
+<!-- PRICING -->
+<div id="pricing" style="background:#f3efe7;border-top:1px solid #e6dfd3;border-bottom:1px solid #e6dfd3">
+  <div style="max-width:1080px;margin:0 auto;padding:72px 40px">
+    <div style="font:400 32px/1.2 'Source Serif 4',serif;letter-spacing:-.01em">One price. Obviously.</div>
+    <div style="margin-top:36px;background:#fff;border:1px solid #e6dfd3;border-radius:10px;padding:36px 40px;max-width:560px;display:flex;align-items:center;gap:36px">
+      <div style="flex:none">
+        <div style="font:400 56px 'Source Serif 4',serif">{{ price }}<span style="font:400 16px 'Libre Franklin',sans-serif;color:#a89f90"> /person/mo</span></div>
+        <div style="margin-top:8px;display:flex;gap:4px">
+          <sc-for list="{{ currencies }}" as="cur" hint-placeholder-count="4">
+            <div onClick="{{ cur.pick }}" style="padding:4px 9px;border-radius:4px;font:600 11px 'Libre Franklin',sans-serif;letter-spacing:.05em;cursor:pointer;background:{{ cur.bg }};color:{{ cur.color }}" style-hover="background:#f3efe7">{{ cur.code }}</div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="font:400 14px/1.65 'Libre Franklin',sans-serif;color:#6b6357;text-wrap:pretty">Everything, for everyone. Solo or a practice of ten — one booking page, unlimited appointments, calendar sync, reminders.</div>
+    </div>
+    <div style="margin-top:20px;font:400 12.5px 'Libre Franklin',sans-serif;color:#a89f90">Starts with 30 days free. No credit card, no "talk to sales," no feature grid — there aren't enough features to make a grid.</div>
+  </div>
+</div>
+
+<!-- FOOTER CTA -->
+<div style="max-width:1080px;margin:0 auto;padding:80px 40px 72px;text-align:center">
+  <div style="font:400 38px/1.15 'Source Serif 4',serif;letter-spacing:-.015em;text-wrap:balance">Boring software that just works.</div>
+  <div style="margin-top:24px;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;background:#fff;border:1px solid #ddd5c8;border-radius:6px;padding:13px 15px;font:400 14.5px 'Libre Franklin',sans-serif;color:#a89f90">booktimewith.link/<span style="color:#26221c;font-weight:500">{{ handle }}</span></div>
+    <div style="padding:14px 22px;background:#26221c;color:#faf8f4;border-radius:6px;font:600 14.5px 'Libre Franklin',sans-serif;cursor:pointer" style-hover="background:#3d372e">Claim it</div>
+  </div>
+  <div style="margin-top:52px;padding-top:24px;border-top:1px solid #e6dfd3;display:flex;justify-content:space-between;font:400 12px 'Libre Franklin',sans-serif;color:#a89f90">
+    <div>© 2026 booktimewith.com</div>
+    <div style="display:flex;gap:20px"><a href="#pricing" style="color:#a89f90">Pricing</a><a href="#how" style="color:#a89f90">How it works</a></div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;handle&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;yourname&quot;, &quot;tsType&quot;: &quot;string&quot;}}">
+class Component extends DCLogic {
+  state = { picked: 1, currency: 'GBP' };
+  renderVals() {
+    const times = ['9:00', '10:00', '1:00', '3:30'];
+    const picked = this.state.picked;
+    const prices = { GBP: '£6', USD: '$8', EUR: '€7', AUD: 'A$12' };
+    const currency = this.state.currency;
+    return {
+      handle: this.props.handle ?? 'yourname',
+      price: prices[currency],
+      currencies: Object.keys(prices).map((code) => ({
+        code,
+        bg: code === currency ? '#26221c' : 'transparent',
+        color: code === currency ? '#faf8f4' : '#a89f90',
+        pick: () => this.setState({ currency: code }),
+      })),
+      heroCta: 'Book Tuesday at ' + times[picked] + ' →',
+      heroSlots: times.map((label, i) => ({
+        label,
+        border: i === picked ? '#26221c' : '#ddd5c8',
+        bg: i === picked ? '#26221c' : '#fff',
+        color: i === picked ? '#faf8f4' : '#26221c',
+        pick: () => this.setState({ picked: i }),
+      })),
+    };
+  }
+}
+</script>
+</body>
+</html>

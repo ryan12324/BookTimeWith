@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style data-omelette-print-defaults>
+@media print {
+  @page { margin: 0.5in; }
+  h1, h2, h3, h4, h5, h6 { break-after: avoid; }
+  figure, table, pre, blockquote, img, svg, tr, [class~="card" i] { break-inside: avoid; }
+  img, svg { max-width: 100%; }
+  p { orphans: 3; widows: 3; }
+}
+</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#1a1712;font-family:'Libre Franklin',sans-serif}
+a{color:#26221c}a:hover{color:#8a7a5c}
+</style>
+</helmet>
+
+<x-import component-from-global-scope="deck-stage" from="./deck-stage.js" width="1920" height="1080" hint-size="100%,100%">
+
+  <!-- 1 · TITLE -->
+  <section data-label="Title" data-speaker-notes="Book Time With — scheduling for service businesses that never wanted software. One link, clients book, done." style="background:#faf8f4;color:#26221c;display:flex;flex-direction:column;justify-content:space-between;padding:100px 120px 80px;box-sizing:border-box">
+    <div style="font:600 30px 'Source Serif 4',serif">booktimewith<span style="color:#a89f90">.com</span></div>
+    <div>
+      <div style="font:400 118px/1.08 'Source Serif 4',serif;letter-spacing:-.015em;max-width:1360px;text-wrap:balance">The un-software for booking clients.</div>
+      <div style="margin-top:44px;font:400 34px/1.5 'Libre Franklin',sans-serif;color:#6b6357;max-width:900px;text-wrap:pretty">One link. Your availability. Clients pick a time and you show up.</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font:400 24px 'Libre Franklin',sans-serif;color:#a89f90">
+      <span>Founder deck</span><span>July 2026</span>
+    </div>
+  </section>
+
+  <!-- 2 · THE PROBLEM -->
+  <section data-label="The problem" data-speaker-notes="Scheduling tools grew into business platforms. Every added feature is confusion, learning curve and cost for someone who just needs bookings." style="background:#26221c;color:#faf8f4;display:flex;flex-direction:column;padding:100px 120px 80px;box-sizing:border-box">
+    <div style="font:400 28px 'Libre Franklin',sans-serif;letter-spacing:.08em;color:#8a7a5c">THE PROBLEM</div>
+    <div style="margin-top:52px;font:400 76px/1.15 'Source Serif 4',serif;letter-spacing:-.01em;max-width:1500px;text-wrap:balance">Scheduling software turned into enterprise software.</div>
+    <div style="margin-top:72px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:60px">
+      <div style="border-top:1px solid #3d372e;padding-top:32px">
+        <div style="font:400 30px/1.45 'Libre Franklin',sans-serif;color:#d6cdbc;text-wrap:pretty"><span style="color:#faf8f4;font-weight:600">CRMs, workflows, AI receptionists</span> — piled onto tools whose one job was booking a time slot.</div>
+      </div>
+      <div style="border-top:1px solid #3d372e;padding-top:32px">
+        <div style="font:400 30px/1.45 'Libre Franklin',sans-serif;color:#d6cdbc;text-wrap:pretty">Every extra feature adds <span style="color:#faf8f4;font-weight:600">confusion, learning curve and cost</span> for people who will never use it.</div>
+      </div>
+      <div style="border-top:1px solid #3d372e;padding-top:32px">
+        <div style="font:400 30px/1.45 'Libre Franklin',sans-serif;color:#d6cdbc;text-wrap:pretty">The result: software that makes booking appointments <span style="color:#faf8f4;font-weight:600">harder, not easier.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 · WHO IT HURTS -->
+  <section data-label="Who it hurts" data-speaker-notes="Service pros sell time directly. They didn't sign up to be software admins — a weekend lost to configuration is a real cost." style="background:#faf8f4;color:#26221c;display:flex;flex-direction:column;padding:100px 120px 80px;box-sizing:border-box">
+    <div style="font:400 28px 'Libre Franklin',sans-serif;letter-spacing:.08em;color:#8a7a5c">WHO IT HURTS</div>
+    <div style="margin-top:52px;font:400 76px/1.15 'Source Serif 4',serif;letter-spacing:-.01em;max-width:1400px;text-wrap:balance">People who sell time, not people who buy software.</div>
+    <div style="margin-top:72px;display:flex;gap:24px;flex-wrap:wrap">
+      <div style="padding:20px 40px;border:1px solid #ddd5c8;border-radius:60px;font:400 30px 'Libre Franklin',sans-serif;color:#6b6357">Therapists</div>
+      <div style="padding:20px 40px;border:1px solid #ddd5c8;border-radius:60px;font:400 30px 'Libre Franklin',sans-serif;color:#6b6357">Coaches</div>
+      <div style="padding:20px 40px;border:1px solid #ddd5c8;border-radius:60px;font:400 30px 'Libre Franklin',sans-serif;color:#6b6357">Consultants</div>
+      <div style="padding:20px 40px;border:1px solid #ddd5c8;border-radius:60px;font:400 30px 'Libre Franklin',sans-serif;color:#6b6357">Contractors</div>
+      <div style="padding:20px 40px;border:1px solid #ddd5c8;border-radius:60px;font:400 30px 'Libre Franklin',sans-serif;color:#6b6357">Tutors</div>
+      <div style="padding:20px 40px;border:1px solid #ddd5c8;border-radius:60px;font:400 30px 'Libre Franklin',sans-serif;color:#6b6357">Small practices of 2–10</div>
+    </div>
+    <div style="margin-top:auto;border-top:1px solid #e6dfd3;padding-top:40px;max-width:1200px">
+      <div style="font:400 40px/1.4 'Source Serif 4',serif;text-wrap:pretty">"I spent a weekend trying to configure the last one. This took the time between two clients."</div>
+      <div style="margin-top:18px;font:400 26px 'Libre Franklin',sans-serif;color:#a89f90">Marcus Okafor · Leadership coach · early user</div>
+    </div>
+  </section>
+
+  <!-- 4 · THE GAP -->
+  <section data-label="The gap" data-speaker-notes="Calendly is simple but meeting-first. Acuity is service-first but complex — 30+ minutes of setup, options overload. Everyone else adds MORE. Nobody serves service pros with less." style="background:#faf8f4;color:#26221c;display:flex;flex-direction:column;padding:100px 120px 80px;box-sizing:border-box">
+    <div style="font:400 28px 'Libre Franklin',sans-serif;letter-spacing:.08em;color:#8a7a5c">THE GAP</div>
+    <div style="margin-top:52px;font:400 76px/1.15 'Source Serif 4',serif;letter-spacing:-.01em;max-width:1400px;text-wrap:balance">Simple tools aren't for services. Service tools aren't simple.</div>
+    <div style="margin-top:72px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:40px">
+      <div style="background:#fff;border:1px solid #e6dfd3;border-radius:16px;padding:44px 48px">
+        <div style="font:600 32px 'Source Serif 4',serif">Meeting schedulers</div>
+        <div style="margin-top:8px;font:400 24px 'Libre Franklin',sans-serif;color:#a89f90">Calendly and kin</div>
+        <div style="margin-top:28px;font:400 27px/1.5 'Libre Franklin',sans-serif;color:#6b6357;text-wrap:pretty">Genuinely simple — but built for meetings. No services, no per-service forms, no client bookings.</div>
+      </div>
+      <div style="background:#fff;border:1px solid #e6dfd3;border-radius:16px;padding:44px 48px">
+        <div style="font:600 32px 'Source Serif 4',serif">Service platforms</div>
+        <div style="margin-top:8px;font:400 24px 'Libre Franklin',sans-serif;color:#a89f90">Acuity, vcita, Zeeg</div>
+        <div style="margin-top:28px;font:400 27px/1.5 'Libre Franklin',sans-serif;color:#6b6357;text-wrap:pretty">Built for services — plus CRM, marketing, AI. Options overload and 30+ minute setups.</div>
+      </div>
+      <div style="background:#26221c;color:#faf8f4;border-radius:16px;padding:44px 48px">
+        <div style="font:600 32px 'Source Serif 4',serif">The gap</div>
+        <div style="margin-top:8px;font:400 24px 'Libre Franklin',sans-serif;color:#8a7a5c">booktimewith.com</div>
+        <div style="margin-top:28px;font:400 27px/1.5 'Libre Franklin',sans-serif;color:#d6cdbc;text-wrap:pretty">Service booking with zero learning curve. Clients book without accounts. Live in five minutes.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 · THE PRODUCT -->
+  <section data-label="The product" data-speaker-notes="The whole product in three steps: claim a link, paint your hours, send it. Clients book in three taps, no account." style="background:#faf8f4;color:#26221c;display:flex;flex-direction:column;padding:100px 120px 80px;box-sizing:border-box">
+    <div style="font:400 28px 'Libre Franklin',sans-serif;letter-spacing:.08em;color:#8a7a5c">THE PRODUCT</div>
+    <div style="margin-top:52px;display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:center;flex:1">
+      <div>
+        <div style="font:400 72px/1.15 'Source Serif 4',serif;letter-spacing:-.01em;text-wrap:balance">One link is the entire product.</div>
+        <div style="margin-top:56px;display:flex;flex-direction:column;gap:36px">
+          <div style="display:flex;gap:28px;align-items:baseline">
+            <div style="font:600 26px 'Libre Franklin',sans-serif;color:#8a7a5c;flex:none">01</div>
+            <div style="font:400 32px/1.4 'Libre Franklin',sans-serif;color:#6b6357;white-space:nowrap">Claim <span style="color:#26221c;font-weight:600">booktimewith.link/you</span></div>
+          </div>
+          <div style="display:flex;gap:28px;align-items:baseline">
+            <div style="font:600 26px 'Libre Franklin',sans-serif;color:#8a7a5c;flex:none">02</div>
+            <div style="font:400 32px/1.4 'Libre Franklin',sans-serif;color:#6b6357">Paint the hours you work</div>
+          </div>
+          <div style="display:flex;gap:28px;align-items:baseline">
+            <div style="font:600 26px 'Libre Franklin',sans-serif;color:#8a7a5c;flex:none">03</div>
+            <div style="font:400 32px/1.4 'Libre Franklin',sans-serif;color:#6b6357">Send it — clients book in three taps, no account</div>
+          </div>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #e6dfd3;border-radius:20px;box-shadow:0 30px 80px rgba(38,34,28,.12);overflow:hidden">
+        <div style="padding:40px 48px;border-bottom:1px solid #efe9de;display:flex;gap:26px;align-items:center">
+          <div style="width:76px;height:76px;border-radius:50%;background:repeating-linear-gradient(45deg,#e6dfd3,#e6dfd3 5px,#efe9de 5px,#efe9de 10px);flex:none"></div>
+          <div>
+            <div style="font:600 32px 'Source Serif 4',serif">Dana Whitfield, LMFT</div>
+            <div style="font:400 24px 'Libre Franklin',sans-serif;color:#a89f90">Therapy session · 50 min</div>
+          </div>
+        </div>
+        <div style="padding:36px 48px 44px">
+          <div style="font:600 24px 'Libre Franklin',sans-serif;letter-spacing:.08em;color:#a89f90;margin-bottom:22px">TUESDAY, JULY 14</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+            <div style="padding:20px 0;text-align:center;border:1px solid #ddd5c8;border-radius:10px;font:500 26px 'Libre Franklin',sans-serif">9:00</div>
+            <div style="padding:20px 0;text-align:center;background:#26221c;color:#faf8f4;border-radius:10px;font:600 26px 'Libre Franklin',sans-serif">10:00</div>
+            <div style="padding:20px 0;text-align:center;border:1px solid #ddd5c8;border-radius:10px;font:500 26px 'Libre Franklin',sans-serif">1:00</div>
+            <div style="padding:20px 0;text-align:center;border:1px solid #ddd5c8;border-radius:10px;font:500 26px 'Libre Franklin',sans-serif">3:30</div>
+          </div>
+          <div style="margin-top:28px;padding:24px 0;text-align:center;background:#8a7a5c;color:#faf8f4;border-radius:12px;font:600 27px 'Libre Franklin',sans-serif">Book Tuesday at 10:00 →</div>
+          <div style="margin-top:20px;text-align:center;font:400 24px 'Libre Franklin',sans-serif;color:#a89f90">No account needed. Ever.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · WHAT WE DELETED -->
+  <section data-label="What we deleted" data-speaker-notes="Our differentiation is subtraction. Saying no is the moat — every no keeps setup at five minutes and support costs near zero." style="background:#26221c;color:#faf8f4;display:flex;flex-direction:column;padding:100px 120px 80px;box-sizing:border-box">
+    <div style="font:400 28px 'Libre Franklin',sans-serif;letter-spacing:.08em;color:#8a7a5c">HOW WE'RE DIFFERENT</div>
+    <div style="margin-top:52px;font:400 76px/1.15 'Source Serif 4',serif;letter-spacing:-.01em;max-width:1500px;text-wrap:balance">Everything we said no to, so our users don't have to.</div>
+    <div style="margin-top:80px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px 80px;font:400 32px/2.1 'Libre Franklin',sans-serif;color:#a89f90">
+      <div><span style="color:#6b6357">✕</span>  CRM pipelines</div>
+      <div><span style="color:#6b6357">✕</span>  AI receptionists</div>
+      <div><span style="color:#6b6357">✕</span>  Lead routing</div>
+      <div><span style="color:#6b6357">✕</span>  Marketing automations</div>
+      <div><span style="color:#6b6357">✕</span>  Gift cards &amp; memberships</div>
+      <div><span style="color:#6b6357">✕</span>  40-question intake forms</div>
+    </div>
+    <div style="margin-top:64px;padding-top:48px;border-top:1px solid #3d372e;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px 80px;font:500 32px/2.1 'Libre Franklin',sans-serif;color:#faf8f4">
+      <div><span style="color:#8a7a5c">✓</span>  Clients book time slots</div>
+      <div><span style="color:#8a7a5c">✓</span>  Calendar sync, both ways</div>
+      <div><span style="color:#8a7a5c">✓</span>  Reminders that stop no-shows</div>
+    </div>
+  </section>
+
+  <!-- 7 · BUSINESS MODEL -->
+  <section data-label="Business model" data-speaker-notes="One price, localised by region — £6 UK, $8 US. 30 days free without a card. Simple pricing IS the product promise; a feature grid would contradict the pitch." style="background:#faf8f4;color:#26221c;display:flex;flex-direction:column;padding:100px 120px 80px;box-sizing:border-box">
+    <div style="font:400 28px 'Libre Franklin',sans-serif;letter-spacing:.08em;color:#8a7a5c">BUSINESS MODEL</div>
+    <div style="margin-top:52px;font:400 76px/1.15 'Source Serif 4',serif;letter-spacing:-.01em">One price. Obviously.</div>
+    <div style="margin-top:80px;display:grid;grid-template-columns:auto 1fr;gap:120px;align-items:center">
+      <div>
+        <div style="font:400 190px/1 'Source Serif 4',serif;letter-spacing:-.02em">£6<span style="font:400 40px 'Libre Franklin',sans-serif;color:#a89f90"> /person/mo</span></div>
+        <div style="margin-top:24px;font:400 28px 'Libre Franklin',sans-serif;color:#a89f90">Localised by region · $8 US · €7 EU</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:40px;max-width:680px">
+        <div style="border-top:1px solid #e6dfd3;padding-top:28px;font:400 32px/1.45 'Libre Franklin',sans-serif;color:#6b6357;text-wrap:pretty"><span style="color:#26221c;font-weight:600">Everything included,</span> solo or a practice of ten. No tiers, no feature grid.</div>
+        <div style="border-top:1px solid #e6dfd3;padding-top:28px;font:400 32px/1.45 'Libre Franklin',sans-serif;color:#6b6357;text-wrap:pretty"><span style="color:#26221c;font-weight:600">30 days free,</span> no credit card. Costs less than a single no-show.</div>
+        <div style="border-top:1px solid #e6dfd3;padding-top:28px;font:400 32px/1.45 'Libre Franklin',sans-serif;color:#6b6357;text-wrap:pretty"><span style="color:#26221c;font-weight:600">Low cost to serve</span> — a deliberately small product means near-zero support and onboarding.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 · WHY NOW -->
+  <section data-label="Why now" data-speaker-notes="Incumbents are racing upmarket, adding AI and CRM — moving away from this audience, not toward it. Early users came from stripping features away, and they stay because there's nothing to churn from." style="background:#faf8f4;color:#26221c;display:flex;flex-direction:column;padding:100px 120px 80px;box-sizing:border-box">
+    <div style="font:400 28px 'Libre Franklin',sans-serif;letter-spacing:.08em;color:#8a7a5c">WHY NOW</div>
+    <div style="margin-top:52px;font:400 76px/1.15 'Source Serif 4',serif;letter-spacing:-.01em;max-width:1500px;text-wrap:balance">The incumbents are running in the other direction.</div>
+    <div style="margin-top:80px;display:grid;grid-template-columns:1fr 1fr;gap:100px">
+      <div style="border-top:1px solid #e6dfd3;padding-top:36px">
+        <div style="font:600 34px 'Source Serif 4',serif">Upmarket drift</div>
+        <div style="margin-top:20px;font:400 30px/1.5 'Libre Franklin',sans-serif;color:#6b6357;text-wrap:pretty">Every incumbent is adding AI routing, CRM and enterprise features. Each release widens the gap beneath them.</div>
+      </div>
+      <div style="border-top:1px solid #e6dfd3;padding-top:36px">
+        <div style="font:600 34px 'Source Serif 4',serif">Demand for less</div>
+        <div style="margin-top:20px;font:400 30px/1.5 'Libre Franklin',sans-serif;color:#6b6357;text-wrap:pretty">Our first users came by stripping features away, not adding them. Boring tools that just work is the traction signal.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 · CLOSE -->
+  <section data-label="Close" data-speaker-notes="The ask: help us stay boring. Thank you." style="background:#26221c;color:#faf8f4;display:flex;flex-direction:column;justify-content:space-between;padding:100px 120px 80px;box-sizing:border-box">
+    <div style="font:600 30px 'Source Serif 4',serif;color:#faf8f4">booktimewith<span style="color:#8a7a5c">.com</span></div>
+    <div>
+      <div style="font:400 110px/1.1 'Source Serif 4',serif;letter-spacing:-.015em;max-width:1400px;text-wrap:balance">Boring software that just works.</div>
+      <div style="margin-top:48px;display:inline-flex;align-items:center;background:#faf8f4;border-radius:12px;padding:26px 36px;font:500 34px 'Libre Franklin',sans-serif;color:#a89f90">booktimewith.link/<span style="color:#26221c;font-weight:600">you</span></div>
+    </div>
+    <div style="font:400 24px 'Libre Franklin',sans-serif;color:#8a7a5c">Thank you</div>
+  </section>
+
+</x-import>
+
+</x-dc>
+<script>
+(async () => {
+  if (!document.title || !document.title.trim()) document.title = "Book Time With - Deck";
+  // Prepend so page-supplied @page / break rules (deck-stage's margin:0,
+  // author CSS) keep source-order precedence over the baseline.
+  const baseCss = document.createElement('style');
+  baseCss.textContent = "@media print {\n  figure, table { break-inside: avoid; }\n  *, *::before, *::after {\n    print-color-adjust: exact; -webkit-print-color-adjust: exact;\n    backdrop-filter: none !important; -webkit-backdrop-filter: none !important;\n    animation-delay: -99s !important; animation-duration: .001s !important;\n    animation-iteration-count: 1 !important; animation-fill-mode: both !important;\n    animation-play-state: running !important; transition-duration: 0s !important;\n  }\n}";
+  document.head.prepend(baseCss);
+  if (document.readyState === 'loading') {
+    await new Promise((r) => document.addEventListener('DOMContentLoaded', r, { once: true }));
+  }
+  let ds = document.querySelector('deck-stage');
+  // whenDefined never resolves when nothing registers the element, so only
+  // await it when a <deck-stage> tag exists (and race a timeout regardless).
+  if (ds && !customElements.get('deck-stage')) {
+    try {
+      await Promise.race([
+        customElements.whenDefined('deck-stage'),
+        new Promise((r) => setTimeout(r, 3000)),
+      ]);
+    } catch (e) {}
+    ds = document.querySelector('deck-stage');
+  }
+  // dc-runtime assigns window.DCLogic at init and mounts into #dc-root on
+  // DOMContentLoaded; settle on that subtree so React has rendered before
+  // print(). Non-DC pages fall through to weighing body.
+  const isDc = !ds && 'DCLogic' in window;
+  const settleRoot = ds || (isDc ? document.getElementById('dc-root') : null) || document.body;
+  if (settleRoot) {
+    // Weigh only content children — skip script/style/template so inline
+    // Babel/CSS doesn't register as stable "content" before the framework
+    // has mounted anything.
+    const MEDIA = 'img,svg,canvas,video,picture,iframe,embed,object';
+    const weigh = () => {
+      let text = 0, media = 0;
+      for (const c of settleRoot.children) {
+        const t = c.tagName;
+        if (t === 'SCRIPT' || t === 'STYLE' || t === 'TEMPLATE') continue;
+        text += (c.textContent || '').trim().length;
+        media += c.querySelectorAll(MEDIA).length + (c.matches(MEDIA) ? 1 : 0);
+      }
+      return text + media * 100;
+    };
+    // "Non-zero and stable" alone is not sufficient to mean rendered: generic
+    // body can carry a static shell while async main content is pending, and
+    // #dc-root can carry the root DC's static text while child refs are still
+    // .sc-placeholder boxes. Gate generic on readyState 'complete', and never
+    // accept stability while a dc-runtime placeholder is present.
+    const isGeneric = settleRoot === document.body;
+    const deadline = Date.now() + 15000;
+    let last = -1, stable = 0;
+    while (Date.now() < deadline) {
+      const n = weigh();
+      const ready =
+        (!isGeneric || document.readyState === 'complete') &&
+        !settleRoot.querySelector('.sc-placeholder');
+      if (n > 0 && n === last && ready) { if (++stable >= 2) break; } else { stable = 0; }
+      last = n;
+      await new Promise((r) => setTimeout(r, 250));
+    }
+  }
+  // Project support.js may predate runtime default-seeding; push via bridge.
+  if (isDc && window.__dcSetProps && window.__dcRootName) {
+    try {
+      const dpEl = document.querySelector('script[data-dc-script]');
+      const meta = JSON.parse((dpEl && dpEl.getAttribute('data-props')) || '{}');
+      const bag = {};
+      for (const k in meta)
+        if (k[0] !== '$' && meta[k] && meta[k].default !== undefined)
+          bag[k] = meta[k].default;
+      if (Object.keys(bag).length) {
+        window.__dcSetProps(window.__dcRootName(), bag);
+        await new Promise((r) => setTimeout(r, 50));
+      }
+    } catch (e) {}
+  }
+  // Reveal content gated on scroll or visibility before printing. Lazy <img>,
+  // IntersectionObserver fade-ins, and collapsed <details> don't render while
+  // off-screen, so a long page would print with them blank or closed. Open
+  // every <details>, force native-lazy images eager, and scroll the document
+  // through its full height to trip lazy-load + IO; then wait (bounded) for the
+  // newly-triggered images. Inert for deck-stage (slides aren't scroll-gated).
+  try {
+    for (const d of document.querySelectorAll('details')) d.open = true;
+    for (const img of document.querySelectorAll('img[loading="lazy"]'))
+      img.loading = 'eager';
+    const scroller = document.scrollingElement || document.documentElement;
+    const full = Math.max(scroller.scrollHeight, document.body.scrollHeight);
+    const step = window.innerHeight || 800;
+    for (let y = 0; y <= full; y += step) {
+      window.scrollTo(0, y);
+      await new Promise((r) => requestAnimationFrame(r));
+    }
+    window.scrollTo(0, 0);
+    await Promise.race([
+      Promise.all(
+        [...document.images].map((img) =>
+          img.complete
+            ? null
+            : new Promise((res) => {
+                img.addEventListener('load', res, { once: true });
+                img.addEventListener('error', res, { once: true });
+              })
+        )
+      ),
+      new Promise((r) => setTimeout(r, 4000)),
+    ]);
+  } catch (e) {}
+  try { await document.fonts.ready; } catch (e) {}
+  // Jump every animation to its end state so print() never captures a slide
+  // mid-entrance. Ordering matters: the 0s-transition style must be live
+  // BEFORE data-deck-active is set so attribute-keyed transitions don't
+  // start a (now-0s) run from the pre-active base.
+  const st = document.createElement('style');
+  st.textContent = '*,*::before,*::after{animation-delay:-99s !important;animation-duration:.001s !important;animation-iteration-count:1 !important;animation-fill-mode:both !important;animation-play-state:running !important;transition-duration:0s !important}';
+  document.head.appendChild(st);
+  for (const d of document.querySelectorAll('deck-stage')) {
+    for (const c of d.children) {
+      const t = c.tagName;
+      if (t === 'SCRIPT' || t === 'STYLE' || t === 'TEMPLATE') continue;
+      c.setAttribute('data-deck-active', '');
+    }
+  }
+  // Re-append deck-stage's @page last so no author @page can add a margin and
+  // spill each full-bleed slide onto two sheets. Backstop for old copies.
+  if (ds) {
+    let pg = document.getElementById('deck-stage-print-page');
+    if (!pg) {
+      pg = document.createElement('style');
+      pg.textContent = '@page{size:' + (+ds.getAttribute('width') || 1920) +
+        'px ' + (+ds.getAttribute('height') || 1080) + 'px;margin:0}';
+    }
+    document.body.appendChild(pg);
+  }
+  try {
+    const sweep = () => {
+      for (const a of document.getAnimations()) {
+        try { a.finish(); } catch (e) {
+          try { a.currentTime = (a.effect && a.effect.getComputedTiming().duration) || 0; a.pause(); } catch (e2) {}
+        }
+      }
+    };
+    sweep();
+    await new Promise((r) => requestAnimationFrame(r));
+    sweep();
+    await new Promise((r) => requestAnimationFrame(r));
+  } catch (e) {}
+  // Size the PDF page to the rendered design unless the file opted into
+  // standard paper via @page{size:letter|A4|…}. Decks own their own @page.
+  // Wrappers (body, …) lose padding+margin so the frame sits at (0,0); the
+  // frame itself loses only margin — its padding is INSIDE the measured
+  // rect and must stay, or content shifts and leaves a gap at bottom/right.
+  var __m = null;
+  try { __m = (() => {
+  var STAMP = true;
+  var docEl = document.documentElement;
+  var doc = { width: docEl.scrollWidth, height: docEl.scrollHeight };
+
+  var ds = document.querySelector('deck-stage');
+  if (ds) {
+    var dw = Number(ds.getAttribute('width')) || 1920;
+    var dh = Number(ds.getAttribute('height')) || 1080;
+    var n = typeof ds.length === 'number' ? ds.length : ds.children.length;
+    var idx = typeof ds.index === 'number' ? ds.index : 0;
+    var frames = [];
+    for (var i = 0; i < n; i++) frames.push({ left: 0, top: 0, width: dw, height: dh });
+    return { kind: 'deck', source: 'declared', doc: doc, frames: frames,
+      authored: frames.map(function(){return{width:true,height:true}}),
+      deck: { width: dw, height: dh, slideCount: n, index: idx },
+      signals: { paperPage: false, pxPage: false } };
+  }
+
+  // Declared kind: a doc-page tag names the kind outright, so no signal
+  // heuristics run (like the deck branch above, signals report false —
+  // they describe inferred classifications only). The tag alone is not
+  // trusted: the element must have upgraded (shadowRoot present), so a
+  // leftover tag whose script was deleted falls through to the heuristics
+  // that handle plain markup.
+  var stageSx = window.scrollX || 0, stageSy = window.scrollY || 0;
+  var dp = document.querySelector('doc-page');
+  if (dp && dp.shadowRoot) {
+    // Crop to the sheet, not the host — the desk around it is screen-only
+    // chrome that must not land in PNG exports.
+    var sheet = dp.shadowRoot.querySelector('.sheet');
+    var sr = (sheet || dp).getBoundingClientRect();
+    return { kind: 'paper-doc', source: 'declared', doc: doc,
+      frames: [{ left: sr.left + stageSx, top: sr.top + stageSy,
+        width: sr.width, height: sr.height }],
+      authored: [{ width: false, height: false }],
+      signals: { paperPage: false, pxPage: false } };
+  }
+  var paperPage = false, pxPage = false;
+  var eachRule = function (fn) {
+    for (var s = 0; s < document.styleSheets.length; s++) {
+      var rs; try { rs = document.styleSheets[s].cssRules; } catch (e) { continue; }
+      for (var r = 0; r < rs.length; r++) {
+        fn(rs[r]);
+        if (rs[r].cssRules) for (var n = 0; n < rs[r].cssRules.length; n++) fn(rs[r].cssRules[n]);
+      }
+    }
+  };
+  eachRule(function (r) {
+    if (r.type !== 6) return;
+    var m = /\bsize\s*:\s*([^;}]+)/i.exec(r.cssText || '');
+    if (!m) return;
+    if (/\b(letter|a[3-5]|legal|ledger)\b/i.test(m[1])) paperPage = true;
+    if (/\d+(?:\.\d+)?px\b/i.test(m[1])) pxPage = true;
+  });
+  var signals = { paperPage: paperPage, pxPage: pxPage };
+
+  var pxVal = function (v) {
+    var m = /^(\d+(?:\.\d+)?)px$/.exec(v || ''); return m ? +m[1] : 0;
+  };
+  var authoredPx = function (el, prop) {
+    if (pxVal(el.style[prop])) return true;
+    var attr = el.getAttribute(prop);
+    if (attr && /^\d+$/.test(attr)) return true;
+    var hit = false;
+    eachRule(function (r) {
+      if (hit || r.type !== 1 || !r.style) return;
+      try { if (el.matches(r.selectorText) && pxVal(r.style[prop])) hit = true; } catch (e) {}
+    });
+    return hit;
+  };
+
+  var el = document.body, rootPxW = false;
+  for (;;) {
+    var kids = [];
+    for (var c = 0; c < el.children.length; c++) {
+      var t = el.children[c].tagName;
+      if (t !== 'SCRIPT' && t !== 'STYLE' && t !== 'TEMPLATE') kids.push(el.children[c]);
+    }
+    if (kids.length !== 1 || !(kids[0] instanceof HTMLElement)) break;
+    if (STAMP) el.setAttribute('data-om-frame-wrap', '');
+    el = kids[0];
+    rootPxW = authoredPx(el, 'width');
+    if (rootPxW) break;
+  }
+  if (!rootPxW) rootPxW = authoredPx(el, 'width');
+
+  // @page{size:letter} alone is a flowing doc; with a px-width root it's a
+  // fixed sheet pretending to be paper — fall through and size to render.
+  if (paperPage && !rootPxW) {
+    return { kind: 'paper-doc', source: 'inferred', doc: doc, signals: signals,
+      frames: [{ left: 0, top: 0, width: doc.width, height: doc.height }],
+      authored: [{ width: false, height: false }] };
+  }
+
+  var sx = window.scrollX || 0, sy = window.scrollY || 0;
+  var rectOf = function (e) {
+    var r = e.getBoundingClientRect();
+    var oy; try { oy = getComputedStyle(e).overflowY; } catch (err) {}
+    var h = oy === 'visible' ? Math.max(r.height, e.scrollHeight || 0) : r.height;
+    return { left: r.left + sx, top: r.top + sy, width: r.width, height: h };
+  };
+
+  // Multi-frame: off unless the page opts in via data-om-multi-frame on the
+  // stop element — the explicit opt-in is what guards against card grids
+  // and pricing tables that match the geometry but aren't separate
+  // canvases. Two ways to name the frames, explicit first:
+  // 1. Descendants marked data-om-frame-export (the social-frames starter
+  //    marks each asset frame; shells/panels around them are presentation,
+  //    so nesting is expected). Document order.
+  // 2. Fallback, no marked descendants: direct children with an authored px
+  //    width AND height (the original geometry heuristic).
+  // Frames may be different sizes (a gallery mixes 1080×1920 stories with
+  // 728×90 banners); data-om-frame-label rides along for export filenames.
+  if (el.hasAttribute('data-om-multi-frame')) {
+    var visOk = function (e) {
+      var cs; try { cs = getComputedStyle(e); } catch (err) { return false; }
+      return cs.display !== 'none' && cs.visibility !== 'hidden' && cs.position !== 'fixed';
+    };
+    // A frame's crop is its VISUAL box — never the scrollHeight-inflated
+    // rect that rectOf computes for page roots. Shadow-DOM hover controls
+    // (image-slot's Replace bar parks 29px below its host) and similar
+    // escaping UI contribute scrollable overflow to the frame, and the
+    // inflated height both squashes the nominal-size resize and drags
+    // content below the frame into the crop. Zoom-independent; bit every
+    // slot-bearing frame.
+    var frameRectOf = function (e) {
+      var r = e.getBoundingClientRect();
+      return { left: r.left + sx, top: r.top + sy, width: r.width, height: r.height };
+    };
+    var pushCand = function (list, e) {
+      if (!visOk(e)) return;
+      var rc = frameRectOf(e);
+      if (rc.width < 2 || rc.height < 2) return;
+      var lbl = e.getAttribute('data-om-frame-label');
+      if (lbl) rc.label = lbl;
+      list.push(rc);
+    };
+    var cands = [];
+    var marked = el.querySelectorAll('[data-om-frame-export]');
+    if (marked.length) {
+      for (var mk = 0; mk < marked.length; mk++) pushCand(cands, marked[mk]);
+    } else {
+      for (var k = 0; k < el.children.length; k++) {
+        var ch = el.children[k];
+        if (!authoredPx(ch, 'width') || !authoredPx(ch, 'height')) continue;
+        pushCand(cands, ch);
+      }
+    }
+    if (cands.length >= 2) {
+      return { kind: 'multi-frame', source: 'inferred', doc: doc, signals: signals,
+        frames: cands, authored: cands.map(function(){return{width:true,height:true}}) };
+    }
+  }
+
+  if (STAMP) el.setAttribute('data-om-frame', '');
+  return { kind: 'single-canvas', source: 'inferred', doc: doc, signals: signals,
+    frames: [rectOf(el)],
+    authored: [{ width: rootPxW, height: authoredPx(el, 'height') }] };
+})(); } catch (e) {}
+  var frame = null;
+  if (__m && __m.kind === 'single-canvas') {
+    var f = __m.frames && __m.frames[0];
+    if (f && f.width >= 200 && f.height >= 200) {
+      frame = f;
+      var fst = document.createElement('style');
+      fst.textContent = '@media print{@page{size:' + Math.ceil(f.width) + 'px ' +
+        Math.ceil(f.height) + 'px;margin:0}' +
+        'html,body,[data-om-frame-wrap]{padding:0!important;margin:0!important;background:none!important}' +
+        '[data-om-frame]{margin:0!important}}';
+      document.body.appendChild(fst);
+    }
+  }
+  // Relax break-inside on oversized elements. An element taller than a
+  // printable page can't honor break-inside: avoid — browsers either overflow
+  // it or push it whole to the next page, leaving a blank gap, then break it
+  // anyway at an arbitrary point. After the final layout (content revealed,
+  // animations jumped), find elements taller than a page that still compute
+  // break-inside: avoid and reset them to auto, so the browser breaks them at
+  // their children's boundaries instead (children keep their own avoid). PAGE_PX
+  // is a conservative portrait estimate at 96 CSS px/in — Letter/A4 usable
+  // height minus our 0.5in margins — so only clearly-oversized elements are
+  // touched and under-page elements still stay whole. Skipped for decks (slides
+  // are sized to the page) and for fixed-size canvases (frame set, or an author
+  // px-based @page) — runs as before for flowing docs on letter/A4.
+  try {
+    if (!ds && !frame && !(__m && __m.signals && __m.signals.pxPage)) {
+      const PAGE_PX = 1024;
+      // Our print defaults add a real @page margin only when the source has
+      // no @page of its own; computed style can't tell us (it reports screen
+      // media), so read the injected rule directly.
+      const defaults = document.querySelector('style[data-omelette-print-defaults]');
+      const pageInset = /@page\s*\{[^}]*margin/.test(defaults ? defaults.textContent || '' : '');
+      const SEL = 'section,article,figure,table,pre,blockquote,[class~="card" i],[class~="page" i],[class~="sheet" i]';
+      for (const el of document.body.querySelectorAll(SEL)) {
+        if (el instanceof HTMLElement && el.offsetHeight > PAGE_PX) {
+          el.setAttribute('data-om-oversized', '');
+          // Fake-paged docs simulate sheets with over-tall break-after:page
+          // boxes; honoring the break spills half-blank pages and ends a
+          // colored box mid-sheet. Flow them, and (only when we own the page
+          // inset) drop the redundant padding/background via the rule below.
+          const cs = getComputedStyle(el);
+          if (cs.breakAfter === 'page' || cs.pageBreakAfter === 'always') {
+            el.setAttribute('data-om-fakepage', '');
+          }
+        }
+      }
+      const ost = document.createElement('style');
+      ost.textContent = '@media print{' +
+        '[data-om-oversized]{break-inside:auto !important;page-break-inside:auto !important}' +
+        '[data-om-fakepage]{break-after:auto !important;page-break-after:auto !important}' +
+        (pageInset ? '[data-om-fakepage]{padding:0 !important;background:none !important}' : '') +
+        '}';
+      document.head.appendChild(ost);
+    }
+  } catch (e) {}
+  // macOS Preview renders Skia-PDF Luminosity soft-masks as opaque grey boxes;
+  // swap the CSS that triggers them for Preview-safe forms.
+  try {
+    for (const el of document.body.querySelectorAll('*')) {
+      const cs = getComputedStyle(el);
+
+      if (cs.boxShadow !== 'none' && cs.filter === 'none') {
+        const outs = [], kept = [];
+        for (const s of cs.boxShadow.split(/,(?![^(]*[)])/)) {
+          const t = s.trim();
+          const m = t.match(/^(rgba?[(][^)]+[)]) (-?[0-9.]+px) (-?[0-9.]+px) ([0-9.]+px) -?[0-9.]+px$/);
+          if (m && parseFloat(m[4]) > 0) outs.push('drop-shadow(' + m[2] + ' ' + m[3] + ' ' + m[4] + ' ' + m[1] + ')');
+          else kept.push(t);
+        }
+        if (outs.length) {
+          el.style.setProperty('filter', outs.join(' '), 'important');
+          el.style.setProperty('box-shadow', kept.join(', ') || 'none', 'important');
+        }
+      }
+
+      const mask = cs.maskImage && cs.maskImage !== 'none' ? cs.maskImage : cs.webkitMaskImage;
+      if (mask && mask !== 'none' && cs.filter === 'none') el.style.setProperty('filter', 'opacity(1)', 'important');
+    }
+  } catch (e) {}
+  setTimeout(() => { try { window.print(); } catch (e) {} }, 200);
+})();
+</script>
+</body>
+</html>

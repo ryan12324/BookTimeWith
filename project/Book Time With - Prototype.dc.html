@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics="">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f0ede6;font-family:'Libre Franklin',sans-serif;color:#26221c;min-height:100vh}
+a{color:#26221c;text-decoration:none}a:hover{color:#8a7a5c}
+input{font-family:'Libre Franklin',sans-serif}
+input:focus{outline:2px solid #8a7a5c;outline-offset:-1px}
+</style>
+</helmet>
+
+<div style="max-width:960px;margin:0 auto;padding:36px 32px 64px">
+
+  <!-- header + flow switcher -->
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px">
+    <div style="font:600 16px 'Source Serif 4',serif">booktimewith<span style="color:#a89f90">.com</span> </div>
+    <div style="display:flex;background:#fff;border:1px solid #ddd5c8;border-radius:7px;padding:3px;gap:3px">
+      <div onClick="{{ showOwner }}" style="padding:8px 16px;border-radius:5px;font:600 13px 'Libre Franklin',sans-serif;cursor:pointer;background:{{ ownerTabBg }};color:{{ ownerTabColor }}">1 · You set up</div>
+      <div onClick="{{ showClient }}" style="padding:8px 16px;border-radius:5px;font:600 13px 'Libre Franklin',sans-serif;cursor:pointer;background:{{ clientTabBg }};color:{{ clientTabColor }}">2 · Client books</div>
+      <div onClick="{{ showBookings }}" style="padding:8px 16px;border-radius:5px;font:600 13px 'Libre Franklin',sans-serif;cursor:pointer;background:{{ bookingsTabBg }};color:{{ bookingsTabColor }}">3 · Your bookings</div>
+      <div onClick="{{ showSettings }}" style="padding:8px 16px;border-radius:5px;font:600 13px 'Libre Franklin',sans-serif;cursor:pointer;background:{{ settingsTabBg }};color:{{ settingsTabColor }}">4 · Your settings</div>
+      <div onClick="{{ showManage }}" style="padding:8px 16px;border-radius:5px;font:600 13px 'Libre Franklin',sans-serif;cursor:pointer;background:{{ manageTabBg }};color:{{ manageTabColor }}">5 · Client manages</div>
+    </div>
+  </div>
+
+  <!-- ══════════ OWNER SETUP ══════════ -->
+  <sc-if value="{{ isOwner }}" hint-placeholder-val="{{ true }}">
+  <div style="margin-top:36px;display:grid;grid-template-columns:220px 1fr;gap:40px;align-items:start">
+
+    <!-- step rail -->
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <sc-for list="{{ ownerSteps }}" as="st" hint-placeholder-count="3">
+        <div onClick="{{ st.go }}" style="display:flex;gap:12px;align-items:baseline;padding:12px 14px;border-radius:7px;cursor:pointer;background:{{ st.bg }}">
+          <div style="font:600 12px 'Libre Franklin',sans-serif;color:#8a7a5c">{{ st.num }}</div>
+          <div>
+            <div style="font:600 13.5px 'Libre Franklin',sans-serif;color:{{ st.color }}">{{ st.title }}</div>
+            <div style="font:400 11.5px/1.4 'Libre Franklin',sans-serif;color:#a89f90;margin-top:2px">{{ st.sub }}</div>
+          </div>
+        </div>
+      </sc-for>
+      <div style="margin-top:18px;padding:14px;border-top:1px solid #ddd5c8;font:400 12px/1.6 'Libre Franklin',sans-serif;color:#a89f90;text-wrap:pretty">This is the whole setup. There is no step 4.</div>
+    </div>
+
+    <!-- step panel -->
+    <div style="background:#fff;border:1px solid #e6dfd3;border-radius:10px;box-shadow:0 12px 32px rgba(38,34,28,.06);padding:32px 36px;min-height:380px">
+
+      <sc-if value="{{ isStep1 }}" hint-placeholder-val="{{ true }}">
+        <div style="font:400 26px 'Source Serif 4',serif;letter-spacing:-.01em">Claim your link</div>
+        <div style="margin-top:8px;font:400 13.5px/1.6 'Libre Franklin',sans-serif;color:#6b6357;max-width:400px">This is the address clients will use. It's yours forever.</div>
+        <div style="margin-top:24px;display:flex;align-items:center;border:1px solid #ddd5c8;border-radius:7px;overflow:hidden;max-width:440px">
+          <div style="padding:14px 0 14px 16px;font:400 15px 'Libre Franklin',sans-serif;color:#a89f90;flex:none">booktimewith.link/</div>
+          <input value="{{ handle }}" onChange="{{ setHandle }}" placeholder="yourname" style="flex:1;border:none;padding:14px 16px 14px 2px;font:500 15px 'Libre Franklin',sans-serif;color:#26221c;min-width:0">
+        </div>
+        <div style="margin-top:10px;font:400 12px 'Libre Franklin',sans-serif;color:{{ handleHintColor }}">{{ handleHint }}</div>
+        <div onClick="{{ toStep2 }}" style="margin-top:28px;display:inline-block;padding:13px 24px;background:#26221c;color:#faf8f4;border-radius:6px;font:600 14px 'Libre Franklin',sans-serif;cursor:pointer" style-hover="background:#3d372e">Next: what you offer →</div>
+      </sc-if>
+
+      <sc-if value="{{ isStep2 }}" hint-placeholder-val="{{ false }}">
+        <div style="font:400 26px 'Source Serif 4',serif;letter-spacing:-.01em">Name your service</div>
+        <div style="margin-top:8px;font:400 13.5px/1.6 'Libre Franklin',sans-serif;color:#6b6357;max-width:400px">One service to start. You can add more later — most people don't need to.</div>
+        <div style="margin-top:24px;max-width:440px">
+          <div style="font:600 11.5px 'Libre Franklin',sans-serif;letter-spacing:.06em;color:#a89f90;margin-bottom:8px">SERVICE</div>
+          <input value="{{ service }}" onChange="{{ setService }}" style="width:100%;box-sizing:border-box;border:1px solid #ddd5c8;border-radius:7px;padding:14px 16px;font:500 15px 'Libre Franklin',sans-serif;color:#26221c">
+          <div style="font:600 11.5px 'Libre Franklin',sans-serif;letter-spacing:.06em;color:#a89f90;margin:20px 0 8px">LENGTH</div>
+          <div style="display:flex;align-items:center;gap:14px">
+            <div style="display:flex;align-items:center;border:1px solid #ddd5c8;border-radius:7px;overflow:hidden">
+              <div onClick="{{ durMinus }}" style="padding:12px 18px;font:600 17px 'Libre Franklin',sans-serif;color:#8a7a5c;cursor:pointer;user-select:none" style-hover="background:#f7f3ea">−</div>
+              <div style="padding:12px 8px;min-width:86px;text-align:center;font:600 15px 'Libre Franklin',sans-serif;color:#26221c;border-left:1px solid #efe9de;border-right:1px solid #efe9de">{{ durationLabel }}</div>
+              <div onClick="{{ durPlus }}" style="padding:12px 18px;font:600 17px 'Libre Franklin',sans-serif;color:#8a7a5c;cursor:pointer;user-select:none" style-hover="background:#f7f3ea">+</div>
+            </div>
+            <div style="font:400 12px 'Libre Franklin',sans-serif;color:#a89f90">Any length, in 5-minute steps.</div>
+          </div>
+          <div style="font:600 11.5px 'Libre Franklin',sans-serif;letter-spacing:.06em;color:#a89f90;margin:20px 0 8px">WHERE</div>
+          <div style="display:flex;gap:8px">
+            <sc-for list="{{ locations }}" as="loc" hint-placeholder-count="2">
+              <div onClick="{{ loc.pick }}" style="flex:1;padding:14px 16px;border:1px solid {{ loc.border }};background:{{ loc.bg }};border-radius:6px;cursor:pointer">
+                <div style="font:600 13.5px 'Libre Franklin',sans-serif;color:#26221c">{{ loc.title }}</div>
+                <div style="font:400 12px/1.5 'Libre Franklin',sans-serif;color:#a89f90;margin-top:3px">{{ loc.sub }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <sc-if value="{{ isAtMine }}" hint-placeholder-val="{{ true }}">
+            <div style="margin-top:12px">
+              <input value="{{ ownerAddress }}" onChange="{{ setOwnerAddress }}" placeholder="Your address, e.g. 12 Harley Street, London" style="width:100%;box-sizing:border-box;border:1px solid #ddd5c8;border-radius:7px;padding:12px 15px;font:500 13.5px 'Libre Franklin',sans-serif;color:#26221c">
+              <div style="margin-top:7px;font:400 11.5px 'Libre Franklin',sans-serif;color:#a89f90">Only shared after someone books.</div>
+            </div>
+          </sc-if>
+        </div>
+        <div onClick="{{ toStep3 }}" style="margin-top:28px;display:inline-block;padding:13px 24px;background:#26221c;color:#faf8f4;border-radius:6px;font:600 14px 'Libre Franklin',sans-serif;cursor:pointer" style-hover="background:#3d372e">Next: when you work →</div>
+      </sc-if>
+
+      <sc-if value="{{ isStep3 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px">
+          <div>
+            <div style="font:400 26px 'Source Serif 4',serif;letter-spacing:-.01em">Paint when you work</div>
+            <div style="margin-top:8px;font:400 13.5px/1.6 'Libre Franklin',sans-serif;color:#6b6357">Click or drag across the hours you take bookings — each block splits into half-hours. Everything else stays closed.</div>
+          </div>
+          <div style="font:400 12px 'Libre Franklin',sans-serif;color:#a89f90">{{ hoursSummary }}</div>
+        </div>
+        <div style="margin-top:18px;display:flex;align-items:center;gap:10px">
+          <div onClick="{{ toggleWeekends }}" style="display:flex;align-items:center;gap:9px;padding:9px 14px;border:1px solid {{ weekendBorder }};background:{{ weekendBg }};border-radius:6px;cursor:pointer">
+            <div style="width:30px;height:17px;border-radius:9px;background:{{ weekendTrack }};position:relative;flex:none;transition:background .15s">
+              <div style="position:absolute;top:2px;left:{{ weekendKnobLeft }};width:13px;height:13px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 1px 2px rgba(38,34,28,.25)"></div>
+            </div>
+            <div style="font:600 12.5px 'Libre Franklin',sans-serif;color:#26221c">We're open weekends</div>
+          </div>
+        </div>
+        <div onClick="{{ startEarlier }}" style="margin-top:16px;display:inline-block;padding:6px 12px;border:1px dashed #d6cdbc;border-radius:5px;font:600 11.5px 'Libre Franklin',sans-serif;color:#8a7a5c;cursor:pointer" style-hover="background:#f7f3ea">{{ earlierLabel }}</div>
+        <div style="margin-top:10px;display:grid;grid-template-columns:{{ gridCols }};gap:4px;user-select:none">
+          <div></div>
+          <sc-for list="{{ dayLabels }}" as="dl" hint-placeholder-count="7">
+            <div style="text-align:center;font:600 11.5px 'Libre Franklin',sans-serif;letter-spacing:.05em;color:#a89f90;padding-bottom:4px">{{ dl }}</div>
+          </sc-for>
+          <sc-for list="{{ gridRows }}" as="row" hint-placeholder-count="10">
+            <div style="font:400 11px 'Libre Franklin',sans-serif;color:#a89f90;text-align:right;padding:8px 8px 0 0">{{ row.label }}</div>
+            <sc-for list="{{ row.cells }}" as="cell">
+              <div style="height:30px;border-radius:4px;cursor:pointer;border:1px solid {{ cell.border }};overflow:hidden;display:flex;flex-direction:column">
+                <div onMouseDown="{{ cell.topDown }}" onMouseEnter="{{ cell.topEnter }}" style="flex:1;background:{{ cell.topBg }}"></div>
+                <div onMouseDown="{{ cell.botDown }}" onMouseEnter="{{ cell.botEnter }}" style="flex:1;background:{{ cell.botBg }}"></div>
+              </div>
+            </sc-for>
+          </sc-for>
+        </div>
+        <div onClick="{{ finishLater }}" style="margin-top:10px;display:inline-block;padding:6px 12px;border:1px dashed #d6cdbc;border-radius:5px;font:600 11.5px 'Libre Franklin',sans-serif;color:#8a7a5c;cursor:pointer" style-hover="background:#f7f3ea">{{ laterLabel }}</div>
+        <div style="margin-top:24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <div onClick="{{ goLive }}" style="padding:13px 24px;background:#8a7a5c;color:#faf8f4;border-radius:6px;font:600 14px 'Libre Franklin',sans-serif;cursor:pointer" style-hover="background:#776a50">You're done — go live</div>
+          <div style="font:400 12.5px 'Libre Franklin',sans-serif;color:#a89f90">Connect Google or Outlook later; busy time blocks itself.</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isLive }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align:center;padding:36px 0">
+          <div style="width:52px;height:52px;border-radius:50%;background:#8a7a5c;color:#faf8f4;display:grid;place-items:center;font:400 24px 'Source Serif 4',serif;margin:0 auto">✓</div>
+          <div style="margin-top:20px;font:400 30px 'Source Serif 4',serif;letter-spacing:-.01em">You're live.</div>
+          <div style="margin-top:10px;font:400 14px/1.6 'Libre Franklin',sans-serif;color:#6b6357">{{ liveSummary }}</div>
+          <div style="margin-top:22px;display:inline-flex;align-items:center;gap:10px;background:#faf8f4;border:1px solid #ddd5c8;border-radius:7px;padding:13px 18px;font:500 14.5px 'Libre Franklin',sans-serif">booktimewith.link/{{ handleShown }}<span style="font:600 11px 'Libre Franklin',sans-serif;letter-spacing:.06em;color:#8a7a5c;cursor:pointer">COPY</span></div>
+          <div onClick="{{ showClient }}" style="margin-top:26px;display:inline-block;padding:13px 24px;background:#26221c;color:#faf8f4;border-radius:6px;font:600 14px 'Libre Franklin',sans-serif;cursor:pointer" style-hover="background:#3d372e">See what clients see →</div>
+        </div>
+      </sc-if>
+
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ══════════ OWNER BOOKINGS ══════════ -->
+  <sc-if value="{{ isBookings }}" hint-placeholder-val="{{ false }}">
+  <div style="margin-top:36px;max-width:680px;margin-left:auto;margin-right:auto">
+    <div style="display:flex;justify-content:space-between;align-items:baseline">
+      <div style="font:400 28px 'Source Serif 4',serif;letter-spacing:-.01em">Your bookings</div>
+      <div style="font:400 12.5px 'Libre Franklin',sans-serif;color:#a89f90">{{ bookingsCount }}</div>
+    </div>
+
+    <div style="margin-top:20px;display:flex;flex-direction:column;gap:24px">
+      <sc-for list="{{ bookingGroups }}" as="grp" hint-placeholder-count="2">
+        <div>
+          <div style="font:600 11.5px 'Libre Franklin',sans-serif;letter-spacing:.06em;color:#a89f90;margin-bottom:8px">{{ grp.label }}</div>
+          <div style="background:#fff;border:1px solid #e6dfd3;border-radius:10px;box-shadow:0 12px 32px rgba(38,34,28,.05);overflow:hidden">
+            <sc-for list="{{ grp.rows }}" as="row">
+              <div style="border-top:1px solid #efe9de;margin-top:-1px">
+                <div style="display:flex;align-items:center;gap:16px;padding:16px 22px">
+                  <div style="font:600 14px 'Libre Franklin',sans-serif;color:{{ row.timeColor }};min-width:48px;text-decoration:{{ row.strike }}">{{ row.time }}</div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font:600 13.5px 'Libre Franklin',sans-serif;color:{{ row.nameColor }};text-decoration:{{ row.strike }}">{{ row.name }}</div>
+                    <div style="font:400 12px 'Libre Franklin',sans-serif;color:#a89f90;margin-top:2px">{{ row.meta }}</div>
+                  </div>
+                  <sc-if value="{{ row.isOk }}" hint-placeholder-val="{{ true }}">
+                    <div style="display:flex;gap:14px">
+                      <div onClick="{{ row.startMove }}" style="font:600 12px 'Libre Franklin',sans-serif;color:#8a7a5c;cursor:pointer" style-hover="color:#6b5d45">Move</div>
+                      <div onClick="{{ row.cancel }}" style="font:600 12px 'Libre Franklin',sans-serif;color:#a89f90;cursor:pointer" style-hover="color:#6b6357">Cancel</div>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ row.isCancelled }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;gap:14px;align-items:center">
+                      <div style="font:400 11.5px 'Libre Franklin',sans-serif;color:#a89f90">Cancelled · {{ row.firstName }} emailed</div>
+                      <div onClick="{{ row.undo }}" style="font:600 12px 'Libre Franklin',sans-serif;color:#8a7a5c;cursor:pointer">Undo</div>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ row.isMoved }}" hint-placeholder-val="{{ false }}">
+                    <div style="font:400 11.5px 'Libre Franklin',sans-serif;color:#8a7a5c">Moved to {{ row.movedTo }} · {{ row.firstName }} emailed</div>
+                  </sc-if>
+                </div>
+                <sc-if value="{{ row.isMoving }}" hint-placeholder-val="{{ false }}">
+                  <div style="padding:0 22px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                    <div style="font:400 12px 'Libre Franklin',sans-serif;color:#6b6357">Move to:</div>
+                    <sc-for list="{{ row.moveOptions }}" as="opt">
+                      <div onClick="{{ opt.pick }}" style="padding:8px 14px;border:1px solid #ddd5c8;border-radius:5px;font:600 12.5px 'Libre Franklin',sans-serif;color:#26221c;cursor:pointer" style-hover="background:#f7f3ea">{{ opt.label }}</div>
+                    </sc-for>
+                    <div onClick="{{ row.stopMove }}" style="font:600 12px 'Libre Franklin',sans-serif;color:#a89f90;cursor:pointer;margin-left:4px">never mind</div>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="margin-top:16px;text-align:center;font:400 11.5px/1.6 'Libre Franklin',sans-serif;color:#a89f90;text-wrap:pretty">Move or cancel here and the client gets a polite email with your reason and available times — you never have to write it.</div>
+  </div>
+  </sc-if>
+
+  <!-- ══════════ OWNER SETTINGS ══════════ -->
+  <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+  <div style="margin-top:36px;max-width:680px;margin-left:auto;margin-right:auto">
+    <div style="display:flex;justify-content:space-between;align-items:baseline">
+      <div style="font:400 28px 'Source Serif 4',serif;letter-spacing:-.01em">Settings</div>
+      <div style="font:400 12.5px 'Libre Franklin',sans-serif;color:#a89f90">This is all of them.</div>
+    </div>
+
+    <div style="margin-top:20px;background:#fff;border:1px solid #e6dfd3;border-radius:10px;box-shadow:0 12px 32px rgba(38,34,28,.06);padding:8px 36px 32px">
+
+      <div style="padding:26px 0 24px;border-bottom:1px solid #efe9de">
+        <div style="font:600 11.5px 'Libre Franklin',sans-serif;letter-spacing:.06em;color:#a89f90;margin-bottom:10px">YOUR LINK</div>
+        <div style="display:flex;align-items:center;border:1px solid #ddd5c8;border-radius:7px;overflow:hidden;max-width:420px">
+          <div style="padding:13px 0 13px 15px;font:400 14.5px 'Libre Franklin',sans-serif;color:#a89f90;flex:none">booktimewith.link/</div>
+          <input value="{{ handle }}" onChange="{{ setHandle }}" placeholder="yourname" style="flex:1;border:none;padding:13px 15px 13px 2px;font:500 14.5px 'Libre Franklin',sans-serif;color:#26221c;min-width:0">
+        </div>
+        <div style="margin-top:8px;font:400 11.5px 'Libre Franklin',sans-serif;color:#a89f90">Changing it redirects your old link for 90 days.</div>
+      </div>
+
+      <div style="padding:24px 0;border-bottom:1px solid #efe9de">
+        <div style="font:600 11.5px 'Libre Franklin',sans-serif;letter-spacing:.06em;color:#a89f90;margin-bottom:10px">YOUR SERVICE</div>
+        <input value="{{ service }}" onChange="{{ setService }}" style="width:100%;box-sizing:border-box;border:1px solid #ddd5c8;border-radius:7px;padding:13px 15px;font:500 14.5px 'Libre Franklin',sans-serif;color:#26221c;max-width:420px">
+        <div style="margin-top:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;border:1px solid #ddd5c8;border-radius:7px;overflow:hidden">
+            <div onClick="{{ durMinus }}" style="padding:11px 17px;font:600 16px 'Libre Franklin',sans-serif;color:#8a7a5c;cursor:pointer;user-select:none" style-hover="background:#f7f3ea">−</div>
+            <div style="padding:11px 8px;min-width:80px;text-align:center;font:600 14px 'Libre Franklin',sans-serif;color:#26221c;border-left:1px solid #efe9de;border-right:1px solid #efe9de">{{ durationLabel }}</div>
+            <div onClick="{{ durPlus }}" style="padding:11px 17px;font:600 16px 'Libre Franklin',sans-serif;color:#8a7a5c;cursor:pointer;user-select:none" style-hover="background:#f7f3ea">+</div>
+          </div>
+          <div style="display:flex;gap:8px;flex:1;min-width:280px">
+            <sc-for list="{{ locations }}" as="loc" hint-placeholder-count="2">
+              <div onClick="{{ loc.pick }}" style="flex:1;padding:11px 14px;border:1px solid {{ loc.border }};background:{{ loc.bg }};border-radius:6px;cursor:pointer;font:600 12.5px 'Libre Franklin',sans-serif;color:#26221c">{{ loc.title }}</div>
+            </sc-for>
+          </div>
+        </div>
+        <sc-if value="{{ isAtMine }}" hint-placeholder-val="{{ true }}">
+          <input value="{{ ownerAddress }}" onChange="{{ setOwnerAddress }}" placeholder="Your address, e.g. 12 Harley Street, London" style="margin-top:12px;width:100%;box-sizing:border-box;border:1px solid #ddd5c8;border-radius:7px;padding:12px 15px;font:500 13.5px 'Libre Franklin',sans-serif;color:#26221c;max-width:420px">
+        </sc-if>
+      </div>
+
+      <div style="padding:24px 0;border-bottom:1px solid #efe9de">
+        <div style="display:flex;justify-content:space-between;align-items:baseline">
+          <div style="font:600 11.5px 'Libre Franklin',sans-serif;letter-spacing:.06em;color:#a89f90">YOUR HOURS</div>
+          <div style="font:400 11.5px 'Libre Franklin',sans-serif;color:#a89f90">{{ hoursSummary }}</div>
+        </div>
+        <div style="margin-top:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <div onClick="{{ toggleWeekends }}" style="display:flex;align-items:center;gap:9px;padding:8px 13px;border:1px solid {{ weekendBorder }};background:{{ weekendBg }};border-radius:6px;cursor:pointer">
+            <div style="width:30px;height:17px;border-radius:9px;background:{{ weekendTrack }};position:relative;flex:none;transition:background .15s">
+              <div style="position:absolute;top:2px;left:{{ weekendKnobLeft }};width:13px;height:13px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 1px 2px rgba(38,34,28,.25)"></div>
+            </div>
+            <div style="font:600 12px 'Libre Franklin',sans-serif;color:#26221c">We're open weekends</div>
+          </div>
+          <div onClick="{{ startEarlier }}" style="padding:8px 12px;border:1px dashed #d6cdbc;border-radius:5px;font:600 11.5px 'Libre Franklin',sans-serif;color:#8a7a5c;cursor:pointer" style-hover="background:#f7f3ea">{{ earlierLabel }}</div>
+          <div onClick="{{ finishLater }}" style="padding:8px 12px;border:1px dashed #d6cdbc;border-radius:5px;font:600 11.5px 'Libre Franklin',sans-serif;color:#8a7a5c;cursor:pointer" style-hover="background:#f7f3ea">{{ laterLabel }}</div>
+        </div>
+        <div style="margin-top:14px;display:grid;grid-template-columns:{{ gridCols }};gap:4px;user-select:none">
+          <div></div>
+          <sc-for list="{{ dayLabels }}" as="dl" hint-placeholder-count="7">
+            <div style="text-align:center;font:600 11px 'Libre Franklin',sans-serif;letter-spacing:.05em;color:#a89f90;padding-bottom:4px">{{ dl }}</div>
+          </sc-for>
+          <sc-for list="{{ gridRows }}" as="row" hint-placeholder-count="10">
+            <div style="font:400 10.5px 'Libre Franklin',sans-serif;color:#a89f90;text-align:right;padding:7px 8px 0 0">{{ row.label }}</div>
+            <sc-for list="{{ row.cells }}" as="cell">
+              <div style="height:26px;border-radius:4px;cursor:pointer;border:1px solid {{ cell.border }};overflow:hidden;display:flex;flex-direction:column">
+                <div onMouseDown="{{ cell.topDown }}" onMouseEnter="{{ cell.topEnter }}" style="flex:1;background:{{ cell.topBg }}"></div>
+                <div onMouseDown="{{ cell.botDown }}" onMouseEnter="{{ cell.botEnter }}" style="flex:1;background:{{ cell.botBg }}"></div>
+              </div>
+            </sc-for>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="padding:24px 0;border-bottom:1px solid #efe9de">
+        <div style="font:600 11.5px 'Libre Franklin',sans-serif;letter-spacing:.06em;color:#a89f90;margin-bottom:10px">CALENDAR</div>
+        <sc-if value="{{ calDisconnected }}" hint-placeholder-val="{{ true }}">
+          <div style="font:400 13px/1.5 'Libre Franklin',sans-serif;color:#6b6357;margin-bottom:14px">Connect your calendar and busy time blocks itself — both ways.</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <sc-for list="{{ calProviders }}" as="cal" hint-placeholder-count="3">
+              <div onClick="{{ cal.connect }}" style="display:flex;align-items:center;gap:9px;padding:11px 18px;border:1px solid #ddd5c8;border-radius:6px;font:600 13px 'Libre Franklin',sans-serif;color:#26221c;cursor:pointer" style-hover="background:#faf8f4">
+                <div style="width:9px;height:9px;border-radius:2px;background:{{ cal.dot }};flex:none"></div>{{ cal.name }}
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ calConnected }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;background:#faf8f4;border:1px solid #efe9de;border-radius:8px;padding:14px 18px">
+            <div style="display:flex;align-items:center;gap:11px">
+              <div style="width:9px;height:9px;border-radius:50%;background:#8a7a5c;flex:none"></div>
+              <div>
+                <div style="font:600 13.5px 'Libre Franklin',sans-serif;color:#26221c">{{ calName }} connected</div>
+                <div style="font:400 12px 'Libre Franklin',sans-serif;color:#a89f90">Busy events block booking slots · bookings appear in your calendar</div>
+              </div>
+            </div>
+            <div onClick="{{ calDisconnect }}" style="font:600 12.5px 'Libre Franklin',sans-serif;color:#a89f90;cursor:pointer" style-hover="color:#6b6357">Disconnect</div>
+          </div>
+        </sc-if>
+      </div>
+
+      <div style="padding:24px 0;border-bottom:1px solid #efe9de">
+        <div style="font:600 11.5px 'Libre Franklin',sans-serif;letter-spacing:.06em;color:#a89f90;margin-bottom:14px">EMAILS TO YOU</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div onClick="{{ toggleNotifyBook }}" style="display:flex;align-items:center;gap:11px;cursor:pointer">
+            <div style="width:30px;height:17px;border-radius:9px;background:{{ notifyBookTrack }};position:relative;flex:none;transition:background .15s">
+              <div style="position:absolute;top:2px;left:{{ notifyBookKnob }};width:13px;height:13px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 1px 2px rgba(38,34,28,.25)"></div>
+            </div>
+            <div style="font:400 13.5px 'Libre Franklin',sans-serif;color:#26221c">When someone books, reschedules or cancels</div>
+          </div>
+          <div onClick="{{ toggleNotifyMorning }}" style="display:flex;align-items:center;gap:11px;cursor:pointer">
+            <div style="width:30px;height:17px;border-radius:9px;background:{{ notifyMorningTrack }};position:relative;flex:none;transition:background .15s">
+              <div style="position:absolute;top:2px;left:{{ notifyMorningKnob }};width:13px;height:13px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 1px 2px rgba(38,34,28,.25)"></div>
+            </div>
+            <div style="font:400 13.5px 'Libre Franklin',sans-serif;color:#26221c">Morning summary of the day's appointments</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding:24px 0 8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+        <div>
+          <div style="font:600 11.5px 'Libre Franklin',sans-serif;letter-spacing:.06em;color:#a89f90">YOUR PLAN</div>
+          <div style="margin-top:8px;font:400 14px 'Libre Franklin',sans-serif;color:#26221c">£6 a month · <span style="color:#6b6357">free trial ends 3 August</span></div>
+        </div>
+        <div style="display:flex;gap:16px;align-items:center">
+          <div style="font:600 12.5px 'Libre Franklin',sans-serif;color:#8a7a5c;cursor:pointer">Manage billing</div>
+          <div style="font:600 12.5px 'Libre Franklin',sans-serif;color:#a89f90;cursor:pointer">Delete account</div>
+        </div>
+      </div>
+
+    </div>
+    <div style="margin-top:14px;text-align:center;font:400 11.5px 'Libre Franklin',sans-serif;color:#a89f90">Changes save as you make them.</div>
+  </div>
+  </sc-if>
+
+  <!-- ══════════ CLIENT MANAGE ══════════ -->
+  <sc-if value="{{ isManage }}" hint-placeholder-val="{{ false }}">
+  <div style="margin-top:36px;display:flex;justify-content:center">
+    <div style="width:420px;max-width:100%">
+      <div style="text-align:center;font:400 12px 'Libre Franklin',sans-serif;color:#a89f90;margin-bottom:12px">the "Change or cancel" link from Alex's email — no account, no login</div>
+      <div style="background:#fff;border:1px solid #e6dfd3;border-radius:12px;box-shadow:0 16px 44px rgba(38,34,28,.09);overflow:hidden">
+
+        <div style="padding:22px 26px;border-bottom:1px solid #efe9de;display:flex;gap:14px;align-items:center">
+          <div style="width:44px;height:44px;border-radius:50%;background:repeating-linear-gradient(45deg,#e6dfd3,#e6dfd3 3px,#efe9de 3px,#efe9de 6px);flex:none"></div>
+          <div>
+            <div style="font:600 16px 'Source Serif 4',serif">{{ ownerName }}</div>
+            <div style="font:400 12.5px 'Libre Franklin',sans-serif;color:#a89f90">{{ serviceLine }}</div>
+          </div>
+        </div>
+
+        <sc-if value="{{ isManageView }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:22px 26px 26px">
+            <div style="font:600 11.5px 'Libre Franklin',sans-serif;letter-spacing:.06em;color:#a89f90;margin-bottom:10px">YOUR BOOKING</div>
+            <div style="background:#faf8f4;border:1px solid #efe9de;border-radius:8px;padding:16px 20px">
+              <div style="font:600 15px 'Libre Franklin',sans-serif;color:#26221c">{{ manageWhen }}</div>
+              <div style="margin-top:4px;font:400 13px 'Libre Franklin',sans-serif;color:#6b6357">{{ manageWhat }}</div>
+            </div>
+            <div onClick="{{ startReschedule }}" style="margin-top:16px;padding:13px 0;text-align:center;background:#26221c;color:#faf8f4;border-radius:7px;font:600 14px 'Libre Franklin',sans-serif;cursor:pointer" style-hover="background:#3d372e">Pick a new time</div>
+            <div onClick="{{ cancelBooking }}" style="margin-top:10px;padding:13px 0;text-align:center;border:1px solid #ddd5c8;border-radius:7px;font:600 14px 'Libre Franklin',sans-serif;color:#26221c;cursor:pointer" style-hover="background:#faf8f4">Cancel booking</div>
+            <div style="margin-top:12px;text-align:center;font:400 11.5px 'Libre Franklin',sans-serif;color:#a89f90">Free to change until 24 hours before.</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isManagePick }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:20px 26px 26px">
+            <div style="background:#f7f3ea;border:1px solid #e6dfd3;border-radius:7px;padding:11px 15px;font:400 12.5px 'Libre Franklin',sans-serif;color:#6b6357">Moving your {{ manageWhenShort }} booking <span onClick="{{ backToManage }}" style="color:#8a7a5c;font-weight:600;cursor:pointer;margin-left:6px">keep it</span></div>
+            <div style="margin-top:16px;display:flex;gap:7px">
+              <sc-for list="{{ mDays }}" as="day" hint-placeholder-count="3">
+                <div onClick="{{ day.pick }}" style="flex:1;padding:10px 0;text-align:center;border-radius:7px;cursor:pointer;background:{{ day.bg }};border:1px solid {{ day.border }}">
+                  <div style="font:600 11px 'Libre Franklin',sans-serif;letter-spacing:.05em;color:{{ day.subColor }}">{{ day.dow }}</div>
+                  <div style="font:600 15px 'Libre Franklin',sans-serif;color:{{ day.color }};margin-top:2px">{{ day.date }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="margin-top:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+              <sc-for list="{{ mSlots }}" as="slot" hint-placeholder-count="6">
+                <div onClick="{{ slot.pick }}" style="padding:11px 0;text-align:center;border:1px solid {{ slot.border }};background:{{ slot.bg }};color:{{ slot.color }};border-radius:6px;font:500 13.5px 'Libre Franklin',sans-serif;cursor:pointer">{{ slot.label }}</div>
+              </sc-for>
+            </div>
+            <div onClick="{{ confirmMove }}" style="margin-top:18px;padding:13px 0;text-align:center;background:{{ moveCtaBg }};color:#faf8f4;border-radius:7px;font:600 14px 'Libre Franklin',sans-serif;cursor:pointer">{{ moveCtaLabel }}</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isManageMoved }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:34px 26px;text-align:center">
+            <div style="width:48px;height:48px;border-radius:50%;background:#8a7a5c;color:#faf8f4;display:grid;place-items:center;font:400 22px 'Source Serif 4',serif;margin:0 auto">✓</div>
+            <div style="margin-top:18px;font:400 24px 'Source Serif 4',serif;letter-spacing:-.01em">Moved.</div>
+            <div style="margin-top:8px;font:400 13.5px/1.6 'Libre Franklin',sans-serif;color:#6b6357">{{ movedSummary }}</div>
+            <div style="margin-top:6px;font:400 12px 'Libre Franklin',sans-serif;color:#a89f90">Dana's been told. A fresh confirmation is in your inbox.</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isManageCancelled }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:34px 26px;text-align:center">
+            <div style="width:48px;height:48px;border-radius:50%;background:#e6dfd3;color:#6b6357;display:grid;place-items:center;font:400 22px 'Source Serif 4',serif;margin:0 auto">—</div>
+            <div style="margin-top:18px;font:400 24px 'Source Serif 4',serif;letter-spacing:-.01em">Cancelled.</div>
+            <div style="margin-top:8px;font:400 13.5px/1.6 'Libre Franklin',sans-serif;color:#6b6357">Your {{ manageWhenShort }} booking is gone. Dana's been told.</div>
+            <div onClick="{{ rebook }}" style="margin-top:20px;display:inline-block;font:600 12.5px 'Libre Franklin',sans-serif;color:#8a7a5c;cursor:pointer">Book a new time instead</div>
+          </div>
+        </sc-if>
+
+      </div>
+      <div style="margin-top:14px;text-align:center;font:400 11px 'Libre Franklin',sans-serif;color:#a89f90">powered by booktimewith.com</div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ══════════ CLIENT BOOKING ══════════ -->
+  <sc-if value="{{ isClient }}" hint-placeholder-val="{{ false }}">
+  <div style="margin-top:36px;display:flex;justify-content:center">
+    <div style="width:420px;max-width:100%">
+      <div style="text-align:center;font:400 12px 'Libre Franklin',sans-serif;color:#a89f90;margin-bottom:12px">booktimewith.link/{{ handleShown }} — what your clients see</div>
+      <div style="background:#fff;border:1px solid #e6dfd3;border-radius:12px;box-shadow:0 16px 44px rgba(38,34,28,.09);overflow:hidden">
+
+        <div style="padding:22px 26px;border-bottom:1px solid #efe9de;display:flex;gap:14px;align-items:center">
+          <div style="width:44px;height:44px;border-radius:50%;background:repeating-linear-gradient(45deg,#e6dfd3,#e6dfd3 3px,#efe9de 3px,#efe9de 6px);flex:none"></div>
+          <div>
+            <div style="font:600 16px 'Source Serif 4',serif">{{ ownerName }}</div>
+            <div style="font:400 12.5px 'Libre Franklin',sans-serif;color:#a89f90">{{ serviceLine }}</div>
+          </div>
+        </div>
+
+        <sc-if value="{{ isPicking }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:20px 26px 26px">
+            <div style="display:flex;gap:7px">
+              <sc-for list="{{ days }}" as="day" hint-placeholder-count="3">
+                <div onClick="{{ day.pick }}" style="flex:1;padding:10px 0;text-align:center;border-radius:7px;cursor:pointer;background:{{ day.bg }};border:1px solid {{ day.border }}">
+                  <div style="font:600 11px 'Libre Franklin',sans-serif;letter-spacing:.05em;color:{{ day.subColor }}">{{ day.dow }}</div>
+                  <div style="font:600 15px 'Libre Franklin',sans-serif;color:{{ day.color }};margin-top:2px">{{ day.date }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="margin-top:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+              <sc-for list="{{ slots }}" as="slot" hint-placeholder-count="6">
+                <div onClick="{{ slot.pick }}" style="padding:11px 0;text-align:center;border:1px solid {{ slot.border }};background:{{ slot.bg }};color:{{ slot.color }};border-radius:6px;font:500 13.5px 'Libre Franklin',sans-serif;cursor:pointer">{{ slot.label }}</div>
+              </sc-for>
+            </div>
+            <div onClick="{{ toDetails }}" style="margin-top:18px;padding:13px 0;text-align:center;background:{{ ctaBg }};color:#faf8f4;border-radius:7px;font:600 14px 'Libre Franklin',sans-serif;cursor:pointer">{{ ctaLabel }}</div>
+            <div style="margin-top:10px;text-align:center;font:400 11.5px 'Libre Franklin',sans-serif;color:#a89f90">No account needed. Ever.</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isDetails }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:20px 26px 26px">
+            <div style="background:#faf8f4;border:1px solid #efe9de;border-radius:7px;padding:12px 16px;font:400 13px 'Libre Franklin',sans-serif;color:#6b6357">{{ pickedSummary }} <span onClick="{{ backToPick }}" style="color:#8a7a5c;font-weight:600;cursor:pointer;margin-left:6px">change</span></div>
+            <div style="margin-top:18px;font:600 11.5px 'Libre Franklin',sans-serif;letter-spacing:.06em;color:#a89f90;margin-bottom:8px">YOUR NAME</div>
+            <input value="{{ clientName }}" onChange="{{ setClientName }}" placeholder="Alex Martin" style="width:100%;box-sizing:border-box;border:1px solid #ddd5c8;border-radius:7px;padding:13px 15px;font:500 14.5px 'Libre Franklin',sans-serif;color:#26221c">
+            <div style="margin-top:14px;font:600 11.5px 'Libre Franklin',sans-serif;letter-spacing:.06em;color:#a89f90;margin-bottom:8px">EMAIL</div>
+            <input value="{{ clientEmail }}" onChange="{{ setClientEmail }}" placeholder="alex@example.com" style="width:100%;box-sizing:border-box;border:1px solid #ddd5c8;border-radius:7px;padding:13px 15px;font:500 14.5px 'Libre Franklin',sans-serif;color:#26221c">
+            <sc-if value="{{ needsClientAddress }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:14px;font:600 11.5px 'Libre Franklin',sans-serif;letter-spacing:.06em;color:#a89f90;margin-bottom:8px">YOUR ADDRESS</div>
+              <input value="{{ clientAddress }}" onChange="{{ setClientAddress }}" placeholder="Where should Dana come?" style="width:100%;box-sizing:border-box;border:1px solid #ddd5c8;border-radius:7px;padding:13px 15px;font:500 14.5px 'Libre Franklin',sans-serif;color:#26221c">
+            </sc-if>
+            <div onClick="{{ confirm }}" style="margin-top:20px;padding:13px 0;text-align:center;background:{{ confirmBg }};color:#faf8f4;border-radius:7px;font:600 14px 'Libre Franklin',sans-serif;cursor:pointer">Confirm booking</div>
+            <div style="margin-top:10px;text-align:center;font:400 11.5px 'Libre Franklin',sans-serif;color:#a89f90">Two fields. That's the whole form.</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isBooked }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:34px 26px 34px;text-align:center">
+            <div style="width:48px;height:48px;border-radius:50%;background:#8a7a5c;color:#faf8f4;display:grid;place-items:center;font:400 22px 'Source Serif 4',serif;margin:0 auto">✓</div>
+            <div style="margin-top:18px;font:400 24px 'Source Serif 4',serif;letter-spacing:-.01em">Booked.</div>
+            <div style="margin-top:8px;font:400 13.5px/1.6 'Libre Franklin',sans-serif;color:#6b6357">{{ bookedSummary }}</div>
+            <div style="margin-top:6px;font:400 13px 'Libre Franklin',sans-serif;color:#6b6357">{{ bookedWhere }}</div>
+            <div style="margin-top:6px;font:400 12px 'Libre Franklin',sans-serif;color:#a89f90">Confirmation and a reminder are on their way to {{ clientEmailShown }}.</div>
+            <div onClick="{{ resetClient }}" style="margin-top:22px;display:inline-block;font:600 12.5px 'Libre Franklin',sans-serif;color:#8a7a5c;cursor:pointer">Book another time</div>
+          </div>
+        </sc-if>
+
+      </div>
+      <div style="margin-top:14px;text-align:center;font:400 11px 'Libre Franklin',sans-serif;color:#a89f90">powered by booktimewith.com</div>
+    </div>
+  </div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 1024, &quot;height&quot;: 780}}">
+class Component extends DCLogic {
+  state = {
+    view: 'owner',
+    ownerStep: 1,
+    handle: 'dana',
+    service: 'Therapy session',
+    duration: 50,
+    cells: { '1-9-a':1,'1-9-b':1,'1-10-a':1,'1-10-b':1,'1-11-a':1,'1-11-b':1,'1-12-a':1,'1-12-b':1,'2-9-a':1,'2-9-b':1,'2-10-a':1,'2-10-b':1,'2-11-a':1,'2-11-b':1,'2-12-a':1,'2-12-b':1,'2-14-a':1,'2-14-b':1,'2-15-a':1,'2-15-b':1,'3-9-a':1,'3-9-b':1,'3-10-a':1,'3-10-b':1,'3-11-a':1,'3-11-b':1,'3-12-a':1,'3-12-b':1,'4-14-a':1,'4-14-b':1,'4-15-a':1,'4-15-b':1,'4-16-a':1,'4-16-b':1 },
+    startHour: 8,
+    endHour: 18,
+    painting: null,
+    clientStep: 'pick',
+    day: 0,
+    slot: -1,
+    clientName: '',
+    clientEmail: '',
+    weekends: false,
+    location: 'mine',
+    ownerAddress: '',
+    clientAddress: '',
+    notifyBook: true,
+    notifyMorning: true,
+    calendar: null,
+    manageStep: 'view',
+    mDay: -1,
+    mSlot: -1,
+    bookings: [
+      { id: 1, grp: 'TODAY · TUESDAY 14', time: '10:00', name: 'Alex Martin', status: 'ok', moving: false, movedTo: '' },
+      { id: 2, grp: 'TODAY · TUESDAY 14', time: '1:00', name: 'Priya Shah', status: 'ok', moving: false, movedTo: '' },
+      { id: 3, grp: 'TODAY · TUESDAY 14', time: '3:30', name: 'Sam Reed', status: 'ok', moving: false, movedTo: '' },
+      { id: 4, grp: 'TOMORROW · WEDNESDAY 15', time: '10:00', name: 'Jordan Lee', status: 'ok', moving: false, movedTo: '' },
+      { id: 5, grp: 'TOMORROW · WEDNESDAY 15', time: '2:00', name: 'Maya Chen', status: 'ok', moving: false, movedTo: '' },
+    ],
+  };
+
+  componentDidMount() {
+    this._up = () => this.setState({ painting: null });
+    window.addEventListener('mouseup', this._up);
+  }
+  componentWillUnmount() { window.removeEventListener('mouseup', this._up); }
+
+  renderVals() {
+    const s = this.state;
+    const ink = '#26221c', paper = '#faf8f4', bronze = '#8a7a5c', line = '#ddd5c8', faint = '#a89f90';
+    const isOwner = s.view === 'owner';
+    const handleShown = (s.handle || 'yourname').trim() || 'yourname';
+    const serviceShown = s.service.trim() || 'Session';
+
+    // owner steps rail
+    const stepDefs = [
+      { num: '01', title: 'Claim your link', sub: 'booktimewith.link/' + handleShown },
+      { num: '02', title: 'Name your service', sub: serviceShown + ' · ' + this._fmtDur(s.duration) },
+      { num: '03', title: 'Paint your hours', sub: Object.keys(s.cells).length / 2 + ' hours open / week' },
+    ];
+    const curStep = s.ownerStep;
+    const ownerSteps = stepDefs.map((d, i) => ({
+      ...d,
+      bg: curStep === i + 1 ? '#fff' : 'transparent',
+      color: curStep === i + 1 ? ink : '#6b6357',
+      go: () => this.setState({ ownerStep: i + 1 }),
+    }));
+
+    // availability grid
+    const dayLabels = s.weekends
+      ? ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+      : ['MON', 'TUE', 'WED', 'THU', 'FRI'];
+    const hours = [];
+    for (let h = s.startHour; h < s.endHour; h++) hours.push(h);
+    const fmtH = (h) => ((h % 12) || 12) + (h < 12 ? 'am' : 'pm');
+    const half = (key, on) => ({
+      bg: on ? bronze : paper,
+      down: (e) => { e.preventDefault(); this._paint(key, !on); this.setState({ painting: !on ? 'add' : 'remove' }); },
+      enter: () => { if (s.painting) this._paint(key, s.painting === 'add'); },
+    });
+    const gridRows = hours.map((h) => ({
+      label: fmtH(h),
+      cells: dayLabels.map((_, c) => {
+        const kA = c + '-' + h + '-a', kB = c + '-' + h + '-b';
+        const onA = !!s.cells[kA], onB = !!s.cells[kB];
+        const a = half(kA, onA), b = half(kB, onB);
+        return {
+          border: onA && onB ? bronze : '#e6dfd3',
+          topBg: a.bg, topDown: a.down, topEnter: a.enter,
+          botBg: b.bg, botDown: b.down, botEnter: b.enter,
+        };
+      }),
+    }));
+    const openHours = Object.keys(s.cells).length / 2;
+    const openHoursLabel = openHours % 1 ? openHours.toFixed(1).replace('.0', '') : String(openHours);
+
+    // client booking data
+    const days = [
+      { dow: 'TUE', date: '14' }, { dow: 'WED', date: '15' }, { dow: 'THU', date: '16' },
+    ].map((d, i) => ({
+      ...d,
+      bg: s.day === i ? '#f3efe7' : '#fff',
+      border: s.day === i ? line : '#efe9de',
+      color: s.day === i ? ink : '#6b6357',
+      subColor: s.day === i ? bronze : faint,
+      pick: () => this.setState({ day: i, slot: -1 }),
+    }));
+    const slotSets = [
+      ['9:00', '10:00', '11:00', '1:00', '2:00', '3:30'],
+      ['10:00', '11:00', '2:00', '4:00'],
+      ['9:00', '12:00', '1:00', '3:00', '4:00'],
+    ];
+    const dayNames = ['Tuesday 14', 'Wednesday 15', 'Thursday 16'];
+    const slots = slotSets[s.day].map((label, i) => ({
+      label,
+      border: s.slot === i ? ink : line,
+      bg: s.slot === i ? ink : '#fff',
+      color: s.slot === i ? paper : ink,
+      pick: () => this.setState({ slot: i }),
+    }));
+    const hasSlot = s.slot >= 0;
+    const pickedTime = hasSlot ? slotSets[s.day][s.slot] : '';
+    const needsClientAddress = s.location === 'theirs';
+    const canConfirm = s.clientName.trim() && s.clientEmail.trim() && (!needsClientAddress || s.clientAddress.trim());
+
+    return {
+      // tabs
+      isOwner, isClient: s.view === 'client',
+      showOwner: () => this.setState({ view: 'owner' }),
+      showClient: () => this.setState({ view: 'client' }),
+      ownerTabBg: isOwner ? ink : 'transparent',
+      ownerTabColor: isOwner ? paper : '#6b6357',
+      clientTabBg: s.view === 'client' ? ink : 'transparent',
+      clientTabColor: s.view === 'client' ? paper : '#6b6357',
+      showBookings: () => this.setState({ view: 'bookings' }),
+      isBookings: s.view === 'bookings',
+      bookingsTabBg: s.view === 'bookings' ? ink : 'transparent',
+      bookingsTabColor: s.view === 'bookings' ? paper : '#6b6357',
+      showSettings: () => this.setState({ view: 'settings' }),
+      showManage: () => this.setState({ view: 'manage' }),
+      isSettings: s.view === 'settings',
+      isManage: s.view === 'manage',
+      settingsTabBg: s.view === 'settings' ? ink : 'transparent',
+      settingsTabColor: s.view === 'settings' ? paper : '#6b6357',
+      manageTabBg: s.view === 'manage' ? ink : 'transparent',
+      manageTabColor: s.view === 'manage' ? paper : '#6b6357',
+
+      // owner
+      ownerSteps,
+      isStep1: curStep === 1, isStep2: curStep === 2, isStep3: curStep === 3, isLive: curStep === 4,
+      handle: s.handle,
+      handleShown,
+      setHandle: (e) => this.setState({ handle: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') }),
+      handleHint: handleShown === 'yourname' ? 'Letters, numbers and dashes.' : '✓ booktimewith.link/' + handleShown + ' is available',
+      handleHintColor: handleShown === 'yourname' ? faint : bronze,
+      toStep2: () => this.setState({ ownerStep: 2 }),
+      service: s.service,
+      setService: (e) => this.setState({ service: e.target.value }),
+      durationLabel: this._fmtDur(s.duration),
+      durMinus: () => this.setState((p) => ({ duration: Math.max(15, p.duration - 5) })),
+      durPlus: () => this.setState((p) => ({ duration: Math.min(240, p.duration + 5) })),
+      toStep3: () => this.setState({ ownerStep: 3 }),
+      locations: [
+        { key: 'mine', title: 'Clients come to me', sub: 'Your address goes in their confirmation' },
+        { key: 'theirs', title: 'I go to clients', sub: 'They give their address when booking' },
+      ].map((l) => ({
+        ...l,
+        border: s.location === l.key ? ink : line,
+        bg: s.location === l.key ? '#f7f3ea' : '#fff',
+        pick: () => this.setState({ location: l.key }),
+      })),
+      isAtMine: s.location === 'mine',
+      ownerAddress: s.ownerAddress,
+      setOwnerAddress: (e) => this.setState({ ownerAddress: e.target.value }),
+      dayLabels, gridRows,
+      gridCols: '52px repeat(' + dayLabels.length + ',1fr)',
+      toggleWeekends: () => this.setState((p) => {
+        if (!p.weekends) return { weekends: true };
+        const cells = { ...p.cells };
+        Object.keys(cells).forEach((k) => { if (+k.split('-')[0] >= 5) delete cells[k]; });
+        return { weekends: false, cells };
+      }),
+      weekendBorder: s.weekends ? '#8a7a5c' : '#ddd5c8',
+      weekendBg: s.weekends ? '#f7f3ea' : '#fff',
+      weekendTrack: s.weekends ? '#8a7a5c' : '#d6cdbc',
+      weekendKnobLeft: s.weekends ? '15px' : '2px',
+      hoursSummary: openHoursLabel + ' hours open per week · half-hours count',
+      goLive: () => this.setState({ ownerStep: 4 }),
+      earlierLabel: '+ Start earlier (' + fmtH(s.startHour - 1) + ')',
+      laterLabel: '+ Finish later (' + fmtH(s.endHour) + ')',
+      startEarlier: () => this.setState((p) => ({ startHour: Math.max(5, p.startHour - 1) })),
+      finishLater: () => this.setState((p) => ({ endHour: Math.min(23, p.endHour + 1) })),
+      liveSummary: serviceShown + ' · ' + this._fmtDur(s.duration) + ' · ' + openHoursLabel + ' bookable hours a week.',
+
+      // client
+      ownerName: 'Dana Whitfield, LMFT',
+      serviceLine: serviceShown + ' · ' + this._fmtDur(s.duration),
+      isPicking: s.clientStep === 'pick',
+      isDetails: s.clientStep === 'details',
+      isBooked: s.clientStep === 'done',
+      days, slots,
+      ctaBg: hasSlot ? bronze : '#d6cdbc',
+      ctaLabel: hasSlot ? 'Book ' + dayNames[s.day].split(' ')[0] + ' at ' + pickedTime + ' →' : 'Pick a time',
+      toDetails: () => { if (hasSlot) this.setState({ clientStep: 'details' }); },
+      pickedSummary: serviceShown + ' · ' + dayNames[s.day] + ' at ' + pickedTime,
+      backToPick: () => this.setState({ clientStep: 'pick' }),
+      clientName: s.clientName,
+      clientEmail: s.clientEmail,
+      setClientName: (e) => this.setState({ clientName: e.target.value }),
+      setClientEmail: (e) => this.setState({ clientEmail: e.target.value }),
+      needsClientAddress,
+      clientAddress: s.clientAddress,
+      setClientAddress: (e) => this.setState({ clientAddress: e.target.value }),
+      confirmBg: canConfirm ? ink : '#d6cdbc',
+      confirm: () => { if (canConfirm) this.setState({ clientStep: 'done' }); },
+      bookedSummary: serviceShown + ' with Dana · ' + dayNames[s.day] + ' at ' + pickedTime + '.',
+      bookedWhere: needsClientAddress
+        ? 'Dana comes to you: ' + (s.clientAddress.trim() || 'your address')
+        : 'At ' + (s.ownerAddress.trim() || "Dana's practice") + ' — address is in your confirmation.',
+      clientEmailShown: s.clientEmail.trim() || 'your inbox',
+      resetClient: () => this.setState({ clientStep: 'pick', slot: -1 }),
+
+      // settings extras
+      toggleNotifyBook: () => this.setState((p) => ({ notifyBook: !p.notifyBook })),
+      toggleNotifyMorning: () => this.setState((p) => ({ notifyMorning: !p.notifyMorning })),
+      notifyBookTrack: s.notifyBook ? bronze : '#d6cdbc',
+      notifyBookKnob: s.notifyBook ? '15px' : '2px',
+      notifyMorningTrack: s.notifyMorning ? bronze : '#d6cdbc',
+      notifyMorningKnob: s.notifyMorning ? '15px' : '2px',
+
+      // owner bookings
+      bookingsCount: s.bookings.filter((b) => b.status !== 'cancelled').length + ' upcoming',
+      bookingGroups: [...new Set(s.bookings.map((b) => b.grp))].map((label) => ({
+        label,
+        rows: s.bookings.filter((b) => b.grp === label).map((b) => ({
+          time: b.time,
+          name: b.name,
+          firstName: b.name.split(' ')[0],
+          meta: serviceShown + ' · ' + this._fmtDur(s.duration),
+          isOk: b.status === 'ok',
+          isCancelled: b.status === 'cancelled',
+          isMoved: b.status === 'moved',
+          isMoving: b.moving,
+          movedTo: b.movedTo,
+          strike: b.status === 'cancelled' ? 'line-through' : 'none',
+          timeColor: b.status === 'cancelled' ? faint : ink,
+          nameColor: b.status === 'cancelled' ? faint : ink,
+          startMove: () => this._setBooking(b.id, { moving: true }),
+          stopMove: () => this._setBooking(b.id, { moving: false }),
+          cancel: () => this._setBooking(b.id, { status: 'cancelled', moving: false }),
+          undo: () => this._setBooking(b.id, { status: 'ok' }),
+          moveOptions: ['11:00', '2:00', '4:30', 'Thu 9:00'].filter((t) => t !== b.time).slice(0, 3).map((t) => ({
+            label: t,
+            pick: () => this._setBooking(b.id, { status: 'moved', moving: false, movedTo: t }),
+          })),
+        })),
+      })),
+
+      // calendar
+      calDisconnected: !s.calendar,
+      calConnected: !!s.calendar,
+      calName: s.calendar,
+      calProviders: [
+        { name: 'Google Calendar', dot: '#4285f4' },
+        { name: 'Outlook', dot: '#0f6cbd' },
+        { name: 'Apple Calendar', dot: '#a2a2a7' },
+      ].map((c) => ({ ...c, connect: () => this.setState({ calendar: c.name }) })),
+      calDisconnect: () => this.setState({ calendar: null }),
+
+      // client manage
+      isManageView: s.manageStep === 'view',
+      isManagePick: s.manageStep === 'pick',
+      isManageMoved: s.manageStep === 'moved',
+      isManageCancelled: s.manageStep === 'cancelled',
+      manageWhen: 'Tuesday, July 14 · 10:00 – 10:50',
+      manageWhenShort: 'Tuesday 10:00',
+      manageWhat: serviceShown + ' with Dana · booked by Alex Martin',
+      startReschedule: () => this.setState({ manageStep: 'pick', mDay: 0, mSlot: -1 }),
+      cancelBooking: () => this.setState({ manageStep: 'cancelled' }),
+      backToManage: () => this.setState({ manageStep: 'view' }),
+      mDays: [
+        { dow: 'TUE', date: '14' }, { dow: 'WED', date: '15' }, { dow: 'THU', date: '16' },
+      ].map((d, i) => ({
+        ...d,
+        bg: s.mDay === i ? '#f3efe7' : '#fff',
+        border: s.mDay === i ? line : '#efe9de',
+        color: s.mDay === i ? ink : '#6b6357',
+        subColor: s.mDay === i ? bronze : faint,
+        pick: () => this.setState({ mDay: i, mSlot: -1 }),
+      })),
+      mSlots: (s.mDay >= 0 ? slotSets[s.mDay] : slotSets[0]).map((label, i) => ({
+        label,
+        border: s.mSlot === i ? ink : line,
+        bg: s.mSlot === i ? ink : '#fff',
+        color: s.mSlot === i ? paper : ink,
+        pick: () => this.setState({ mSlot: i }),
+      })),
+      moveCtaBg: s.mSlot >= 0 ? bronze : '#d6cdbc',
+      moveCtaLabel: s.mSlot >= 0 ? 'Move to ' + dayNames[s.mDay].split(' ')[0] + ' at ' + slotSets[s.mDay][s.mSlot] + ' →' : 'Pick a new time',
+      confirmMove: () => { if (s.mSlot >= 0) this.setState({ manageStep: 'moved' }); },
+      movedSummary: serviceShown + ' with Dana · now ' + (s.mSlot >= 0 ? dayNames[s.mDay] + ' at ' + slotSets[s.mDay][s.mSlot] : '') + '.',
+      rebook: () => this.setState({ manageStep: 'pick', mDay: 0, mSlot: -1 }),
+    };
+  }
+
+  _fmtDur(m) {
+    if (m < 60) return m + ' min';
+    const h = Math.floor(m / 60), r = m % 60;
+    return r ? h + ' hr ' + r : h + ' hr';
+  }
+
+  _setBooking(id, patch) {
+    this.setState((prev) => ({
+      bookings: prev.bookings.map((b) => (b.id === id ? { ...b, ...patch } : b)),
+    }));
+  }
+
+  _paint(key, add) {
+    this.setState((prev) => {
+      const cells = { ...prev.cells };
+      if (add) cells[key] = 1; else delete cells[key];
+      return { cells };
+    });
+  }
+}
+</script>
+</body>
+</html>

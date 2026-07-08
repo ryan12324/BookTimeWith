@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#e9e5dc;font-family:'Libre Franklin',sans-serif;color:#26221c}
+a{color:#26221c;text-decoration:none}a:hover{color:#8a7a5c}
+</style>
+</helmet>
+
+<div style="padding:44px 48px 64px">
+  <div style="font:600 15px 'Libre Franklin',sans-serif;margin-bottom:6px">Transactional emails</div>
+  <div style="font:400 12.5px/1.5 'Libre Franklin',sans-serif;color:#6b6357;max-width:640px;margin-bottom:32px">Eight emails, one system. Every client email carries a magic manage link — reschedule or cancel with no account. Billing emails follow the same honest voice: no urgency theatre, clear grace periods, nothing deleted silently.</div>
+
+  <div style="font:600 13px 'Libre Franklin',sans-serif;color:#26221c;margin-bottom:14px">Booking emails</div>
+  <div style="display:flex;flex-wrap:wrap;gap:36px;align-items:flex-start">
+
+    <!-- ═══ 1 · CLIENT CONFIRMATION ═══ -->
+    <div style="width:520px">
+      <div style="font:600 11px 'Libre Franklin',sans-serif;letter-spacing:.08em;color:#8a7a5c;margin-bottom:10px">TO CLIENT · ON BOOKING</div>
+      <div style="background:#fff;border:1px solid #ddd5c8;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(38,34,28,.05)">
+        <div style="padding:14px 22px;border-bottom:1px solid #efe9de;font:400 11.5px 'Libre Franklin',sans-serif;color:#a89f90">
+          <div><span style="color:#6b6357;font-weight:600">From:</span> Dana Whitfield via booktimewith.com</div>
+          <div style="margin-top:3px"><span style="color:#6b6357;font-weight:600">Subject:</span> <span style="color:#26221c;font-weight:500">You're booked — Tuesday, July 14 at 10:00</span></div>
+        </div>
+        <div style="padding:36px 40px 32px;background:#faf8f4">
+          <div style="font:400 26px 'Source Serif 4',serif;letter-spacing:-.01em">You're booked, Alex.</div>
+          <div style="margin-top:20px;background:#fff;border:1px solid #e6dfd3;border-radius:8px;padding:20px 24px">
+            <div style="font:600 13.5px 'Source Serif 4',serif;font-size:16px">Therapy session with Dana Whitfield</div>
+            <div style="margin-top:10px;font:400 14px/1.7 'Libre Franklin',sans-serif;color:#6b6357">
+              <div><span style="color:#26221c;font-weight:600">Tuesday, July 14</span> · 10:00 – 10:50</div>
+              <div>Video call — the link arrives with your reminder</div>
+            </div>
+          </div>
+          <div style="margin-top:18px;display:flex;gap:10px">
+            <div style="padding:11px 18px;background:#26221c;color:#faf8f4;border-radius:6px;font:600 13px 'Libre Franklin',sans-serif">Add to calendar</div>
+            <div style="padding:11px 18px;border:1px solid #ddd5c8;border-radius:6px;font:600 13px 'Libre Franklin',sans-serif;color:#26221c">Change or cancel</div>
+          </div>
+          <div style="margin-top:16px;font:400 12px/1.6 'Libre Franklin',sans-serif;color:#a89f90;text-wrap:pretty">Plans change — the button above lets you pick a new time or cancel in two taps. No account, no phone call needed.</div>
+        </div>
+        <div style="padding:14px 40px;border-top:1px solid #efe9de;background:#faf8f4;font:400 11px 'Libre Franklin',sans-serif;color:#a89f90">Booked at booktimewith.link/dana · powered by booktimewith.com</div>
+      </div>
+    </div>
+
+    <!-- ═══ 2 · CLIENT REMINDER ═══ -->
+    <div style="width:520px">
+      <div style="font:600 11px 'Libre Franklin',sans-serif;letter-spacing:.08em;color:#8a7a5c;margin-bottom:10px">TO CLIENT · 24H BEFORE</div>
+      <div style="background:#fff;border:1px solid #ddd5c8;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(38,34,28,.05)">
+        <div style="padding:14px 22px;border-bottom:1px solid #efe9de;font:400 11.5px 'Libre Franklin',sans-serif;color:#a89f90">
+          <div><span style="color:#6b6357;font-weight:600">From:</span> Dana Whitfield via booktimewith.com</div>
+          <div style="margin-top:3px"><span style="color:#6b6357;font-weight:600">Subject:</span> <span style="color:#26221c;font-weight:500">Tomorrow at 10:00 — your session with Dana</span></div>
+        </div>
+        <div style="padding:36px 40px 32px;background:#faf8f4">
+          <div style="font:400 26px 'Source Serif 4',serif;letter-spacing:-.01em">See you tomorrow at 10:00.</div>
+          <div style="margin-top:20px;background:#fff;border:1px solid #e6dfd3;border-radius:8px;padding:20px 24px">
+            <div style="font:600 16px 'Source Serif 4',serif">Therapy session with Dana Whitfield</div>
+            <div style="margin-top:10px;font:400 14px/1.7 'Libre Franklin',sans-serif;color:#6b6357">
+              <div><span style="color:#26221c;font-weight:600">Tuesday, July 14</span> · 10:00 – 10:50</div>
+            </div>
+            <div style="margin-top:14px;padding:12px 0;text-align:center;background:#8a7a5c;color:#faf8f4;border-radius:6px;font:600 13.5px 'Libre Franklin',sans-serif">Join video call</div>
+          </div>
+          <div style="margin-top:18px;display:flex;gap:10px;align-items:center">
+            <div style="padding:11px 18px;border:1px solid #ddd5c8;border-radius:6px;font:600 13px 'Libre Franklin',sans-serif;color:#26221c">Change or cancel</div>
+            <div style="font:400 12px 'Libre Franklin',sans-serif;color:#a89f90">Free until 24 hours before</div>
+          </div>
+        </div>
+        <div style="padding:14px 40px;border-top:1px solid #efe9de;background:#faf8f4;font:400 11px 'Libre Franklin',sans-serif;color:#a89f90">Booked at booktimewith.link/dana · powered by booktimewith.com</div>
+      </div>
+    </div>
+
+    <!-- ═══ 3 · OWNER NEW BOOKING ═══ -->
+    <div style="width:520px">
+      <div style="font:600 11px 'Libre Franklin',sans-serif;letter-spacing:.08em;color:#8a7a5c;margin-bottom:10px">TO OWNER · ON BOOKING</div>
+      <div style="background:#fff;border:1px solid #ddd5c8;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(38,34,28,.05)">
+        <div style="padding:14px 22px;border-bottom:1px solid #efe9de;font:400 11.5px 'Libre Franklin',sans-serif;color:#a89f90">
+          <div><span style="color:#6b6357;font-weight:600">From:</span> booktimewith.com</div>
+          <div style="margin-top:3px"><span style="color:#6b6357;font-weight:600">Subject:</span> <span style="color:#26221c;font-weight:500">New booking — Alex Martin, Tue Jul 14 at 10:00</span></div>
+        </div>
+        <div style="padding:36px 40px 32px;background:#faf8f4">
+          <div style="font:400 26px 'Source Serif 4',serif;letter-spacing:-.01em">Alex Martin booked you.</div>
+          <div style="margin-top:20px;background:#fff;border:1px solid #e6dfd3;border-radius:8px;padding:20px 24px">
+            <div style="font:600 16px 'Source Serif 4',serif">Therapy session · 50 min</div>
+            <div style="margin-top:10px;font:400 14px/1.7 'Libre Franklin',sans-serif;color:#6b6357">
+              <div><span style="color:#26221c;font-weight:600">Tuesday, July 14</span> · 10:00 – 10:50</div>
+              <div>Alex Martin · alex@example.com</div>
+            </div>
+          </div>
+          <div style="margin-top:18px;display:flex;gap:10px">
+            <div style="padding:11px 18px;border:1px solid #ddd5c8;border-radius:6px;font:600 13px 'Libre Franklin',sans-serif;color:#26221c">Reschedule</div>
+            <div style="padding:11px 18px;border:1px solid #ddd5c8;border-radius:6px;font:600 13px 'Libre Franklin',sans-serif;color:#26221c">Cancel</div>
+          </div>
+          <div style="margin-top:16px;font:400 12px/1.6 'Libre Franklin',sans-serif;color:#a89f90;text-wrap:pretty">It's already on your calendar. If you reschedule or cancel, Alex gets a polite email with your available times — you never have to write it.</div>
+        </div>
+        <div style="padding:14px 40px;border-top:1px solid #efe9de;background:#faf8f4;font:400 11px 'Libre Franklin',sans-serif;color:#a89f90">booktimewith.link/dana · notification settings</div>
+      </div>
+    </div>
+
+    <!-- ═══ 4 · OWNER MORNING REMINDER ═══ -->
+    <div style="width:520px">
+      <div style="font:600 11px 'Libre Franklin',sans-serif;letter-spacing:.08em;color:#8a7a5c;margin-bottom:10px">TO OWNER · MORNING OF</div>
+      <div style="background:#fff;border:1px solid #ddd5c8;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(38,34,28,.05)">
+        <div style="padding:14px 22px;border-bottom:1px solid #efe9de;font:400 11.5px 'Libre Franklin',sans-serif;color:#a89f90">
+          <div><span style="color:#6b6357;font-weight:600">From:</span> booktimewith.com</div>
+          <div style="margin-top:3px"><span style="color:#6b6357;font-weight:600">Subject:</span> <span style="color:#26221c;font-weight:500">Today: 3 sessions, first at 10:00</span></div>
+        </div>
+        <div style="padding:36px 40px 32px;background:#faf8f4">
+          <div style="font:400 26px 'Source Serif 4',serif;letter-spacing:-.01em">Tuesday: three sessions.</div>
+          <div style="margin-top:20px;background:#fff;border:1px solid #e6dfd3;border-radius:8px;overflow:hidden">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 24px;border-bottom:1px solid #efe9de">
+              <div style="font:400 14px 'Libre Franklin',sans-serif"><span style="font-weight:600">10:00</span> <span style="color:#6b6357">· Alex Martin</span></div>
+              <div style="font:400 12px 'Libre Franklin',sans-serif;color:#a89f90">Therapy session</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 24px;border-bottom:1px solid #efe9de">
+              <div style="font:400 14px 'Libre Franklin',sans-serif"><span style="font-weight:600">1:00</span> <span style="color:#6b6357">· Priya Shah</span></div>
+              <div style="font:400 12px 'Libre Franklin',sans-serif;color:#a89f90">Therapy session</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 24px">
+              <div style="font:400 14px 'Libre Franklin',sans-serif"><span style="font-weight:600">3:30</span> <span style="color:#6b6357">· Sam Reed</span></div>
+              <div style="font:400 12px 'Libre Franklin',sans-serif;color:#a89f90">Therapy session</div>
+            </div>
+          </div>
+          <div style="margin-top:18px;display:flex;gap:10px;align-items:center">
+            <div style="padding:11px 18px;border:1px solid #ddd5c8;border-radius:6px;font:600 13px 'Libre Franklin',sans-serif;color:#26221c">Open your day</div>
+            <div style="font:400 12px 'Libre Franklin',sans-serif;color:#a89f90">Everyone's been reminded already</div>
+          </div>
+        </div>
+        <div style="padding:14px 40px;border-top:1px solid #efe9de;background:#faf8f4;font:400 11px 'Libre Franklin',sans-serif;color:#a89f90">booktimewith.link/dana · notification settings</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="font:600 13px 'Libre Franklin',sans-serif;color:#26221c;margin:40px 0 14px">Billing emails</div>
+  <div style="display:flex;flex-wrap:wrap;gap:36px;align-items:flex-start">
+
+    <!-- ═══ 5 · TRIAL ENDING ═══ -->
+    <div style="width:520px">
+      <div style="font:600 11px 'Libre Franklin',sans-serif;letter-spacing:.08em;color:#8a7a5c;margin-bottom:10px">TO OWNER · 7 DAYS BEFORE TRIAL ENDS</div>
+      <div style="background:#fff;border:1px solid #ddd5c8;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(38,34,28,.05)">
+        <div style="padding:14px 22px;border-bottom:1px solid #efe9de;font:400 11.5px 'Libre Franklin',sans-serif;color:#a89f90">
+          <div><span style="color:#6b6357;font-weight:600">From:</span> booktimewith.com</div>
+          <div style="margin-top:3px"><span style="color:#6b6357;font-weight:600">Subject:</span> <span style="color:#26221c;font-weight:500">Your free month ends Monday, August 3</span></div>
+        </div>
+        <div style="padding:36px 40px 32px;background:#faf8f4">
+          <div style="font:400 26px 'Source Serif 4',serif;letter-spacing:-.01em">Your free month ends Monday.</div>
+          <div style="margin-top:14px;font:400 14px/1.7 'Libre Franklin',sans-serif;color:#6b6357;text-wrap:pretty">Since July 3 your link has taken <span style="color:#26221c;font-weight:600">14 bookings</span>. If that's been useful, keeping it is £6 a month — add a card and nothing changes.</div>
+          <div style="margin-top:20px;display:flex;gap:10px">
+            <div style="padding:11px 18px;background:#26221c;color:#faf8f4;border-radius:6px;font:600 13px 'Libre Franklin',sans-serif">Add a card — £6/mo</div>
+          </div>
+          <div style="margin-top:16px;font:400 12px/1.6 'Libre Franklin',sans-serif;color:#a89f90;text-wrap:pretty">If you do nothing, your booking page pauses on August 3. Your link and settings are kept for 90 days, so you can pick up where you left off.</div>
+        </div>
+        <div style="padding:14px 40px;border-top:1px solid #efe9de;background:#faf8f4;font:400 11px 'Libre Franklin',sans-serif;color:#a89f90">booktimewith.link/dana · billing settings</div>
+      </div>
+    </div>
+
+    <!-- ═══ 6 · RECEIPT ═══ -->
+    <div style="width:520px">
+      <div style="font:600 11px 'Libre Franklin',sans-serif;letter-spacing:.08em;color:#8a7a5c;margin-bottom:10px">TO OWNER · MONTHLY RECEIPT</div>
+      <div style="background:#fff;border:1px solid #ddd5c8;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(38,34,28,.05)">
+        <div style="padding:14px 22px;border-bottom:1px solid #efe9de;font:400 11.5px 'Libre Franklin',sans-serif;color:#a89f90">
+          <div><span style="color:#6b6357;font-weight:600">From:</span> booktimewith.com</div>
+          <div style="margin-top:3px"><span style="color:#6b6357;font-weight:600">Subject:</span> <span style="color:#26221c;font-weight:500">Receipt — £6.00, August</span></div>
+        </div>
+        <div style="padding:36px 40px 32px;background:#faf8f4">
+          <div style="font:400 26px 'Source Serif 4',serif;letter-spacing:-.01em">Paid. Nothing to do.</div>
+          <div style="margin-top:20px;background:#fff;border:1px solid #e6dfd3;border-radius:8px;padding:20px 24px">
+            <div style="display:flex;justify-content:space-between;font:400 14px 'Libre Franklin',sans-serif;color:#6b6357">
+              <span>booktimewith · August 2026</span><span style="color:#26221c;font-weight:600">£6.00</span>
+            </div>
+            <div style="margin-top:8px;display:flex;justify-content:space-between;font:400 12.5px 'Libre Franklin',sans-serif;color:#a89f90">
+              <span>Visa ending 4242 · August 3</span><span>VAT included</span>
+            </div>
+          </div>
+          <div style="margin-top:18px;display:flex;gap:14px;align-items:center">
+            <div style="padding:11px 18px;border:1px solid #ddd5c8;border-radius:6px;font:600 13px 'Libre Franklin',sans-serif;color:#26221c">Download invoice (PDF)</div>
+            <div style="font:400 12px 'Libre Franklin',sans-serif;color:#a89f90">For your accountant</div>
+          </div>
+        </div>
+        <div style="padding:14px 40px;border-top:1px solid #efe9de;background:#faf8f4;font:400 11px 'Libre Franklin',sans-serif;color:#a89f90">booktimewith.link/dana · billing settings</div>
+      </div>
+    </div>
+
+    <!-- ═══ 7 · PAYMENT FAILED ═══ -->
+    <div style="width:520px">
+      <div style="font:600 11px 'Libre Franklin',sans-serif;letter-spacing:.08em;color:#8a7a5c;margin-bottom:10px">TO OWNER · PAYMENT FAILED</div>
+      <div style="background:#fff;border:1px solid #ddd5c8;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(38,34,28,.05)">
+        <div style="padding:14px 22px;border-bottom:1px solid #efe9de;font:400 11.5px 'Libre Franklin',sans-serif;color:#a89f90">
+          <div><span style="color:#6b6357;font-weight:600">From:</span> booktimewith.com</div>
+          <div style="margin-top:3px"><span style="color:#6b6357;font-weight:600">Subject:</span> <span style="color:#26221c;font-weight:500">Your card didn't go through — no rush</span></div>
+        </div>
+        <div style="padding:36px 40px 32px;background:#faf8f4">
+          <div style="font:400 26px 'Source Serif 4',serif;letter-spacing:-.01em">Your card didn't go through.</div>
+          <div style="margin-top:14px;font:400 14px/1.7 'Libre Franklin',sans-serif;color:#6b6357;text-wrap:pretty">It happens — expired card, new bank. <span style="color:#26221c;font-weight:600">Your booking page keeps working for 14 days</span> while we retry, so no client will notice anything.</div>
+          <div style="margin-top:20px;display:flex;gap:10px">
+            <div style="padding:11px 18px;background:#26221c;color:#faf8f4;border-radius:6px;font:600 13px 'Libre Franklin',sans-serif">Update card</div>
+          </div>
+          <div style="margin-top:16px;font:400 12px/1.6 'Libre Franklin',sans-serif;color:#a89f90;text-wrap:pretty">We'll retry on August 6 and August 10. If it still fails, your page pauses — nothing is deleted.</div>
+        </div>
+        <div style="padding:14px 40px;border-top:1px solid #efe9de;background:#faf8f4;font:400 11px 'Libre Franklin',sans-serif;color:#a89f90">booktimewith.link/dana · billing settings</div>
+      </div>
+    </div>
+
+    <!-- ═══ 8 · CANCELLED ═══ -->
+    <div style="width:520px">
+      <div style="font:600 11px 'Libre Franklin',sans-serif;letter-spacing:.08em;color:#8a7a5c;margin-bottom:10px">TO OWNER · ON CANCELLATION</div>
+      <div style="background:#fff;border:1px solid #ddd5c8;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(38,34,28,.05)">
+        <div style="padding:14px 22px;border-bottom:1px solid #efe9de;font:400 11.5px 'Libre Franklin',sans-serif;color:#a89f90">
+          <div><span style="color:#6b6357;font-weight:600">From:</span> booktimewith.com</div>
+          <div style="margin-top:3px"><span style="color:#6b6357;font-weight:600">Subject:</span> <span style="color:#26221c;font-weight:500">Cancelled — your page runs until September 3</span></div>
+        </div>
+        <div style="padding:36px 40px 32px;background:#faf8f4">
+          <div style="font:400 26px 'Source Serif 4',serif;letter-spacing:-.01em">Done — you're cancelled.</div>
+          <div style="margin-top:14px;font:400 14px/1.7 'Libre Franklin',sans-serif;color:#6b6357;text-wrap:pretty">No wind-down tricks: you've paid to September 3, so your page works until then. Booked appointments still happen and reminders still go out.</div>
+          <div style="margin-top:20px;display:flex;gap:10px">
+            <div style="padding:11px 18px;border:1px solid #ddd5c8;border-radius:6px;font:600 13px 'Libre Franklin',sans-serif;color:#26221c">Export your bookings (CSV)</div>
+          </div>
+          <div style="margin-top:16px;font:400 12px/1.6 'Libre Franklin',sans-serif;color:#a89f90;text-wrap:pretty">We keep your link and settings for 90 days in case you change your mind. After that, everything is deleted — properly.</div>
+        </div>
+        <div style="padding:14px 40px;border-top:1px solid #efe9de;background:#faf8f4;font:400 11px 'Libre Franklin',sans-serif;color:#a89f90">booktimewith.link/dana · come back anytime</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</x-dc>
+</body>
+</html>
