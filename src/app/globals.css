@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-serif: "Source Serif 4", Georgia, serif;
+  --font-sans: "Libre Franklin", system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-paper font-sans text-ink antialiased;
+  }
+  a {
+    @apply text-ink no-underline;
+  }
+  a:hover {
+    @apply text-bronze;
+  }
+  /* Inputs are ≥16px to stop iOS from zooming the viewport on focus. */
+  input,
+  textarea,
+  select {
+    font-family: var(--font-sans);
+    font-size: 16px;
+  }
+  /* Bronze focus ring per the accessibility tokens. */
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 2px solid #8a7a5c;
+    outline-offset: -1px;
+  }
+  :focus-visible {
+    outline: 2px solid #8a7a5c;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+@layer utilities {
+  /* text-wrap helpers used throughout the designs */
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+  /* the striped avatar placeholder (real photo upload is a phase-2 feature) */
+  .avatar-stripe {
+    background: repeating-linear-gradient(
+      45deg,
+      #e6dfd3,
+      #e6dfd3 3px,
+      #efe9de 3px,
+      #efe9de 6px
+    );
+  }
+  /* the availability grid must not scroll the page while drag-painting on touch */
+  .touch-none {
+    touch-action: none;
+  }
+}
