@@ -1,12 +1,13 @@
-import { render } from "@react-email/components";
+import { render } from "react-email";
 import { EMAILS, type EmailMeta } from "@/emails/registry";
 import { Wordmark } from "@/components/ui";
+import { Outbox } from "@/components/app/Outbox";
 
 export const metadata = { title: "Transactional emails" };
 
 /**
  * Dev preview gallery for all transactional emails. Each is rendered to real
- * email HTML (same output the Cloudflare Email Worker will send in phase 2) and
+ * email HTML (the same output handed to the configured email transport) and
  * shown in an iframe, with its From/Subject annotated as in the design file.
  */
 export default async function EmailsPage() {
@@ -21,14 +22,16 @@ export default async function EmailsPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#e9e5dc] px-6 py-11 md:px-12">
+    <main id="main-content" className="min-h-screen bg-paper-dim px-6 py-11 md:px-12">
       <Wordmark size={15} />
       <h1 className="mt-4 font-sans text-[15px] font-semibold">Transactional emails</h1>
       <p className="mb-8 mt-1 max-w-[640px] font-sans text-[12.5px] leading-[1.5] text-body">
-        Eight emails, one system. Every client email carries a magic manage link —
+        {EMAILS.length} emails, one system. Every client email carries a magic manage link —
         reschedule or cancel with no account. Billing emails follow the same honest
         voice: no urgency theatre, clear grace periods, nothing deleted silently.
       </p>
+
+      <Outbox />
 
       {groups.map((g) => (
         <section key={g.ids} className="mb-10">
@@ -62,7 +65,7 @@ export default async function EmailsPage() {
                     <iframe
                       title={meta.id}
                       srcDoc={html}
-                      className="block w-full border-0 bg-[#e9e5dc]"
+                      className="block w-full border-0 bg-paper-dim"
                       style={{ height: 560 }}
                     />
                   </div>

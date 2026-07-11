@@ -36,3 +36,28 @@ export function clearWeekendCells(cells: Cells): Cells {
   }
   return next;
 }
+
+/** One DB row per painted half-hour block (availability table). */
+export interface AvailabilityBlock {
+  weekday: number; // 0=MON … 6=SUN
+  startMinute: number;
+  endMinute: number;
+}
+
+export function cellsToBlocks(cells: Cells): AvailabilityBlock[] {
+  return Object.keys(cells).map((k) => {
+    const [col, hour, half] = k.split("-");
+    const start = Number(hour) * 60 + (half === "b" ? 30 : 0);
+    return { weekday: Number(col), startMinute: start, endMinute: start + 30 };
+  });
+}
+
+export function blocksToCells(blocks: AvailabilityBlock[]): Cells {
+  const cells: Cells = {};
+  for (const b of blocks) {
+    const hour = Math.floor(b.startMinute / 60);
+    const half: Half = b.startMinute % 60 === 30 ? "b" : "a";
+    cells[cellKey(b.weekday, hour, half)] = 1;
+  }
+  return cells;
+}

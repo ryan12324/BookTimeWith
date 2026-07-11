@@ -33,25 +33,27 @@ const STEPS = [
 
 export default function LandingPage() {
   return (
-    <main className="bg-paper">
+    <main id="main-content" className="bg-paper">
       {/* NAV */}
-      <div className="mx-auto flex max-w-[1080px] items-center justify-between px-6 pt-[26px] md:px-10">
-        <Wordmark />
-        <div className="flex items-center gap-4 font-sans text-[13.5px] font-medium text-body sm:gap-[26px]">
-          <Link href="#how" className="hidden text-body sm:inline">
+      <header className="mx-auto flex max-w-[1080px] items-center justify-between px-6 pt-[26px] md:px-10">
+        <div className="min-w-0 max-w-[158px] sm:max-w-none [&_img]:max-w-full">
+          <Wordmark />
+        </div>
+        <nav aria-label="Main navigation" className="flex items-center gap-4 font-sans text-[13.5px] font-medium text-body sm:gap-[26px]">
+          <Link href="#how" className="hidden min-h-[44px] items-center text-body sm:inline-flex">
             How it works
           </Link>
-          <Link href="#pricing" className="hidden text-body sm:inline">
+          <Link href="#pricing" className="hidden min-h-[44px] items-center text-body sm:inline-flex">
             Pricing
           </Link>
           <Link
             href="#claim"
-            className="rounded-[5px] bg-ink px-[18px] py-[9px] font-semibold text-paper hover:text-paper"
+            className="inline-flex min-h-[44px] items-center rounded-[5px] bg-ink px-[18px] py-[9px] font-semibold text-paper hover:text-paper"
           >
             Get your link
           </Link>
-        </div>
-      </div>
+        </nav>
+      </header>
 
       {/* HERO */}
       <div className="mx-auto grid max-w-[1080px] items-center gap-12 px-6 pb-[72px] pt-14 md:grid-cols-[1.1fr_.9fr] md:gap-16 md:px-10 md:pt-[88px]">
@@ -85,22 +87,22 @@ export default function LandingPage() {
           <h2 className="max-w-[540px] font-serif text-[26px] font-normal leading-[1.2] tracking-[-.01em] text-balance md:text-[32px]">
             Everything we said no to, so you don&apos;t have to.
           </h2>
-          <div className="mt-9 grid grid-cols-1 gap-x-10 gap-y-[2px] font-sans text-[14.5px] leading-[2.2] text-faint sm:grid-cols-2 md:grid-cols-3">
+          <div className="mt-9 grid grid-cols-1 gap-x-10 gap-y-[2px] font-sans text-[14.5px] leading-[2.2] text-paper-muted sm:grid-cols-2 md:grid-cols-3">
             {SAID_NO_TO.map((item) => (
               <div key={item}>
-                <span className="text-body">✕</span> {item}
+                <span className="text-paper-muted">✕</span> {item}
               </div>
             ))}
           </div>
           <div className="mt-9 grid grid-cols-1 gap-x-10 gap-y-[2px] border-t border-ink-soft pt-7 font-sans text-[14.5px] font-medium leading-[2.2] text-paper sm:grid-cols-2 md:grid-cols-3">
             <div>
-              <span className="text-bronze">✓</span> Clients book time slots
+              <span className="text-bronze-light">✓</span> Clients book time slots
             </div>
             <div>
-              <span className="text-bronze">✓</span> Calendar sync, both ways
+              <span className="text-bronze-light">✓</span> Calendar sync, both ways
             </div>
             <div>
-              <span className="text-bronze">✓</span> Reminders that stop no-shows
+              <span className="text-bronze-light">✓</span> Reminders that stop no-shows
             </div>
           </div>
         </div>
@@ -165,17 +167,17 @@ export default function LandingPage() {
         <div className="mt-6">
           <ClaimInput center />
         </div>
-        <div className="mt-[52px] flex flex-col items-center justify-between gap-3 border-t border-line-soft pt-6 font-sans text-[12px] text-faint sm:flex-row">
+        <footer className="mt-[52px] flex flex-col items-center justify-between gap-3 border-t border-line-soft pt-6 font-sans text-[12px] text-faint sm:flex-row">
           <div>© 2026 booktimewith.com</div>
           <div className="flex gap-5">
-            <Link href="#pricing" className="text-faint">
+            <Link href="#pricing" className="inline-flex min-h-[44px] items-center text-faint">
               Pricing
             </Link>
-            <Link href="#how" className="text-faint">
+            <Link href="#how" className="inline-flex min-h-[44px] items-center text-faint">
               How it works
             </Link>
           </div>
-        </div>
+        </footer>
       </div>
     </main>
   );

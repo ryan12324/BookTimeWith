@@ -8,6 +8,7 @@ import {
   OwnerMorningSummary,
   OwnerNewBooking,
   OwnerSignIn,
+  OwnerVerifyEmail,
   PaymentFailed,
   Receipt,
   TrialEnding,
@@ -21,12 +22,19 @@ export interface EmailMeta {
   category: EmailCategory;
   tag: string; // the "TO … · WHEN" label from the design
   from: string;
+  /**
+   * Client-facing emails send From "{Owner} via booktimewith.com" with
+   * Reply-To the owner's real address, so replies reach the owner, not us
+   * (README "Email deliverability").
+   */
+  replyTo?: string;
   subject: string;
   designed: boolean; // true for 1–8, false for the in-voice 9–12
   Component: ComponentType;
 }
 
 const OWNER_FROM = "Dana Whitfield via booktimewith.com";
+const OWNER_REPLY_TO = "dana@example.com"; // the owner's real email
 const SYSTEM_FROM = "booktimewith.com";
 
 export const EMAILS: EmailMeta[] = [
@@ -36,6 +44,7 @@ export const EMAILS: EmailMeta[] = [
     category: "booking",
     tag: "TO CLIENT · ON BOOKING",
     from: OWNER_FROM,
+    replyTo: OWNER_REPLY_TO,
     subject: "You're booked — Tuesday, July 14 at 10:00",
     designed: true,
     Component: ClientConfirmation,
@@ -45,6 +54,7 @@ export const EMAILS: EmailMeta[] = [
     category: "booking",
     tag: "TO CLIENT · 24H BEFORE",
     from: OWNER_FROM,
+    replyTo: OWNER_REPLY_TO,
     subject: "Tomorrow at 10:00 — your session with Dana",
     designed: true,
     Component: ClientReminder,
@@ -128,6 +138,7 @@ export const EMAILS: EmailMeta[] = [
     category: "system",
     tag: "TO CLIENT · OWNER MOVED YOUR BOOKING",
     from: OWNER_FROM,
+    replyTo: OWNER_REPLY_TO,
     subject: "Dana had to move your Tuesday session",
     designed: false,
     Component: ClientOwnerChanged,
@@ -140,5 +151,14 @@ export const EMAILS: EmailMeta[] = [
     subject: "You're set up — here's your link",
     designed: false,
     Component: Welcome,
+  },
+  {
+    id: "owner-verify-email",
+    category: "system",
+    tag: "TO OWNER · CONFIRM EMAIL",
+    from: SYSTEM_FROM,
+    subject: "Confirm your email — one click",
+    designed: false,
+    Component: OwnerVerifyEmail,
   },
 ];

@@ -1,87 +1,107 @@
 import type { Cells } from "./availability";
+import type { CurrencyCode } from "./format";
 
-/**
- * Mock data standing in for what the server would return in phase 2. The owner
- * config is persisted to localStorage (see store.tsx) so edits in the owner app
- * flow through to the client booking demo — the same "live" feel as the design
- * prototype, without a backend.
- */
+/** Shared owner-config contract for the API-backed owner and public surfaces. */
 
 export type LocationMode = "mine" | "theirs";
 
+/** "Away 3–10 Aug" — one control on the bookings page, blocks all slots. */
+export interface AwayPeriod {
+  start: string; // ISO date, inclusive
+  end: string; // ISO date, inclusive
+}
+
 export interface OwnerConfig {
   handle: string;
+  name: string; // the owner — shown on the booking page and in email From lines
   service: string;
   duration: number; // minutes, 15–240 step 5
   location: LocationMode;
   ownerAddress: string;
+  // Optional static Zoom/Meet URL — used in reminders when there's no
+  // calendar-created Google Meet link.
+  meetingLink: string;
   cells: Cells;
   startHour: number;
   endHour: number;
   weekends: boolean;
   calendar: string | null; // provider name once connected
+  calendarStatus?: "connected" | "degraded";
+  calendarError?: string | null;
+  calendarLastSyncedAt?: string | null;
   notifyBook: boolean;
   notifyMorning: boolean;
+  timezone: string; // IANA; availability is painted in this zone
+  currency: CurrencyCode; // plan display + Stripe price selection
+  // True once Stripe owns the subscription price. The selector becomes display-
+  // only; currency changes must happen through a supported billing migration.
+  billingCurrencyLocked: boolean;
+  away: AwayPeriod | null;
+  // Billing-driven page state (grace expired / trial lapsed), set by Stripe
+  // webhooks; the booking page renders its paused state from this value.
+  paused: boolean;
+  // Address displayed in the editor (the pending replacement when one exists).
+  email: string;
+  // Trusted notification/sign-in identity until `email` is confirmed.
+  activeEmail: string;
+  pendingEmail: string | null; // untrusted replacement until its link is consumed
+  emailVerified: boolean;
+  emailDeliveryConfigured: boolean;
+  // False until onboarding finishes — gates the Bookings/Settings nav.
+  setupComplete: boolean;
+  // Billing state (server-derived, read-only on the client)
+  planStatus: "trialing" | "active" | "past_due" | "paused" | "cancelled";
+  trialEndsAt: string | null; // ISO
+  graceUntil: string | null; // ISO
 }
 
 /** The demo owner — Dana Whitfield, matching the design files. */
 export const OWNER_NAME = "Dana Whitfield, LMFT";
 
+/**
+ * A brand-new account: everything blank — signup collects it. The only
+ * prefill the setup flow ever gets is the ?handle= from the landing claim.
+ */
 export const DEFAULT_OWNER: OwnerConfig = {
-  handle: "dana",
-  service: "Therapy session",
+  handle: "",
+  name: "",
+  service: "",
   duration: 50,
   location: "mine",
   ownerAddress: "",
-  startHour: 8,
-  endHour: 18,
+  meetingLink: "",
+  // Grid defaults to 9am–5pm; the earlier/later buttons extend from there.
+  startHour: 9,
+  endHour: 17,
   weekends: false,
   calendar: null,
   notifyBook: true,
   notifyMorning: true,
-  // Painted weekday mornings + a couple of afternoons, from the prototype.
-  cells: {
-    "1-9-a": 1, "1-9-b": 1, "1-10-a": 1, "1-10-b": 1, "1-11-a": 1, "1-11-b": 1, "1-12-a": 1, "1-12-b": 1,
-    "2-9-a": 1, "2-9-b": 1, "2-10-a": 1, "2-10-b": 1, "2-11-a": 1, "2-11-b": 1, "2-12-a": 1, "2-12-b": 1,
-    "2-14-a": 1, "2-14-b": 1, "2-15-a": 1, "2-15-b": 1,
-    "3-9-a": 1, "3-9-b": 1, "3-10-a": 1, "3-10-b": 1, "3-11-a": 1, "3-11-b": 1, "3-12-a": 1, "3-12-b": 1,
-    "4-14-a": 1, "4-14-b": 1, "4-15-a": 1, "4-15-b": 1, "4-16-a": 1, "4-16-b": 1,
-  },
+  timezone: "Europe/London",
+  currency: "GBP",
+  billingCurrencyLocked: false,
+  away: null,
+  paused: false,
+  email: "",
+  activeEmail: "",
+  pendingEmail: null,
+  emailVerified: false,
+  emailDeliveryConfigured: false,
+  setupComplete: false,
+  planStatus: "trialing",
+  trialEndsAt: null,
+  graceUntil: null,
+  cells: {},
 };
 
-/** Three bookable days with real-ish dates, matching the design. */
-export const BOOKING_DAYS = [
-  { dow: "TUE", date: "14", full: "Tuesday 14" },
-  { dow: "WED", date: "15", full: "Wednesday 15" },
-  { dow: "THU", date: "16", full: "Thursday 16" },
-] as const;
-
-/** Available slot times per day index (pre-computed for the mock). */
-export const SLOT_SETS: string[][] = [
-  ["9:00", "10:00", "11:00", "1:00", "2:00", "3:30"],
-  ["10:00", "11:00", "2:00", "4:00"],
-  ["9:00", "12:00", "1:00", "3:00", "4:00"],
-];
-
-export type BookingStatus = "ok" | "moved" | "cancelled";
-
-export interface Booking {
-  id: number;
-  grp: string;
-  time: string;
-  name: string;
-  status: BookingStatus;
-  moving: boolean;
-  movedTo: string;
+/** "TODAY · TUESDAY 14" / "TOMORROW · WEDNESDAY 15" / "FRIDAY 17" */
+export function bookingGroupLabel(start: Date, now: Date): string {
+  const label = `${start
+    .toLocaleDateString("en-GB", { weekday: "long" })
+    .toUpperCase()} ${start.getDate()}`;
+  const day = (d: Date) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+  const tomorrow = new Date(now.getTime() + 86_400_000);
+  if (day(start) === day(now)) return `TODAY · ${label}`;
+  if (day(start) === day(tomorrow)) return `TOMORROW · ${label}`;
+  return label;
 }
-
-export const DEFAULT_BOOKINGS: Booking[] = [
-  { id: 1, grp: "TODAY · TUESDAY 14", time: "10:00", name: "Alex Martin", status: "ok", moving: false, movedTo: "" },
-  { id: 2, grp: "TODAY · TUESDAY 14", time: "1:00", name: "Priya Shah", status: "ok", moving: false, movedTo: "" },
-  { id: 3, grp: "TODAY · TUESDAY 14", time: "3:30", name: "Sam Reed", status: "ok", moving: false, movedTo: "" },
-  { id: 4, grp: "TOMORROW · WEDNESDAY 15", time: "10:00", name: "Jordan Lee", status: "ok", moving: false, movedTo: "" },
-  { id: 5, grp: "TOMORROW · WEDNESDAY 15", time: "2:00", name: "Maya Chen", status: "ok", moving: false, movedTo: "" },
-];
-
-/** Alternative times offered by the owner "Move" action. */
-export const MOVE_OPTIONS = ["11:00", "2:00", "4:30", "Thu 9:00"];

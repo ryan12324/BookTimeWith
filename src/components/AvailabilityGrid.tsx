@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { useOwnerConfig } from "@/lib/store";
 import {
   cellKey,
@@ -11,7 +11,7 @@ import {
   openHours,
   type Half,
 } from "@/lib/availability";
-import { fmtHour, fmtOpenHours } from "@/lib/format";
+import { fmtHour, fmtHours } from "@/lib/format";
 import { T } from "@/lib/tokens";
 
 const DAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
@@ -37,7 +37,7 @@ export function useGridControls() {
     canLater: endHour < GRID_MAX_HOUR,
     earlierLabel: `+ Start earlier (${fmtHour(startHour - 1)})`,
     laterLabel: `+ Finish later (${fmtHour(endHour)})`,
-    summary: `${fmtOpenHours(openHours(cells))} hours open per week · half-hours count`,
+    summary: `${fmtHours(openHours(cells))} open per week · half-hours count`,
   };
 }
 
@@ -52,6 +52,8 @@ export function AvailabilityGrid({ cellHeight = 30 }: { cellHeight?: number }) {
   const { cells, startHour, endHour, weekends } = config;
   const labels = dayLabels(weekends);
   const cols = labels.length;
+  const instructionsId = useId();
+  const [activeKey, setActiveKey] = useState(() => cellKey(0, startHour, "a"));
 
   const hours: number[] = [];
   for (let h = startHour; h < endHour; h++) hours.push(h);
@@ -71,18 +73,34 @@ export function AvailabilityGrid({ cellHeight = 30 }: { cellHeight?: number }) {
     [setConfig],
   );
 
-  const endPaint = useCallback(() => {
-    mode.current = null;
+  // "Mouseup anywhere ends" (README interactions): the paint stroke survives
+  // leaving the grid and only ends when the pointer is actually released.
+  useEffect(() => {
+    const endPaint = () => {
+      mode.current = null;
+    };
+    window.addEventListener("pointerup", endPaint);
+    window.addEventListener("pointercancel", endPaint);
+    return () => {
+      window.removeEventListener("pointerup", endPaint);
+      window.removeEventListener("pointercancel", endPaint);
+    };
   }, []);
 
   const startPaint = (key: string, currentlyOn: boolean, e: React.PointerEvent) => {
     e.preventDefault();
+    setActiveKey(key);
     mode.current = currentlyOn ? "remove" : "add";
     paint(key, !currentlyOn);
   };
 
-  // Touch drag: pointer is captured by the first cell, so siblings never get
-  // pointerenter — resolve the cell under the finger by coordinates instead.
+  const toggleCell = (key: string, currentlyOn: boolean) => {
+    setActiveKey(key);
+    paint(key, !currentlyOn);
+  };
+
+  // Mouse/pen drag may move faster than pointerenter delivery, so resolve the
+  // cell under the pointer by coordinates instead.
   const onPointerMove = (e: React.PointerEvent) => {
     if (!mode.current) return;
     const el = document
@@ -93,7 +111,7 @@ export function AvailabilityGrid({ cellHeight = 30 }: { cellHeight?: number }) {
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     const target = e.target as HTMLElement;
-    if (!target.dataset.r) return;
+    if (target.dataset.r === undefined) return;
     const r = Number(target.dataset.r);
     const c = Number(target.dataset.c);
     const maxR = hours.length * 2 - 1;
@@ -105,49 +123,70 @@ export function AvailabilityGrid({ cellHeight = 30 }: { cellHeight?: number }) {
     else if (e.key === "ArrowRight") nc = Math.min(cols - 1, c + 1);
     else return;
     e.preventDefault();
-    grid.current
-      ?.querySelector<HTMLElement>(`[data-r="${nr}"][data-c="${nc}"]`)
-      ?.focus();
+    const next = grid.current?.querySelector<HTMLElement>(`[data-r="${nr}"][data-c="${nc}"]`);
+    if (next?.dataset.key) {
+      setActiveKey(next.dataset.key);
+      next.focus();
+    }
   };
 
   const grid = useRef<HTMLDivElement>(null);
 
-  return (
-    <div
-      ref={grid}
-      className="grid touch-none select-none"
-      style={{
-        gridTemplateColumns: `52px repeat(${cols},1fr)`,
-        gap: 4,
-      }}
-      onPointerMove={onPointerMove}
-      onPointerUp={endPaint}
-      onPointerLeave={endPaint}
-      onKeyDown={onKeyDown}
-    >
-      {/* header row */}
-      <div />
-      {labels.map((l) => (
-        <div
-          key={l}
-          className="pb-1 text-center font-sans text-[11px] font-semibold tracking-[.05em] text-faint"
-        >
-          {l}
-        </div>
-      ))}
+  useEffect(() => {
+    if (grid.current?.querySelector(`[data-key="${activeKey}"]`)) return;
+    setActiveKey(cellKey(0, startHour, "a"));
+  }, [activeKey, endHour, startHour, weekends]);
 
-      {/* hour rows */}
-      {hours.map((h, hi) => (
-        <HourRow
-          key={h}
-          hour={h}
-          hi={hi}
-          cols={cols}
-          cells={cells}
-          cellHeight={cellHeight}
-          onStart={startPaint}
-        />
-      ))}
+  return (
+    <div>
+      <p id={instructionsId} className="sr-only">
+        Weekly availability. Use arrow keys to move between half-hours and Space or Enter to
+        toggle the focused time.
+      </p>
+      {/* Five weekday columns fit the 375px panel; weekends scroll horizontally. */}
+      <div className="overflow-x-auto overscroll-x-contain pb-1">
+        <div
+          ref={grid}
+          role="group"
+          aria-label="Weekly availability"
+          aria-describedby={instructionsId}
+          className="grid touch-auto select-none"
+          style={{
+            gridTemplateColumns: `52px repeat(${cols},minmax(46px,1fr))`,
+            gap: 4,
+            minWidth: 52 + cols * 50,
+          }}
+          onPointerMove={onPointerMove}
+          onKeyDown={onKeyDown}
+        >
+          {/* header row */}
+          <div />
+          {labels.map((l) => (
+            <div
+              key={l}
+              className="pb-1 text-center font-sans text-[11px] font-semibold tracking-[.05em] text-body"
+            >
+              {l}
+            </div>
+          ))}
+
+          {/* hour rows */}
+          {hours.map((h, hi) => (
+            <HourRow
+              key={h}
+              hour={h}
+              hi={hi}
+              cols={cols}
+              cells={cells}
+              cellHeight={cellHeight}
+              activeKey={activeKey}
+              onActive={setActiveKey}
+              onStart={startPaint}
+              onToggle={toggleCell}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -158,18 +197,24 @@ function HourRow({
   cols,
   cells,
   cellHeight,
+  activeKey,
+  onActive,
   onStart,
+  onToggle,
 }: {
   hour: number;
   hi: number;
   cols: number;
   cells: Record<string, 1>;
   cellHeight: number;
+  activeKey: string;
+  onActive: (key: string) => void;
   onStart: (key: string, on: boolean, e: React.PointerEvent) => void;
+  onToggle: (key: string, on: boolean) => void;
 }) {
   return (
     <>
-      <div className="pr-2 pt-[7px] text-right font-sans text-[10.5px] text-faint">
+      <div className="pr-2 pt-[7px] text-right font-sans text-[10.5px] text-body">
         {fmtHour(hour)}
       </div>
       {Array.from({ length: cols }, (_, c) => {
@@ -180,14 +225,14 @@ function HourRow({
         return (
           <div
             key={c}
-            className="flex flex-col overflow-hidden rounded-cell border"
+            className="availability-hour flex flex-col overflow-hidden rounded-cell border"
             style={{
-              height: cellHeight,
-              borderColor: onA && onB ? T.bronze : T.lineSoft,
-            }}
+              "--availability-hour-height": `${cellHeight}px`,
+              borderColor: onA && onB ? T.bronze : T.line,
+            } as React.CSSProperties}
           >
-            <HalfCell col={c} hour={hour} half="a" r={hi * 2} on={onA} kkey={kA} onStart={onStart} />
-            <HalfCell col={c} hour={hour} half="b" r={hi * 2 + 1} on={onB} kkey={kB} onStart={onStart} />
+            <HalfCell col={c} hour={hour} half="a" r={hi * 2} on={onA} kkey={kA} active={activeKey === kA} onActive={onActive} onStart={onStart} onToggle={onToggle} />
+            <HalfCell col={c} hour={hour} half="b" r={hi * 2 + 1} on={onB} kkey={kB} active={activeKey === kB} onActive={onActive} onStart={onStart} onToggle={onToggle} />
           </div>
         );
       })}
@@ -202,7 +247,10 @@ function HalfCell({
   r,
   on,
   kkey,
+  active,
+  onActive,
   onStart,
+  onToggle,
 }: {
   col: number;
   hour: number;
@@ -210,12 +258,17 @@ function HalfCell({
   r: number;
   on: boolean;
   kkey: string;
+  active: boolean;
+  onActive: (key: string) => void;
   onStart: (key: string, on: boolean, e: React.PointerEvent) => void;
+  onToggle: (key: string, on: boolean) => void;
 }) {
-  const startMin = half === "a" ? "00" : "30";
-  const endLabel =
-    half === "a" ? `${((hour % 12) || 12)}:30` : `${(((hour + 1) % 12) || 12)}:00`;
-  const label = `${DAY_NAMES[col]} ${(hour % 12) || 12}:${startMin} to ${endLabel}, ${on ? "open" : "closed"}`;
+  const paintedFromPointer = useRef(false);
+  const time = (value: number, minutes: "00" | "30") =>
+    `${(value % 12) || 12}:${minutes}${value < 12 ? "am" : "pm"}`;
+  const startLabel = time(hour, half === "a" ? "00" : "30");
+  const endLabel = half === "a" ? time(hour, "30") : time(hour + 1, "00");
+  const label = `${DAY_NAMES[col]} ${startLabel} to ${endLabel}, ${on ? "open" : "closed"}`;
   return (
     <button
       type="button"
@@ -226,13 +279,35 @@ function HalfCell({
       role="checkbox"
       aria-checked={on}
       aria-label={label}
-      className="flex-1 cursor-pointer"
+      tabIndex={active ? 0 : -1}
+      className={`availability-cell relative flex-1 cursor-pointer ${half === "b" ? "border-t border-line" : ""}`}
       style={{ background: on ? T.bronze : T.paper }}
-      onPointerDown={(e) => onStart(kkey, on, e)}
+      onFocus={() => onActive(kkey)}
+      onPointerDown={(e) => {
+        // Touch stays native so the page and weekend overflow can scroll. A tap
+        // toggles on click; mouse/pen retain the fast drag-paint interaction.
+        paintedFromPointer.current = e.pointerType !== "touch";
+        if (paintedFromPointer.current) onStart(kkey, on, e);
+      }}
+      onPointerUp={() => {
+        window.setTimeout(() => {
+          paintedFromPointer.current = false;
+        }, 0);
+      }}
+      onPointerCancel={() => {
+        paintedFromPointer.current = false;
+      }}
+      onClick={() => {
+        if (paintedFromPointer.current) {
+          paintedFromPointer.current = false;
+          return;
+        }
+        onToggle(kkey, on);
+      }}
       onKeyDown={(e) => {
         if (e.key === " " || e.key === "Enter") {
           e.preventDefault();
-          onStart(kkey, on, e as unknown as React.PointerEvent);
+          onToggle(kkey, on);
         }
       }}
     />

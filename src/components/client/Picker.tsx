@@ -27,15 +27,15 @@ export function DayTabs({
             type="button"
             onClick={() => onPick(i)}
             aria-pressed={on}
-            className="min-h-[44px] flex-1 rounded-chip border py-[10px] text-center"
+            className="min-h-[44px] min-w-[72px] flex-1 rounded-chip border py-[10px] text-center"
             style={{
               background: on ? T.tint : "#fff",
-              borderColor: on ? T.line : T.hairline,
+              borderColor: on ? T.ink : T.line,
             }}
           >
             <div
               className="font-sans text-[11px] font-semibold tracking-[.05em]"
-              style={{ color: on ? T.bronze : T.faint }}
+              style={{ color: on ? T.bronzeHover : T.body }}
             >
               {d.dow}
             </div>

@@ -6,14 +6,16 @@ import { T } from "@/lib/tokens";
 export function Toggle({ on }: { on: boolean }) {
   return (
     <div
+      aria-hidden="true"
       className="relative flex-none rounded-[9px] transition-colors"
-      style={{ width: 30, height: 17, background: on ? T.bronze : T.disabled }}
+      style={{ width: 30, height: 17, background: on ? T.bronze : T.toggleOff }}
     >
       <div
-        className="absolute rounded-full bg-white transition-[left]"
+        className="absolute rounded-full bg-white transition-transform"
         style={{
           top: 2,
-          left: on ? 15 : 2,
+          left: 2,
+          transform: on ? "translateX(13px)" : "translateX(0)",
           width: 13,
           height: 13,
           boxShadow: "0 1px 2px rgba(38,34,28,.25)",
@@ -39,7 +41,7 @@ export function ToggleRow({
       onClick={onToggle}
       role="switch"
       aria-checked={on}
-      className="flex items-center gap-[11px] text-left"
+      className="flex min-h-[44px] items-center gap-[11px] rounded-input px-1 text-left"
     >
       <Toggle on={on} />
       <span className="font-sans text-[13.5px] text-ink">{children}</span>

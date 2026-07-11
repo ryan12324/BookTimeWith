@@ -18,7 +18,7 @@
     @apply text-ink no-underline;
   }
   a:hover {
-    @apply text-bronze;
+    @apply text-bronze-ink;
   }
   /* Inputs are ≥16px to stop iOS from zooming the viewport on focus. */
   input,
@@ -27,18 +27,49 @@
     font-family: var(--font-sans);
     font-size: 16px;
   }
-  /* Bronze focus ring per the accessibility tokens. */
-  input:focus-visible,
-  textarea:focus-visible,
-  select:focus-visible {
-    outline: 2px solid #8a7a5c;
-    outline-offset: -1px;
+  button:disabled {
+    cursor: not-allowed;
   }
-  :focus-visible {
-    outline: 2px solid #8a7a5c;
-    outline-offset: 2px;
-    border-radius: 4px;
-  }
+}
+
+/*
+ * Keep focus treatment outside Tailwind's cascade layers so component-level
+ * `outline-none` utilities cannot accidentally erase keyboard focus.
+ */
+:where(a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])):focus-visible,
+.focus-group:focus-within {
+  outline: 3px solid #776a50;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.availability-cell:focus-visible {
+  z-index: 1;
+  outline: none;
+  box-shadow:
+    inset 0 0 0 2px #faf8f4,
+    inset 0 0 0 5px #26221c;
+}
+
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 100;
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  padding: 0 16px;
+  transform: translateY(-160%);
+  border: 1px solid #8f8677;
+  border-radius: 6px;
+  background: #faf8f4;
+  color: #26221c;
+  font: 600 13px/1 var(--font-sans);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
 }
 
 @layer utilities {
@@ -49,7 +80,7 @@
   .text-pretty {
     text-wrap: pretty;
   }
-  /* the striped avatar placeholder (real photo upload is a phase-2 feature) */
+  /* deliberately abstract striped avatar mark */
   .avatar-stripe {
     background: repeating-linear-gradient(
       45deg,
@@ -59,8 +90,34 @@
       #efe9de 6px
     );
   }
-  /* the availability grid must not scroll the page while drag-painting on touch */
-  .touch-none {
-    touch-action: none;
+  /* Half-hour controls are full touch targets on phones, compact on desktop. */
+  .availability-hour {
+    height: 90px;
+  }
+}
+
+@media (min-width: 640px) {
+  .availability-hour {
+    height: max(var(--availability-hour-height), 50px);
+  }
+}
+
+/* Utility classes and legacy inline styles must not reintroduce iOS focus zoom. */
+@media (max-width: 639px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

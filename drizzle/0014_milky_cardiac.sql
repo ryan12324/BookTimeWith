@@ -1,0 +1,2 @@
+ALTER TABLE "booking_actions" ADD COLUMN "mail_recovery_checked_at" timestamp with time zone;--> statement-breakpoint
+ALTER TABLE "bookings" ADD COLUMN "mail_recovery_checked_at" timestamp with time zone;

@@ -1,0 +1,16 @@
+node_modules
+.next
+.data
+.git
+.github
+.agents
+.env
+.env.local
+chats
+project
+*.log
+.DS_Store
+.claude
+docs
+Dockerfile
+docker-compose.yml

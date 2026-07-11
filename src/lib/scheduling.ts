@@ -2,7 +2,7 @@ import type { Cells } from "./availability";
 
 /**
  * Scheduling engine rules, spelled out from the design (README "Scheduling
- * engine rules"). These are pure functions — the phase-2 API layer feeds them
+ * engine rules"). These are pure functions — the API layer feeds them
  * real bookings and synced-calendar busy time; here they encode the policy.
  */
 

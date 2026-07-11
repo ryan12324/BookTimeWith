@@ -16,18 +16,23 @@ const config: Config = {
         ink: "#26221c", // text, primary buttons, selected slots
         "ink-soft": "#3d372e", // primary button hover; dark-section hairlines
         body: "#6b6357", // secondary text
-        faint: "#a89f90", // tertiary text, placeholders
-        bronze: "#8a7a5c", // accent: confirm CTAs, painted cells, badges, links
-        "bronze-hover": "#776a50", // bronze button hover
-        "bronze-ink": "#6b5d45", // bronze text hover (bookings "Move")
-        line: "#ddd5c8", // input / card borders
+        faint: "#71695d", // tertiary text, 4.6:1+ on every light app surface
+        bronze: "#776a50", // accent: 4.5:1+ on light surfaces and behind paper text
+        "bronze-hover": "#695a41", // bronze button hover
+        "bronze-ink": "#5f513b", // high-contrast accent text and links
+        "bronze-light": "#c5b894", // warm accent on ink surfaces
+        "paper-muted": "#c7bfb2", // secondary copy on ink surfaces
+        line: "#8f8677", // 3:1+ control boundaries on app surfaces
         "line-soft": "#e6dfd3", // card borders
         hairline: "#efe9de", // hairline dividers
-        disabled: "#d6cdbc", // disabled CTA bg, toggle-off track
+        disabled: "#d6cdbc", // disabled CTA background
+        "toggle-off": "#8f8677", // 3:1+ off-state track on light surfaces
       },
       fontFamily: {
-        serif: ["var(--font-serif)", "Source Serif 4", "Georgia", "serif"],
-        sans: ["var(--font-sans)", "Libre Franklin", "system-ui", "sans-serif"],
+        // Names with digits must be quoted in the emitted CSS or the whole
+        // font-family declaration is invalid (bare `3`/`4` isn't an identifier).
+        serif: ["var(--font-serif)", "'Source Serif 4'", "Georgia", "serif"],
+        sans: ["var(--font-sans)", "'Libre Franklin'", "system-ui", "sans-serif"],
       },
       borderRadius: {
         input: "6px",

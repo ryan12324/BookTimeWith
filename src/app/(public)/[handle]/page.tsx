@@ -1,8 +1,17 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { RESERVED_HANDLES } from "@/lib/handles";
-import { OWNER_NAME } from "@/lib/mock";
+import { getDb } from "@/db/client";
+import { ownerByHandle } from "@/db/repo";
 import { BookingFlow } from "@/components/client/BookingFlow";
+
+export const dynamic = "force-dynamic";
+
+async function resolve(handle: string) {
+  if (RESERVED_HANDLES.has(handle.toLowerCase())) return null;
+  const db = await getDb();
+  return (await ownerByHandle(db, handle.toLowerCase())) ?? null;
+}
 
 export async function generateMetadata({
   params,
@@ -10,11 +19,24 @@ export async function generateMetadata({
   params: Promise<{ handle: string }>;
 }): Promise<Metadata> {
   const { handle } = await params;
-  // OG image is generated from name + service in production (paper + serif tokens).
+  const owner = await resolve(handle);
+  const name = owner?.name?.split(",")[0] || handle;
+  const title = `Book time with ${name}`;
+  const description = `Pick a time with ${name} — no account needed.`;
+  // The OG image itself comes from ./opengraph-image.tsx (name + service on
+  // the paper/serif tokens).
   return {
-    title: `Book time with ${OWNER_NAME.split(",")[0]}`,
-    description: `Pick a time with ${OWNER_NAME.split(",")[0]} — no account needed.`,
+    title,
+    description,
     alternates: { canonical: `https://booktimewith.link/${handle}` },
+    openGraph: {
+      title,
+      description,
+      url: `https://booktimewith.link/${handle}`,
+      siteName: "Book Time With",
+      type: "website",
+    },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 
@@ -24,8 +46,9 @@ export default async function BookingPage({
   params: Promise<{ handle: string }>;
 }) {
   const { handle } = await params;
-  // Reserved paths aren't bookable handles. In production an unknown handle 404s;
-  // in this demo every other handle renders the mock owner (Dana).
-  if (RESERVED_HANDLES.has(handle.toLowerCase())) notFound();
+  const owner = await resolve(handle);
+  if (!owner) notFound(); // unknown or reserved handles are 404s
+  // Old handles redirect to the current one for 90 days (handle_redirects).
+  if (owner.handle !== handle.toLowerCase()) redirect(`/${owner.handle}`);
   return <BookingFlow />;
 }

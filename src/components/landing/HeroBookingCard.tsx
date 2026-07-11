@@ -4,7 +4,7 @@ import { useState } from "react";
 import { StripedAvatar } from "@/components/ui";
 import { T } from "@/lib/tokens";
 
-const TIMES = ["9:00", "10:00", "1:00", "3:30"];
+const TIMES = ["9:00am", "10:00am", "1:00pm", "3:30pm"];
 
 /** The floating booking-card demo in the hero — clickable slots update the CTA. */
 export function HeroBookingCard() {
@@ -32,7 +32,7 @@ export function HeroBookingCard() {
                 type="button"
                 onClick={() => setPicked(i)}
                 aria-pressed={on}
-                className="rounded-[5px] border py-[10px] text-center font-sans text-[13px] font-medium"
+                className="min-h-[44px] rounded-[5px] border px-1 py-[10px] text-center font-sans text-[13px] font-medium"
                 style={{
                   borderColor: on ? T.ink : T.line,
                   background: on ? T.ink : "#fff",
@@ -46,7 +46,7 @@ export function HeroBookingCard() {
         </div>
         <button
           type="button"
-          className="mt-[15px] w-full rounded-input bg-bronze py-3 text-center font-sans text-[13.5px] font-semibold text-paper hover:bg-bronze-hover"
+          className="mt-[15px] min-h-[44px] w-full rounded-input bg-bronze py-3 text-center font-sans text-[13.5px] font-semibold text-paper hover:bg-bronze-hover"
         >
           Book Tuesday at {TIMES[picked]} →
         </button>

@@ -18,6 +18,10 @@ export function fmtOpenHours(hours: number): string {
   return hours % 1 ? hours.toFixed(1).replace(".0", "") : String(hours);
 }
 
+export function fmtHours(hours: number): string {
+  return `${fmtOpenHours(hours)} ${hours === 1 ? "hour" : "hours"}`;
+}
+
 export type CurrencyCode = "GBP" | "USD" | "EUR" | "AUD";
 
 /** Localised single-plan pricing (README billing rules). GBP is the default. */

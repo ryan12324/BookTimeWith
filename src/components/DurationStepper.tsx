@@ -15,6 +15,8 @@ export function DurationStepper({
   onChange: (next: number) => void;
   size?: "lg" | "sm";
 }) {
+  const atMinimum = minutes <= 15;
+  const atMaximum = minutes >= 240;
   const dec = () => onChange(Math.max(15, minutes - 5));
   const inc = () => onChange(Math.min(240, minutes + 5));
 
@@ -28,12 +30,13 @@ export function DurationStepper({
       : "min-w-[80px] px-2 py-[11px] text-[14px]";
 
   return (
-    <div className="inline-flex items-center overflow-hidden rounded-chip border border-line">
+    <div className="inline-flex items-center rounded-chip border border-line">
       <button
         type="button"
         onClick={dec}
+        disabled={atMinimum}
         aria-label="Decrease length by 5 minutes"
-        className={`select-none font-sans font-semibold text-bronze hover:bg-tint-warm ${btn}`}
+        className={`select-none rounded-l-chip font-sans font-semibold text-bronze hover:bg-tint-warm disabled:text-faint ${btn}`}
       >
         −
       </button>
@@ -46,8 +49,9 @@ export function DurationStepper({
       <button
         type="button"
         onClick={inc}
+        disabled={atMaximum}
         aria-label="Increase length by 5 minutes"
-        className={`select-none font-sans font-semibold text-bronze hover:bg-tint-warm ${btn}`}
+        className={`select-none rounded-r-chip font-sans font-semibold text-bronze hover:bg-tint-warm disabled:text-faint ${btn}`}
       >
         +
       </button>

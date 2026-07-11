@@ -1,0 +1,2 @@
+CREATE INDEX "bookings_client_pii_retention_idx" ON "bookings" USING btree ("client_pii_anonymized_at","ends_at");--> statement-breakpoint
+CREATE INDEX "owners_cron_checked_at_idx" ON "owners" USING btree ("cron_checked_at");

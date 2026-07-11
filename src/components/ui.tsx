@@ -1,6 +1,11 @@
 import type { CSSProperties } from "react";
 
-/** Serif wordmark: booktimewith + faint domain suffix. */
+/**
+ * Brand wordmark. The real logo lockup (calendar mark + "booktimewith.com")
+ * lives at /images/btw_logo.png; `size` stays the visual text size so existing
+ * call sites read the same. The image bakes in the ".com" suffix, so any
+ * non-".com" surface (e.g. a .link footer) falls back to the text mark.
+ */
 export function Wordmark({
   size = 17,
   suffix = ".com",
@@ -8,14 +13,29 @@ export function Wordmark({
   size?: number;
   suffix?: string;
 }) {
+  if (suffix !== ".com") {
+    return (
+      <span className="font-serif font-semibold" style={{ fontSize: size }}>
+        booktimewith<span className="text-faint">{suffix}</span>
+      </span>
+    );
+  }
+  // Intrinsic logo is 2193×297 (≈7.38:1); height tracks the text size so the
+  // mark sits at the same weight the serif wordmark did.
+  const height = Math.round(size * 1.6);
   return (
-    <span className="font-serif font-semibold" style={{ fontSize: size }}>
-      booktimewith<span className="text-faint">{suffix}</span>
-    </span>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/images/btw_logo.png"
+      alt="booktimewith.com"
+      width={2193}
+      height={297}
+      style={{ height, width: "auto" }}
+    />
   );
 }
 
-/** Striped placeholder avatar (real photo upload is a phase-2 feature). */
+/** Deliberately abstract striped avatar mark. */
 export function StripedAvatar({ size = 44 }: { size?: number }) {
   return (
     <div
@@ -30,19 +50,24 @@ export function SectionLabel({
   children,
   className = "",
   style,
+  as = "div",
+  htmlFor,
 }: {
   children: React.ReactNode;
   className?: string;
   style?: CSSProperties;
+  as?: "div" | "label";
+  htmlFor?: string;
 }) {
-  return (
-    <div
-      className={`font-sans text-[11.5px] font-semibold uppercase tracking-label text-faint ${className}`}
-      style={style}
-    >
-      {children}
-    </div>
-  );
+  const classes = `font-sans text-[11.5px] font-semibold uppercase tracking-label text-body ${className}`;
+  if (as === "label") {
+    return (
+      <label htmlFor={htmlFor} className={classes} style={style}>
+        {children}
+      </label>
+    );
+  }
+  return <div className={classes} style={style}>{children}</div>;
 }
 
 /** The rounded check / neutral status badge used on "done" screens. */
@@ -61,7 +86,7 @@ export function StatusBadge({
         width: size,
         height: size,
         fontSize: Math.round(size * 0.46),
-        background: done ? "#8a7a5c" : "#e6dfd3",
+        background: done ? "#776a50" : "#e6dfd3",
         color: done ? "#faf8f4" : "#6b6357",
       }}
     >

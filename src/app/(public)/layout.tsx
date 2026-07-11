@@ -6,5 +6,9 @@
  * see README "Domain architecture".)
  */
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
-  return <div className="min-h-screen bg-paper py-0 sm:py-6">{children}</div>;
+  return (
+    <main id="main-content" className="min-h-screen bg-paper py-0 sm:py-6">
+      {children}
+    </main>
+  );
 }

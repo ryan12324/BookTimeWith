@@ -1,0 +1,1 @@
+ALTER TABLE "bookings" ADD COLUMN "calendar_revision" integer DEFAULT 0 NOT NULL;

@@ -1,0 +1,135 @@
+# Book Time With — Docker Compose deployment with a real PostgreSQL server.
+# The app and workers are stateless; PostgreSQL owns the only durable volume.
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_DB=booktimewith
+      - POSTGRES_USER=booktimewith
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD (openssl rand -hex 32)}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U booktimewith -d booktimewith"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  app:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      # Keep the origin off public interfaces; a trusted edge/Coolify proxy is
+      # responsible for TLS and sanitized client-IP headers.
+      - "127.0.0.1:3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://booktimewith:${POSTGRES_PASSWORD:?set URL-safe POSTGRES_PASSWORD}@postgres:5432/booktimewith
+      - DATABASE_POOL_MAX=${DATABASE_POOL_MAX:-10}
+      # REQUIRED in production: signs owner session cookies. Compose refuses to
+      # start if it's unset — a known/empty key means anyone can forge a login.
+      # Generate one with:  openssl rand -base64 48
+      - AUTH_TOKEN_SECRET=${AUTH_TOKEN_SECRET:?set AUTH_TOKEN_SECRET (openssl rand -base64 48)}
+      # Bearer token guarding GET /api/cron; required in production so the job
+      # endpoint isn't world-triggerable.
+      - CRON_SECRET=${CRON_SECRET:?set CRON_SECRET (openssl rand -base64 32)}
+      - RATE_LIMIT_SECRET=${RATE_LIMIT_SECRET:-}
+      - CALENDAR_TOKEN_SECRET=${CALENDAR_TOKEN_SECRET:-}
+      - TRUST_PROXY_HEADERS=true
+      - APP_URL=${APP_URL:-https://booktimewith.com}
+      - BOOKING_URL=${BOOKING_URL:-https://booktimewith.link}
+      # Passwordless sign-in and booking notifications are core product paths.
+      - EMAIL_WEBHOOK_URL=${EMAIL_WEBHOOK_URL:?set EMAIL_WEBHOOK_URL to the HTTPS mail transport}
+      - EMAIL_FROM_DOMAIN=${EMAIL_FROM_DOMAIN:-mail.booktimewith.com}
+      - CLOUDFLARE_EMAIL_TOKEN=${CLOUDFLARE_EMAIL_TOKEN:-}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
+      - MICROSOFT_CLIENT_ID=${MICROSOFT_CLIENT_ID:-}
+      - MICROSOFT_CLIENT_SECRET=${MICROSOFT_CLIENT_SECRET:-}
+      - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY:-}
+      - TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY:-}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-}
+      - STRIPE_PRICE_GBP=${STRIPE_PRICE_GBP:-}
+      - STRIPE_PRICE_USD=${STRIPE_PRICE_USD:-}
+      - STRIPE_PRICE_EUR=${STRIPE_PRICE_EUR:-}
+      - STRIPE_PRICE_AUD=${STRIPE_PRICE_AUD:-}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  scheduler:
+    build: .
+    healthcheck:
+      disable: true
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      - CRON_SECRET=${CRON_SECRET:?set CRON_SECRET (openssl rand -base64 32)}
+      - CRON_INTERVAL_SECONDS=${CRON_INTERVAL_SECONDS:-300}
+    command:
+      - /bin/sh
+      - -c
+      - |
+        while true; do
+          if ! wget -qO- --header="Authorization: Bearer $$CRON_SECRET" http://app:3000/api/cron; then
+            echo "Scheduled cron request failed" >&2
+          fi
+          sleep "$$CRON_INTERVAL_SECONDS"
+        done
+    restart: unless-stopped
+
+  auth-mail-scheduler:
+    build: .
+    healthcheck:
+      disable: true
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      - CRON_SECRET=${CRON_SECRET:?set CRON_SECRET (openssl rand -base64 32)}
+      - AUTH_MAIL_INTERVAL_SECONDS=${AUTH_MAIL_INTERVAL_SECONDS:-60}
+    command:
+      - /bin/sh
+      - -c
+      - |
+        while true; do
+          if ! wget -qO- --header="Authorization: Bearer $$CRON_SECRET" http://app:3000/api/cron/auth-mail; then
+            echo "Auth-mail retry request failed" >&2
+          fi
+          sleep "$$AUTH_MAIL_INTERVAL_SECONDS"
+        done
+    restart: unless-stopped
+
+  booking-mail-scheduler:
+    build: .
+    healthcheck:
+      disable: true
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      - CRON_SECRET=${CRON_SECRET:?set CRON_SECRET (openssl rand -base64 32)}
+      - BOOKING_MAIL_INTERVAL_SECONDS=${BOOKING_MAIL_INTERVAL_SECONDS:-60}
+    command:
+      - /bin/sh
+      - -c
+      - |
+        while true; do
+          if ! wget -qO- --header="Authorization: Bearer $$CRON_SECRET" http://app:3000/api/cron/booking-mail; then
+            echo "Booking-mail recovery request failed" >&2
+          fi
+          sleep "$$BOOKING_MAIL_INTERVAL_SECONDS"
+        done
+    restart: unless-stopped
+
+volumes:
+  postgres-data:

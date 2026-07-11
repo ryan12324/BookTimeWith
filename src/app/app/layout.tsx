@@ -11,7 +11,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <OwnerConfigProvider>
       <div className="min-h-screen bg-paper-dim">
         <OwnerNav />
-        <div className="mx-auto max-w-[960px] px-6 pb-16 md:px-8">{children}</div>
+        <main id="main-content" className="mx-auto max-w-[960px] px-6 pb-16 md:px-8">
+          {children}
+        </main>
       </div>
     </OwnerConfigProvider>
   );

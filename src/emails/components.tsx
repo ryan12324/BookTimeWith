@@ -7,7 +7,7 @@ import {
   Preview,
   Section,
   Text,
-} from "@react-email/components";
+} from "react-email";
 import type { CSSProperties } from "react";
 
 /**
@@ -26,7 +26,7 @@ const container: CSSProperties = {
   maxWidth: 600,
   margin: "0 auto",
   backgroundColor: "#faf8f4",
-  border: "1px solid #ddd5c8",
+  border: "1px solid #8f8677",
   borderRadius: 10,
   overflow: "hidden",
 };
@@ -35,7 +35,7 @@ const footerStrip: CSSProperties = {
   padding: "14px 40px",
   borderTop: "1px solid #efe9de",
   fontSize: 11,
-  color: "#a89f90",
+  color: "#71695d",
   fontFamily: SANS,
 };
 
@@ -98,7 +98,7 @@ export function Lead({ children }: { children: React.ReactNode }) {
 
 export function FinePrint({ children }: { children: React.ReactNode }) {
   return (
-    <Text style={{ margin: "16px 0 0", fontFamily: SANS, fontSize: 12, lineHeight: 1.6, color: "#a89f90" }}>
+    <Text style={{ margin: "16px 0 0", fontFamily: SANS, fontSize: 12, lineHeight: 1.6, color: "#71695d" }}>
       {children}
     </Text>
   );
@@ -154,24 +154,34 @@ export function CardLine({
 
 type BtnKind = "ink" | "outline" | "bronze-block";
 
-export function Btn({ children, kind = "ink" }: { children: React.ReactNode; kind?: BtnKind }) {
+export function Btn({
+  children,
+  kind = "ink",
+  href,
+}: {
+  children: React.ReactNode;
+  kind?: BtnKind;
+  /** Every shipped CTA must have a real destination, including previews. */
+  href: string;
+}) {
   const base: CSSProperties = {
     display: "inline-block",
     fontFamily: SANS,
     fontSize: 13,
     fontWeight: 600,
+    lineHeight: "20px",
     borderRadius: 6,
-    padding: "11px 18px",
+    padding: "12px 18px",
     textDecoration: "none",
   };
   const styles: Record<BtnKind, CSSProperties> = {
     ink: { ...base, background: "#26221c", color: "#faf8f4" },
-    outline: { ...base, border: "1px solid #ddd5c8", color: "#26221c" },
+    outline: { ...base, border: "1px solid #8f8677", color: "#26221c" },
     "bronze-block": {
       ...base,
       display: "block",
       textAlign: "center",
-      background: "#8a7a5c",
+      background: "#776a50",
       color: "#faf8f4",
       fontSize: 13.5,
       padding: "12px 0",
@@ -179,7 +189,7 @@ export function Btn({ children, kind = "ink" }: { children: React.ReactNode; kin
   };
   // Rendered as a styled anchor so it survives every mail client.
   return (
-    <a href="#" style={styles[kind]}>
+    <a href={href} style={styles[kind]}>
       {children}
     </a>
   );
