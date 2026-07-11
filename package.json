@@ -5,6 +5,9 @@
   "description": "Book Time With — the un-software for booking clients. Deliberately minimal scheduling for service businesses.",
   "scripts": {
     "dev": "next dev",
+    "dev:docker": "docker compose -f docker-compose.dev.yml up",
+    "dev:docker:down": "docker compose -f docker-compose.dev.yml down",
+    "dev:docker:reset": "docker compose -f docker-compose.dev.yml down -v",
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --max-warnings=0",

@@ -44,6 +44,22 @@ an edge worker without a compatible PostgreSQL adapter.
 
 ## Run locally
 
+The quickest path is the development Compose stack. It starts PostgreSQL 16
+and the Next.js dev server with hot reload, while keeping dependencies, build
+cache, and database data in named Docker volumes:
+
+```bash
+npm run dev:docker       # app: http://localhost:3000
+npm run dev:docker:down  # stop and retain the dev database
+npm run dev:docker:reset # stop and delete all dev data/caches
+```
+
+Set `DEV_APP_PORT` or `DEV_POSTGRES_PORT` when the defaults are occupied. The
+Compose credentials are intentionally local-only and are never used by the
+Coolify Dockerfile deployment.
+
+To run Next.js directly on the host instead:
+
 ```bash
 npm install
 docker run --name booktimewith-postgres \

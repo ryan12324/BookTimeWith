@@ -13,3 +13,4 @@ project
 .claude
 docs
 Dockerfile
+docker-compose.dev.yml
