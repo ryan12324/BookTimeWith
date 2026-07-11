@@ -73,28 +73,21 @@ Useful routes:
 | `/emails` | Email previews and the scoped local outbox |
 | `/api/health` | Database readiness probe |
 
-## Deploy with Docker/Coolify
+## Deploy with Coolify
 
-The included [`Dockerfile`](Dockerfile) builds Next’s standalone server.
-[`docker-compose.yml`](docker-compose.yml) runs the app, a five-minute general
-scheduler, and isolated one-minute auth-mail and booking-mail recovery workers.
-It also runs PostgreSQL 16; the application containers are stateless and only
-the database service mounts the durable volume. For managed PostgreSQL, deploy
-the Dockerfile with the provider's `DATABASE_URL` instead.
+The included [`Dockerfile`](Dockerfile) builds the stateless Next.js standalone
+server Coolify deploys. Provision PostgreSQL 16+ in Coolify (or attach a managed
+database), then supply its connection string as `DATABASE_URL`; the application
+container does not need a persistent filesystem volume.
 
 Production readiness requires strong `AUTH_TOKEN_SECRET` and `CRON_SECRET`
 values plus an HTTPS outbound email transport (passwordless sign-in depends on
 it). Copy
-[`.env.example`](.env.example), supply the relevant integration credentials,
-and complete [`docs/LAUNCH_CHECKLIST.md`](docs/LAUNCH_CHECKLIST.md).
-
-```bash
-export AUTH_TOKEN_SECRET="$(openssl rand -base64 48)"
-export CRON_SECRET="$(openssl rand -base64 32)"
-export POSTGRES_PASSWORD="$(openssl rand -hex 32)" # URL-safe
-export EMAIL_WEBHOOK_URL="https://your-mail-transport.example/send"
-docker compose up --build
-```
+[`.env.example`](.env.example), add the relevant values to the Coolify
+environment, and complete [`docs/LAUNCH_CHECKLIST.md`](docs/LAUNCH_CHECKLIST.md).
+Configure three Coolify scheduled tasks: `/api/cron` every five minutes, plus
+`/api/cron/auth-mail` and `/api/cron/booking-mail` every minute. Each request
+must send `Authorization: Bearer $CRON_SECRET`.
 
 Migrations run on first database access under an advisory lock and the
 container health check calls `/api/health`. Back up PostgreSQL (or configure

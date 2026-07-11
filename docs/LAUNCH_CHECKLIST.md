@@ -10,6 +10,8 @@ each environment before accepting real client data.
   HTTPS, redirects, and cookie host isolation on both domains.
 - [ ] Provision PostgreSQL 16+ (or a compatible managed service), set the
   secret `DATABASE_URL`, and include the provider-required TLS `sslmode`.
+- [ ] Configure the Coolify application to build the repository Dockerfile;
+  do not attach an application data volume or add a Compose deployment layer.
 - [ ] Budget `DATABASE_POOL_MAX × app replicas` below the database connection
   limit, leaving capacity for migrations, operators, backups, and maintenance.
 - [ ] Enable encrypted PostgreSQL backups/point-in-time recovery and document
@@ -22,9 +24,9 @@ each environment before accepting real client data.
   rollback before directing traffic to PostgreSQL.
 - [ ] Configure uptime checks for `/api/health`, request-error reporting, disk
   capacity alerts, email failures, calendar degradation, and failed cron runs.
-- [ ] Confirm the general scheduler calls `/api/cron` every five minutes and
-  the isolated workers call `/api/cron/auth-mail` and `/api/cron/booking-mail`
-  every minute with the production cron bearer token.
+- [ ] Configure Coolify scheduled tasks so `/api/cron` runs every five minutes
+  and `/api/cron/auth-mail` plus `/api/cron/booking-mail` run every minute, all
+  with the production cron bearer token.
 - [ ] Configure the edge/reverse proxy to discard client-supplied
   `CF-Connecting-IP`, `X-Forwarded-For`, and `X-Real-IP` values and set one
   trustworthy client address before requests reach the app; keep the origin
