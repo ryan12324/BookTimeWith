@@ -16,6 +16,7 @@
     "test:watch": "vitest",
     "check": "npm run lint && npm run typecheck && npm test && npm run build",
     "db:generate": "drizzle-kit generate",
+    "db:migrate": "node scripts/migrate.mjs",
     "db:import:pglite": "node scripts/import-pglite.mjs"
   },
   "dependencies": {

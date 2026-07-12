@@ -14,6 +14,8 @@ provider-console settings, callback URLs, scopes, and webhook events.
   secret `DATABASE_URL`, and include the provider-required TLS `sslmode`.
 - [ ] Configure the Coolify application to build the repository Dockerfile;
   do not attach an application data volume or add a Compose deployment layer.
+- [ ] Confirm deployment logs show `PostgreSQL migrations are current.` before
+  the Next.js server starts; a migration failure must stop the container.
 - [ ] Budget `DATABASE_POOL_MAX × app replicas` below the database connection
   limit, leaving capacity for migrations, operators, backups, and maintenance.
 - [ ] Enable encrypted PostgreSQL backups/point-in-time recovery and document

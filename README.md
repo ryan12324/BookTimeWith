@@ -106,11 +106,13 @@ Configure three Coolify scheduled tasks: `/api/cron` every five minutes, plus
 `/api/cron/auth-mail` and `/api/cron/booking-mail` every minute. Each request
 must send `Authorization: Bearer $CRON_SECRET`.
 
-Migrations run on first database access under an advisory lock and the
-container health check calls `/api/health`. Back up PostgreSQL (or configure
-managed point-in-time recovery) and rehearse a restore before accepting real
-bookings. Tune `DATABASE_POOL_MAX` per app replica against the server's
-connection limit; its default is 10.
+The production entrypoint runs every migration under that advisory lock and
+exits on failure before starting the HTTP server. First database access retains
+the same locked migration check as defense in depth. The container health check
+calls `/api/health`. Back up PostgreSQL (or configure managed point-in-time
+recovery) and rehearse a restore before accepting real bookings. Tune
+`DATABASE_POOL_MAX` per app replica against the server's connection limit; its
+default is 10.
 
 ### One-time import from the old PGlite runtime
 
