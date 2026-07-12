@@ -112,6 +112,7 @@ export function bookableDays(
   now: Date = new Date(),
   count = 3,
   viewerTz: string = cfg.timezone,
+  after?: Date,
 ): DaySlots[] {
   if (isAwayNow(cfg.away, now, cfg.timezone)) return [];
 
@@ -131,6 +132,7 @@ export function bookableDays(
     for (const mins of generateSlots(free, cfg.duration)) {
       const start = validSlotInstant(y, m, d, mins, tz);
       if (!start) continue;
+      if (after && start.getTime() <= after.getTime()) continue;
       if (!meetsMinNotice(start, now) || !withinHorizon(start, now, cfg.bookingHorizonDays)) continue;
 
       // Bucket and label in the VIEWER's timezone — the booking page renders

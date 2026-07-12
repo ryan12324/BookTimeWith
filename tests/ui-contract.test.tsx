@@ -7,7 +7,7 @@ import { DurationStepper } from "@/components/DurationStepper";
 import { outboxDeliveryLabel } from "@/components/app/Outbox";
 import { PlanSection, VerificationBanner } from "@/components/app/Settings";
 import { CardShell } from "@/components/client/CardShell";
-import { DayTabs, SlotGrid } from "@/components/client/Picker";
+import { DatePager, DayTabs, SlotGrid } from "@/components/client/Picker";
 import { RouteError } from "@/components/RouteError";
 import {
   CalendarDownloadLinks,
@@ -93,6 +93,30 @@ describe("UI accessibility contracts", () => {
     expect(days).toContain("min-h-[44px]");
     expect(slots).toContain('aria-pressed="true"');
     expect(slots).toContain("min-h-[44px]");
+  });
+
+  it("makes the full booking window reachable with accessible date paging", () => {
+    const firstPage = renderToStaticMarkup(
+      <DatePager
+        hasEarlier={false}
+        hasMore
+        onEarlier={vi.fn()}
+        onMore={vi.fn()}
+      />,
+    );
+    const laterPage = renderToStaticMarkup(
+      <DatePager
+        hasEarlier
+        hasMore={false}
+        onEarlier={vi.fn()}
+        onMore={vi.fn()}
+      />,
+    );
+
+    expect(firstPage).toContain('aria-label="Available date pages"');
+    expect(firstPage).toContain("More dates");
+    expect(laterPage).toContain("Earlier dates");
+    expect(firstPage).toContain("min-h-[44px]");
   });
 
   it("locks the active subscription currency and explains why", () => {

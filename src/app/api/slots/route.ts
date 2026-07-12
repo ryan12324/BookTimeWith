@@ -6,6 +6,7 @@ import { bookingByManageToken, ownerByHandle, slotsFor } from "@/db/repo";
 import { canAcceptBookings } from "@/lib/entitlements";
 import { requestIp, takeRateLimit } from "@/lib/rate-limit";
 import { CalendarUnavailableError } from "@/lib/calendar";
+import { formatInTimeZone } from "date-fns-tz";
 
 export const dynamic = "force-dynamic";
 
@@ -68,7 +69,8 @@ export async function GET(request: Request) {
   // labelled and bucketed into days — a 9:00-London slot files under Monday
   // evening for someone in Sydney. Validated before use; falls back to the
   // owner's zone if absent or bogus.
-  const tzParam = new URL(request.url).searchParams.get("tz");
+  const url = new URL(request.url);
+  const tzParam = url.searchParams.get("tz");
   let viewerTz: string | undefined;
   if (tzParam) {
     try {
@@ -78,11 +80,17 @@ export async function GET(request: Request) {
       viewerTz = undefined;
     }
   }
+  const afterParam = url.searchParams.get("after");
+  const after = afterParam ? new Date(afterParam) : undefined;
+  if (after && !Number.isFinite(after.getTime())) {
+    return NextResponse.json({ error: "Invalid availability cursor" }, { status: 400 });
+  }
   let days;
+  const now = new Date();
   try {
     days = !canAcceptBookings(owner)
       ? []
-      : await slotsFor(db, owner.id, new Date(), 3, viewerTz);
+      : await slotsFor(db, owner.id, now, 4, viewerTz, after);
   } catch (error) {
     if (error instanceof CalendarUnavailableError) {
       return NextResponse.json(
@@ -95,12 +103,21 @@ export async function GET(request: Request) {
     }
     throw error;
   }
+  const visibleDays = days.slice(0, 3);
+  const lastVisibleSlot = visibleDays.at(-1)?.slots.at(-1);
+  const horizonEnd = new Date(now.getTime() + owner.bookingHorizonDays * 86_400_000);
   return NextResponse.json(
     {
-      days: days.map((d) => ({
+      days: visibleDays.map((d) => ({
         ...d,
         slots: d.slots.map((s) => ({ startsAt: s.start.toISOString(), label: s.label })),
       })),
+      hasMore: days.length > visibleDays.length,
+      nextCursor: days.length > visibleDays.length && lastVisibleSlot
+        ? lastVisibleSlot.start.toISOString()
+        : null,
+      bookingHorizonDays: owner.bookingHorizonDays,
+      bookingThrough: formatInTimeZone(horizonEnd, viewerTz ?? owner.timezone, "d MMMM yyyy"),
     },
     { headers: { "Cache-Control": "private, no-store" } },
   );

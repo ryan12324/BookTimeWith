@@ -322,10 +322,11 @@ export async function slotsFor(
   now = new Date(),
   count = 3,
   viewerTz?: string,
+  after?: Date,
 ): Promise<DaySlots[]> {
   const cfg = await getOwnerConfig(db, ownerId);
   const busy = await busySpansFor(db, ownerId, undefined, true, cfg.bookingHorizonDays);
-  return bookableDays(cfg, busy, now, count, viewerTz ?? cfg.timezone);
+  return bookableDays(cfg, busy, now, count, viewerTz ?? cfg.timezone, after);
 }
 
 /**

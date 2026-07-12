@@ -52,6 +52,40 @@ export function DayTabs({
   );
 }
 
+export function DatePager({
+  hasEarlier,
+  hasMore,
+  onEarlier,
+  onMore,
+}: {
+  hasEarlier: boolean;
+  hasMore: boolean;
+  onEarlier: () => void;
+  onMore: () => void;
+}) {
+  if (!hasEarlier && !hasMore) return null;
+  return (
+    <nav aria-label="Available date pages" className="mt-3 flex items-center justify-between gap-3">
+      <button
+        type="button"
+        onClick={onEarlier}
+        disabled={!hasEarlier}
+        className="min-h-[44px] rounded-input px-2 font-sans text-[12.5px] font-semibold text-bronze-ink disabled:invisible"
+      >
+        ← Earlier dates
+      </button>
+      <button
+        type="button"
+        onClick={onMore}
+        disabled={!hasMore}
+        className="min-h-[44px] rounded-input px-2 font-sans text-[12.5px] font-semibold text-bronze-ink disabled:invisible"
+      >
+        More dates →
+      </button>
+    </nav>
+  );
+}
+
 /** 3-column slot grid; selected slot inverts to ink. */
 export function SlotGrid({
   slots,

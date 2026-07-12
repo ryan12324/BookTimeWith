@@ -7,7 +7,7 @@ import { clientZone, zoneLabel } from "@/lib/timezone";
 import { googleCalendarUrl, icsDataUri, outlookCalendarUrl, type CalendarEvent } from "@/lib/ics";
 import { StatusBadge } from "@/components/ui";
 import { CardShell } from "./CardShell";
-import { DayTabs, SlotGrid } from "./Picker";
+import { DatePager, DayTabs, SlotGrid } from "./Picker";
 import { T } from "@/lib/tokens";
 
 type Step = "pick" | "details" | "done";
@@ -139,6 +139,11 @@ export function BookingFlow() {
 
   const [step, setStep] = useState<Step>("pick");
   const [days, setDays] = useState<ApiDay[] | null>(null); // null = loading
+  const [bookingThrough, setBookingThrough] = useState("");
+  const [hasMoreDays, setHasMoreDays] = useState(false);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [pageCursors, setPageCursors] = useState<Array<string | null>>([null]);
+  const [page, setPage] = useState(0);
   const [day, setDay] = useState(0);
   const [slot, setSlot] = useState(-1);
   const [name, setName] = useState("");
@@ -173,27 +178,54 @@ export function BookingFlow() {
     booked?.durationMinutes ?? cfg.duration,
   )}`;
 
-  const loadSlots = useCallback(async () => {
+  const loadSlots = useCallback(async (after: string | null = null) => {
     setDays(null);
     setSlotError(null);
     try {
       const params = new URLSearchParams({ tz: clientZone() });
       const pathHandle = window.location.pathname.split("/").filter(Boolean)[0];
       if (cfg.handle || pathHandle) params.set("handle", cfg.handle || pathHandle);
+      if (after) params.set("after", after);
       const res = await fetch(`/api/slots?${params.toString()}`);
-      const data = (await res.json()) as { days?: ApiDay[]; error?: string };
+      const data = (await res.json()) as {
+        days?: ApiDay[];
+        error?: string;
+        hasMore?: boolean;
+        nextCursor?: string | null;
+        bookingThrough?: string;
+      };
       if (!res.ok || !Array.isArray(data.days)) {
         throw new Error(data.error ?? "Availability couldn't load.");
       }
       setDays(data.days);
+      setBookingThrough(data.bookingThrough ?? "");
+      setHasMoreDays(Boolean(data.hasMore));
+      setNextCursor(data.nextCursor ?? null);
+      setDay(0);
+      setSlot(-1);
     } catch {
       setDays([]);
       setSlotError("Availability couldn't load. Check your connection and try again.");
     }
   }, [cfg.handle]);
   useEffect(() => {
-    void loadSlots();
+    void loadSlots(null);
   }, [loadSlots]);
+
+  const showNextDates = () => {
+    if (!nextCursor) return;
+    const nextPage = page + 1;
+    setPageCursors((current) => [...current.slice(0, nextPage), nextCursor]);
+    setPage(nextPage);
+    void loadSlots(nextCursor);
+  };
+
+  const showEarlierDates = () => {
+    if (page === 0) return;
+    const previousPage = page - 1;
+    setPage(previousPage);
+    void loadSlots(pageCursors[previousPage] ?? null);
+  };
 
   const currentDay = days?.[day];
   const hasSlot = slot >= 0 && !!currentDay?.slots[slot];
@@ -259,7 +291,7 @@ export function BookingFlow() {
         if (challengeSiteKey) resetChallenge();
         setConflict(true);
         setSlot(-1);
-        await loadSlots();
+        await loadSlots(pageCursors[page] ?? null);
         setStep("pick");
         return;
       }
@@ -290,7 +322,9 @@ export function BookingFlow() {
       setChallengeSiteKey(null);
       setTurnstileToken(null);
       setChallengeUnavailable(false);
-      await loadSlots();
+      setPage(0);
+      setPageCursors([null]);
+      await loadSlots(null);
       setStep("done");
     } catch {
       if (challengeSiteKey) resetChallenge();
@@ -418,15 +452,37 @@ export function BookingFlow() {
             )}
             {days && !slotError && days.length === 0 && (
               <div className="py-8 text-center font-sans text-[13.5px] leading-[1.6] text-body">
-                Nothing available in the next few weeks.
+                {page > 0 ? "No more open times." : bookingThrough
+                  ? `No open times before ${bookingThrough}.`
+                  : "No open times available."}
+                {page > 0 && (
+                  <button
+                    type="button"
+                    onClick={showEarlierDates}
+                    className="mx-auto mt-3 block min-h-[44px] px-3 font-semibold text-bronze-ink"
+                  >
+                    ← Earlier dates
+                  </button>
+                )}
               </div>
             )}
             {days && !slotError && days.length > 0 && (
               <>
+                {bookingThrough && (
+                  <p className="mb-3 text-center font-sans text-[11.5px] text-body">
+                    Book through {bookingThrough}
+                  </p>
+                )}
                 <DayTabs
                   days={days}
                   selected={day}
                   onPick={(i) => { setDay(i); setSlot(-1); setSubmitError(null); requestKey.current = null; }}
+                />
+                <DatePager
+                  hasEarlier={page > 0}
+                  hasMore={hasMoreDays}
+                  onEarlier={showEarlierDates}
+                  onMore={showNextDates}
                 />
                 <div className="mt-[18px]">
                   <SlotGrid

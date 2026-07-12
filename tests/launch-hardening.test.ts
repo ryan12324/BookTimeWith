@@ -47,6 +47,8 @@ import {
   subtractBusy,
   withinHorizon,
 } from "../src/lib/scheduling";
+import { bookableDays } from "../src/lib/slots";
+import { DEFAULT_OWNER } from "../src/lib/mock";
 import {
   createSession,
   safeNextPath,
@@ -116,6 +118,33 @@ describe("launch hardening", () => {
     expect(withinHorizon(new Date("2026-07-14T10:00:00Z"), now, 2)).toBe(true);
     expect(withinHorizon(new Date("2026-07-14T10:00:01Z"), now, 2)).toBe(false);
     expect(withinHorizon(new Date("2026-07-19T10:00:00Z"), now, 7)).toBe(true);
+  });
+
+  it("pages through every open date without crossing the owner's horizon", () => {
+    const now = new Date("2026-07-12T00:00:00Z");
+    const cells = Object.fromEntries(
+      Array.from({ length: 7 }, (_, col) => [
+        [`${col}-9-a`, 1],
+        [`${col}-9-b`, 1],
+      ]).flat(),
+    );
+    const config = {
+      ...DEFAULT_OWNER,
+      cells,
+      duration: 50,
+      bookingHorizonDays: 7,
+      timezone: "UTC",
+    };
+    const firstPage = bookableDays(config, [], now, 3, "UTC");
+    const cursor = firstPage.at(-1)?.slots.at(-1)?.start;
+    const secondPage = bookableDays(config, [], now, 3, "UTC", cursor);
+
+    expect(firstPage).toHaveLength(3);
+    expect(secondPage).toHaveLength(3);
+    expect(secondPage[0].slots[0].start.getTime()).toBeGreaterThan(cursor!.getTime());
+    expect(secondPage.at(-1)!.slots.at(-1)!.start.getTime()).toBeLessThanOrEqual(
+      now.getTime() + 7 * 86_400_000,
+    );
   });
 
   it("materializes owner wall time correctly on both sides of UK DST", () => {
