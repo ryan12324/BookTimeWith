@@ -98,9 +98,10 @@ container does not need a persistent filesystem volume.
 
 Production readiness requires strong `AUTH_TOKEN_SECRET` and `CRON_SECRET`
 values plus an HTTPS outbound email transport (passwordless sign-in depends on
-it). Copy
-[`.env.example`](.env.example), add the relevant values to the Coolify
-environment, and complete [`docs/LAUNCH_CHECKLIST.md`](docs/LAUNCH_CHECKLIST.md).
+it). Follow the provider-by-provider
+[`docs/SECRETS_SETUP.md`](docs/SECRETS_SETUP.md), copy the relevant values from
+[`.env.example`](.env.example) into the Coolify environment, and complete
+[`docs/LAUNCH_CHECKLIST.md`](docs/LAUNCH_CHECKLIST.md).
 Configure three Coolify scheduled tasks: `/api/cron` every five minutes, plus
 `/api/cron/auth-mail` and `/api/cron/booking-mail` every minute. Each request
 must send `Authorization: Bearer $CRON_SECRET`.

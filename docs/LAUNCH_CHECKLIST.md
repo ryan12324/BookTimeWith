@@ -2,7 +2,9 @@
 
 Code can enforce application invariants; it cannot configure providers, review
 legal text, or prove that backups restore. Complete and record these checks for
-each environment before accepting real client data.
+each environment before accepting real client data. Use
+[`SECRETS_SETUP.md`](SECRETS_SETUP.md) for the exact secret-generation commands,
+provider-console settings, callback URLs, scopes, and webhook events.
 
 ## Infrastructure
 
