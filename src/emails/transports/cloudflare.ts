@@ -90,17 +90,20 @@ export class CloudflareEmailTransport implements EmailTransport {
         };
       }
 
-      if (data.result?.permanent_bounces?.includes(message.to)) {
+      // This adapter sends exactly one recipient per request. Cloudflare may
+      // normalize the address it echoes (for example, casing), so list
+      // membership is more reliable than comparing the returned string to the
+      // original input byte-for-byte.
+      if ((data.result?.permanent_bounces?.length ?? 0) > 0) {
         return {
           status: "failed",
           error: "Cloudflare Email permanently rejected the recipient",
         };
       }
 
-      const accepted = [
-        ...(data.result?.delivered ?? []),
-        ...(data.result?.queued ?? []),
-      ].includes(message.to);
+      const accepted =
+        (data.result?.delivered?.length ?? 0) > 0 ||
+        (data.result?.queued?.length ?? 0) > 0;
       if (!data.result?.message_id || !accepted) {
         return {
           status: "failed",
@@ -120,4 +123,3 @@ export class CloudflareEmailTransport implements EmailTransport {
     }
   }
 }
-

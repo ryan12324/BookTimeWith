@@ -11,13 +11,13 @@ const environment = {
   EMAIL_TRANSPORT: "cloudflare",
   CLOUDFLARE_ACCOUNT_ID: "a".repeat(32),
   CLOUDFLARE_EMAIL_API_TOKEN: "api-token",
-  EMAIL_FROM_DOMAIN: "mail.booktimewith.com",
+  EMAIL_FROM_DOMAIN: "booking.booktimewith.com",
 };
 
 const message = {
   to: "client@example.com",
   from: {
-    address: "no-reply@mail.booktimewith.com",
+    address: "no-reply@booking.booktimewith.com",
     name: "Dana via booktimewith.com",
   },
   replyTo: "dana@example.com",
@@ -90,7 +90,9 @@ describe("Cloudflare Email Service adapter", () => {
         result: {
           message_id: "message-123",
           delivered: [],
-          queued: [message.to],
+          // Cloudflare is allowed to normalize the echoed address. The request
+          // contains one recipient, so a non-empty queue is authoritative.
+          queued: [message.to.toUpperCase()],
           permanent_bounces: [],
         },
       }),
@@ -116,7 +118,7 @@ describe("Cloudflare Email Service adapter", () => {
     expect(JSON.parse(init.body as string)).toEqual({
       to: ["client@example.com"],
       from: {
-        address: "no-reply@mail.booktimewith.com",
+        address: "no-reply@booking.booktimewith.com",
         name: "Dana via booktimewith.com",
       },
       reply_to: "dana@example.com",
