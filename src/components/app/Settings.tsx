@@ -17,6 +17,34 @@ const PROVIDERS = [
   { key: "outlook", name: "Outlook", dot: "#0f6cbd" },
 ];
 
+function DisclosureSection({
+  title,
+  summary,
+  children,
+}: {
+  title: string;
+  summary: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <details className="group border-b border-hairline py-1">
+      <summary className="flex min-h-[64px] cursor-pointer list-none items-center justify-between gap-4 py-3 marker:content-none [&::-webkit-details-marker]:hidden">
+        <span className="font-sans text-[14px] font-semibold text-ink">{title}</span>
+        <span className="flex min-w-0 items-center gap-3">
+          <span className="truncate font-sans text-[12px] text-body">{summary}</span>
+          <span
+            aria-hidden="true"
+            className="text-[17px] leading-none text-body transition-transform duration-200 ease-out group-open:rotate-45"
+          >
+            +
+          </span>
+        </span>
+      </summary>
+      <div className="pb-6 pt-1">{children}</div>
+    </details>
+  );
+}
+
 export function VerificationBanner({
   email,
   busy,
@@ -195,6 +223,13 @@ export function PlanSection({
     paused: <span className="text-body">Paused — add a card and your page comes straight back.</span>,
     cancelled: <span className="text-body">Cancelled — bookings already made still happen.</span>,
   };
+  const summary: Record<string, string> = {
+    trialing: `${PRICES[currency]} a month`,
+    active: `${PRICES[currency]} a month`,
+    past_due: "Payment issue",
+    paused: "Paused",
+    cancelled: "Cancelled",
+  };
 
   const manageBilling = async () => {
     if (billingBusy) return;
@@ -237,7 +272,10 @@ export function PlanSection({
   };
 
   return (
-    <section className="pb-2 pt-6">
+    <DisclosureSection
+      title="Plan and account"
+      summary={summary[planStatus] ?? "Billing and data"}
+    >
       <div className="flex flex-wrap items-center justify-between gap-[10px]">
         <div>
           <SectionLabel>Your plan</SectionLabel>
@@ -336,7 +374,7 @@ export function PlanSection({
         </div>
       )}
       {note && <div role="alert" className="mt-2 font-sans text-[12px] text-body">{note}</div>}
-    </section>
+    </DisclosureSection>
   );
 }
 
@@ -647,9 +685,9 @@ export function Settings() {
 
   return (
     <div className="mx-auto mt-9 max-w-[680px]">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
+      <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-line-soft pb-5">
         <h1 className="font-serif text-[28px] tracking-[-.01em]">Settings</h1>
-        <div className="font-sans text-[12.5px] text-body">This is all of them.</div>
+        <div className="font-sans text-[12px] text-body">Changes save automatically</div>
       </div>
       {pageNote && (
         <div role="status" className="mt-3 rounded-chip border border-line-soft bg-white px-4 py-3 font-sans text-[12.5px] text-body">
@@ -665,10 +703,13 @@ export function Settings() {
         />
       )}
 
-      <div className="mt-5 rounded-card border border-line-soft bg-white px-6 pb-8 pt-2 shadow-card md:px-9">
-        {/* YOUR LINK */}
-        <section className="border-b border-hairline pb-6 pt-[26px]">
-          <SectionLabel className="mb-[10px]">Your link</SectionLabel>
+      <div>
+        {/* BOOKING PAGE */}
+        <DisclosureSection
+          title="Booking page"
+          summary={`${config.name} · ${config.service}`}
+        >
+          <SectionLabel className="mb-[10px] mt-5">Your link</SectionLabel>
           <OwnerHandle handle={config.handle} onCommit={(handle) => update({ handle })} />
           <SectionLabel as="label" htmlFor="settings-name" className="mb-2 mt-5 block">
             Public name
@@ -681,10 +722,8 @@ export function Settings() {
             autoComplete="name"
             className="w-full max-w-[420px] rounded-chip border border-line px-[15px] py-[13px] font-medium text-ink outline-none"
           />
-        </section>
-
         {/* YOUR SERVICE */}
-        <section className="border-b border-hairline py-6">
+        <div className="pt-6">
           <SectionLabel as="label" htmlFor="settings-service" className="mb-[10px] block">Your service</SectionLabel>
           <input
             id="settings-service"
@@ -741,10 +780,14 @@ export function Settings() {
             className="mt-3 w-full max-w-[420px] rounded-chip border border-line px-[15px] py-3 font-medium text-ink outline-none"
             style={{ fontSize: 13.5 }}
           />
-        </section>
+        </div>
+        </DisclosureSection>
 
         {/* YOUR HOURS */}
-        <section className="border-b border-hairline py-6">
+        <DisclosureSection
+          title="Availability"
+          summary={`${g.summary.split(" · ")[0]} · ${config.timezone}`}
+        >
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <SectionLabel>Your hours</SectionLabel>
             <div className="font-sans text-[11.5px] text-body">{g.summary}</div>
@@ -793,11 +836,13 @@ export function Settings() {
           <div className="mt-[14px]">
             <AvailabilityGrid cellHeight={26} />
           </div>
-        </section>
+        </DisclosureSection>
 
         {/* CALENDAR */}
-        <section className="border-b border-hairline py-6">
-          <SectionLabel className="mb-[10px]">Calendar</SectionLabel>
+        <DisclosureSection
+          title="Calendar"
+          summary={config.calendar ? `${config.calendar} connected` : "Not connected"}
+        >
           {!config.calendar ? (
             <>
               <p className="mb-[14px] font-sans text-[13px] leading-[1.5] text-body">
@@ -884,11 +929,13 @@ export function Settings() {
               </div>
             </div>
           )}
-        </section>
+        </DisclosureSection>
 
         {/* EMAILS TO YOU */}
-        <section className="border-b border-hairline py-6">
-          <SectionLabel className="mb-[14px]">Emails to you</SectionLabel>
+        <DisclosureSection
+          title="Notifications"
+          summary={config.notifyBook || config.notifyMorning ? "Email updates on" : "Email updates off"}
+        >
           {!config.emailDeliveryConfigured && (
             <div
               role="alert"
@@ -918,7 +965,7 @@ export function Settings() {
             resendBusy={verifyBusy}
             resendNote={verifyNote}
           />
-        </section>
+        </DisclosureSection>
 
         {/* YOUR PLAN */}
         <PlanSection
