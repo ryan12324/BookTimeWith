@@ -174,7 +174,7 @@ describe("Cloudflare Email Service adapter", () => {
     expect(body.attachments[0].content).toBe("YWxyZWFkeS1lbmNvZGVk");
   });
 
-  it("returns actionable failures for API errors, permanent bounces, and malformed success", async () => {
+  it("returns actionable failures for API errors and permanent bounces", async () => {
     const responses = [
       new Response(
         JSON.stringify({
@@ -192,7 +192,6 @@ describe("Cloudflare Email Service adapter", () => {
           permanent_bounces: [message.to],
         },
       }),
-      Response.json({ success: true, result: { delivered: [message.to] } }),
     ];
     const request = vi.fn();
     for (const response of responses) request.mockResolvedValueOnce(response);
@@ -209,9 +208,19 @@ describe("Cloudflare Email Service adapter", () => {
       status: "failed",
       error: "Cloudflare Email permanently rejected the recipient",
     });
+  });
+
+  it("accepts a successful envelope when Cloudflare omits recipient status", async () => {
+    const request = vi.fn().mockResolvedValue(
+      Response.json({ success: true, result: {} }),
+    );
+    const transport = new CloudflareEmailTransport(
+      { accountId: "account-123", apiToken: "api-token" },
+      request,
+    );
+
     await expect(transport.send(message)).resolves.toEqual({
-      status: "failed",
-      error: "Cloudflare Email returned success without accepting the recipient",
+      status: "delivered",
     });
   });
 

@@ -90,24 +90,13 @@ export class CloudflareEmailTransport implements EmailTransport {
         };
       }
 
-      // This adapter sends exactly one recipient per request. Cloudflare may
-      // normalize the address it echoes (for example, casing), so list
-      // membership is more reliable than comparing the returned string to the
-      // original input byte-for-byte.
+      // Cloudflare can return a successful API envelope without populating the
+      // immediate delivery/queue arrays, even though it has accepted and sends
+      // the message. Only an explicit bounce should override `success: true`.
       if ((data.result?.permanent_bounces?.length ?? 0) > 0) {
         return {
           status: "failed",
           error: "Cloudflare Email permanently rejected the recipient",
-        };
-      }
-
-      const accepted =
-        (data.result?.delivered?.length ?? 0) > 0 ||
-        (data.result?.queued?.length ?? 0) > 0;
-      if (!data.result?.message_id || !accepted) {
-        return {
-          status: "failed",
-          error: "Cloudflare Email returned success without accepting the recipient",
         };
       }
 
