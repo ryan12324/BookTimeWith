@@ -22,11 +22,17 @@ import {
   OwnerVerifyEmail,
   Welcome,
 } from "./templates";
+import {
+  createEmailTransport,
+  emailTransportConfiguration,
+  isEmailTransportConfigured,
+} from "./transports/factory";
+import type { EmailAttachment } from "./transports/types";
 
 /**
  * The outbound-email pipeline. Locally there are no SMTP credentials, so the
  * "transport" is the email_outbox table (browse it at /emails) — in production
- * this function hands the same rendered HTML to the Cloudflare Email Worker.
+ * a provider adapter hands the same rendered HTML to Cloudflare Email Service.
  * email_log enforces idempotency for anything cron-ish via dedupe keys.
  */
 
@@ -107,11 +113,7 @@ export const STALE_OUTBOX_DELIVERY_STATES = [
   "processing",
 ] as const;
 
-export interface Attachment {
-  filename: string;
-  contentType: string;
-  content: string; // text (the .ics); base64 in production for binaries
-}
+export type Attachment = EmailAttachment;
 
 interface Envelope {
   to: string;
@@ -143,64 +145,32 @@ const SYSTEM_FROM = "booktimewith.com";
 const ownerFrom = (owner: Owner) => `${owner.name.split(",")[0]} via booktimewith.com`;
 
 /**
- * Hand off to the real transport when configured (EMAIL_WEBHOOK_URL — a
- * Cloudflare Email Worker / MailChannels-shaped endpoint). Returns the
- * delivery status recorded on the outbox row — an unconfigured transport is
- * "skipped", loudly, not silently fine. A transport failure never breaks the
- * booking that triggered it.
+ * Hand off through the provider-neutral adapter boundary. An unconfigured
+ * transport is "skipped", loudly, not silently fine. A provider failure never
+ * breaks the booking that triggered it.
  */
 async function deliver(
   env: DeliveryPayload,
   html: string,
 ): Promise<{ status: "delivered" | "failed" | "skipped"; error?: string }> {
-  const url = process.env.EMAIL_WEBHOOK_URL?.trim();
-  if (!url) return { status: "skipped", error: "EMAIL_WEBHOOK_URL is not configured" };
-  if (
-    process.env.NODE_ENV === "production" &&
-    (!/^https:\/\//i.test(url) || !URL.canParse(url))
-  ) {
-    return {
-      status: "failed",
-      error: "EMAIL_WEBHOOK_URL must use https in production",
-    };
+  const configuration = emailTransportConfiguration();
+  if (!configuration.configured) {
+    return { status: "skipped", error: configuration.error };
   }
-  try {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(process.env.CLOUDFLARE_EMAIL_TOKEN?.trim()
-          ? { Authorization: `Bearer ${process.env.CLOUDFLARE_EMAIL_TOKEN.trim()}` }
-          : {}),
-        ...(env.idempotencyKey
-          ? { "Idempotency-Key": env.idempotencyKey }
-          : {}),
-      },
-      body: JSON.stringify({
-        personalizations: [{ to: [{ email: env.to }] }],
-        from: {
-          email: `no-reply@${process.env.EMAIL_FROM_DOMAIN?.trim() || "mail.booktimewith.com"}`,
-          name: env.from,
-        },
-        ...(env.replyTo ? { reply_to: { email: env.replyTo } } : {}),
-        subject: env.subject,
-        content: [{ type: "text/html", value: html }],
-        attachments: env.attachments,
-      }),
-      signal: AbortSignal.timeout(10_000),
-    });
-    if (res.ok) return { status: "delivered" };
-    const detail = (await res.text().catch(() => "")).slice(0, 300);
-    return {
-      status: "failed",
-      error: `Email transport returned ${res.status}${detail ? `: ${detail}` : ""}`,
-    };
-  } catch (error) {
-    return {
-      status: "failed",
-      error: error instanceof Error ? error.message : "Email transport failed",
-    };
-  }
+  const transport = createEmailTransport();
+  if (!transport) return { status: "failed", error: "Email transport factory failed" };
+  return transport.send({
+    to: env.to,
+    from: {
+      address: `no-reply@${process.env.EMAIL_FROM_DOMAIN!.trim()}`,
+      name: env.from,
+    },
+    replyTo: env.replyTo,
+    subject: env.subject,
+    html,
+    attachments: env.attachments,
+    idempotencyKey: env.idempotencyKey,
+  });
 }
 
 export async function spool(
@@ -210,7 +180,8 @@ export async function spool(
 ): Promise<string | false> {
   const html = await render(env.element);
   const queuedAt = new Date();
-  const delivery = process.env.EMAIL_WEBHOOK_URL ? "pending" : "skipped";
+  const configuration = emailTransportConfiguration();
+  const delivery = configuration.configured ? "pending" : "skipped";
   const values: typeof schema.emailOutbox.$inferInsert = {
     ownerId: env.ownerId ?? null,
     ownerRecipientVersion: env.ownerRecipientVersion ?? null,
@@ -229,9 +200,7 @@ export async function spool(
     delivery,
     attempts: 0,
     nextAttemptAt: queuedAt,
-    lastError: process.env.EMAIL_WEBHOOK_URL
-      ? null
-      : "EMAIL_WEBHOOK_URL is not configured",
+    lastError: configuration.configured ? null : configuration.error,
     deliveredAt: null,
     createdAt: queuedAt,
   };
@@ -262,7 +231,7 @@ export async function spool(
   }
 
   if (!queued) return false;
-  if (process.env.EMAIL_WEBHOOK_URL && !options.deferDelivery) {
+  if (configuration.configured && !options.deferDelivery) {
     await deliverQueuedEmail(db, queued.id);
   }
   return queued.id;
@@ -509,7 +478,7 @@ export async function deliverQueuedEmail(
 
 /** Retry due mail and recover rows left processing by a crashed worker. */
 export async function retryEmailOutbox(db: Db, now = new Date(), limit = 25) {
-  if (!process.env.EMAIL_WEBHOOK_URL) return { attempted: 0, delivered: 0 };
+  if (!isEmailTransportConfigured()) return { attempted: 0, delivered: 0 };
   const due = await db.query.emailOutbox.findMany({
     where: and(
       inArray(schema.emailOutbox.delivery, [
@@ -545,7 +514,7 @@ export async function retryAuthEmailOutbox(
   now = new Date(),
   limit = 5,
 ) {
-  if (!process.env.EMAIL_WEBHOOK_URL) return { attempted: 0, delivered: 0 };
+  if (!isEmailTransportConfigured()) return { attempted: 0, delivered: 0 };
   const due = await db.query.emailOutbox.findMany({
     where: and(
       inArray(schema.emailOutbox.template, [
@@ -585,7 +554,7 @@ export async function retryBookingEmailOutbox(
   now = new Date(),
   limit = 10,
 ) {
-  if (!process.env.EMAIL_WEBHOOK_URL) return { attempted: 0, delivered: 0 };
+  if (!isEmailTransportConfigured()) return { attempted: 0, delivered: 0 };
   const due = await db.query.emailOutbox.findMany({
     where: and(
       inArray(schema.emailOutbox.template, [

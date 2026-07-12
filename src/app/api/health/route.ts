@@ -5,8 +5,8 @@ import * as schema from "@/db/schema";
 import {
   canonicalAppUrl,
   canonicalBookingUrl,
-  isHttpUrl,
 } from "@/lib/urls";
+import { emailTransportConfiguration } from "@/emails/transports/factory";
 
 export const dynamic = "force-dynamic";
 
@@ -77,12 +77,8 @@ function assertProductionConfiguration() {
   if (stripeConfiguredCount > 0 && stripeConfiguredCount < stripeNames.length) {
     issues.push("Stripe secret, webhook secret, and every supported price must be set together");
   }
-  const emailWebhook = process.env.EMAIL_WEBHOOK_URL?.trim();
-  if (!emailWebhook) {
-    issues.push("EMAIL_WEBHOOK_URL is required for passwordless production");
-  } else if (!isHttpUrl(emailWebhook) || new URL(emailWebhook).protocol !== "https:") {
-    issues.push("EMAIL_WEBHOOK_URL must use https in production");
-  }
+  const emailConfiguration = emailTransportConfiguration();
+  if (!emailConfiguration.configured) issues.push(emailConfiguration.error);
   try {
     const appUrl = new URL(canonicalAppUrl());
     const bookingUrl = new URL(canonicalBookingUrl());

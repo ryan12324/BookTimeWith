@@ -16,6 +16,7 @@ import { CalendarUnavailableError } from "@/lib/calendar";
 import { canonicalBookingUrl } from "@/lib/urls";
 import { withBookingMutex, withOwnerMutex } from "@/lib/keyed-mutex";
 import { assertSessionConfiguration } from "@/lib/session";
+import { isEmailTransportConfigured } from "@/emails/transports/factory";
 
 export const dynamic = "force-dynamic";
 
@@ -193,9 +194,9 @@ export async function PATCH(
       idempotent: true,
       startsAt: current?.startsAt.toISOString(),
       status: current?.status,
-      emailDeliveryConfigured: Boolean(process.env.EMAIL_WEBHOOK_URL),
+      emailDeliveryConfigured: isEmailTransportConfigured(),
       clientEmailQueued: Boolean(
-        process.env.EMAIL_WEBHOOK_URL && clientNoticeQueued,
+        isEmailTransportConfigured() && clientNoticeQueued,
       ),
     });
   }
@@ -307,8 +308,8 @@ export async function PATCH(
       return NextResponse.json({
         ok: true,
         startsAt: updated.startsAt.toISOString(),
-        emailDeliveryConfigured: Boolean(process.env.EMAIL_WEBHOOK_URL),
-        clientEmailQueued: Boolean(process.env.EMAIL_WEBHOOK_URL && clientNotice),
+        emailDeliveryConfigured: isEmailTransportConfigured(),
+        clientEmailQueued: Boolean(isEmailTransportConfigured() && clientNotice),
       });
     }
 
@@ -374,8 +375,8 @@ export async function PATCH(
       }, { deferDelivery: true });
       return NextResponse.json({
         ok: true,
-        emailDeliveryConfigured: Boolean(process.env.EMAIL_WEBHOOK_URL),
-        clientEmailQueued: Boolean(process.env.EMAIL_WEBHOOK_URL && clientNotice),
+        emailDeliveryConfigured: isEmailTransportConfigured(),
+        clientEmailQueued: Boolean(isEmailTransportConfigured() && clientNotice),
       });
     }
 
@@ -468,8 +469,8 @@ export async function PATCH(
     return NextResponse.json({
       ok: true,
       status: updated.status,
-      emailDeliveryConfigured: Boolean(process.env.EMAIL_WEBHOOK_URL),
-      clientEmailQueued: Boolean(process.env.EMAIL_WEBHOOK_URL && clientNotice),
+      emailDeliveryConfigured: isEmailTransportConfigured(),
+      clientEmailQueued: Boolean(isEmailTransportConfigured() && clientNotice),
     });
   } catch (error) {
     const existing = await priorAction(db, parsed.data.actionKey);
@@ -493,9 +494,9 @@ export async function PATCH(
           idempotent: true,
           startsAt: current.startsAt.toISOString(),
           status: current.status,
-          emailDeliveryConfigured: Boolean(process.env.EMAIL_WEBHOOK_URL),
+          emailDeliveryConfigured: isEmailTransportConfigured(),
           clientEmailQueued: Boolean(
-            process.env.EMAIL_WEBHOOK_URL && clientNoticeQueued,
+            isEmailTransportConfigured() && clientNoticeQueued,
           ),
         });
       }

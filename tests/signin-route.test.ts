@@ -51,7 +51,10 @@ const request = () =>
 describe("sign-in response privacy", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.stubEnv("EMAIL_WEBHOOK_URL", "https://email.example.test/send");
+    vi.stubEnv("EMAIL_TRANSPORT", "cloudflare");
+    vi.stubEnv("CLOUDFLARE_ACCOUNT_ID", "a".repeat(32));
+    vi.stubEnv("CLOUDFLARE_EMAIL_API_TOKEN", "email-token");
+    vi.stubEnv("EMAIL_FROM_DOMAIN", "mail.booktimewith.com");
     mocks.takeRateLimit.mockResolvedValue({
       allowed: true,
       retryAfterSeconds: 0,

@@ -14,6 +14,7 @@ import { requestIp, takeRateLimit } from "@/lib/rate-limit";
 import { deliverQueuedEmail, spool } from "@/emails/send";
 import { OwnerSignIn } from "@/emails/templates";
 import { canonicalAppUrl } from "@/lib/urls";
+import { isEmailTransportConfigured } from "@/emails/transports/factory";
 
 export const dynamic = "force-dynamic";
 
@@ -132,7 +133,7 @@ export async function POST(request: Request) {
     console.error("Sign-in email could not be queued", error);
   }
 
-  if (queuedId && process.env.EMAIL_WEBHOOK_URL) {
+  if (queuedId && isEmailTransportConfigured()) {
     const deliveryId = queuedId;
     after(async () => {
       try {

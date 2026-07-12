@@ -35,6 +35,7 @@ import {
 import { snapshotBookingService } from "@/lib/booking-snapshot";
 import { withOwnerMutex } from "@/lib/keyed-mutex";
 import { assertSessionConfiguration } from "@/lib/session";
+import { isEmailTransportConfigured } from "@/emails/transports/factory";
 
 export const dynamic = "force-dynamic";
 
@@ -135,7 +136,7 @@ function bookingResponse(
     locationMode: booking.locationModeSnapshot,
     location: booking.locationSnapshot,
     meetingLink: booking.meetingLink,
-    emailDeliveryConfigured: Boolean(process.env.EMAIL_WEBHOOK_URL),
+    emailDeliveryConfigured: isEmailTransportConfigured(),
   };
 }
 

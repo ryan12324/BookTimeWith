@@ -47,9 +47,11 @@ provider-console settings, callback URLs, scopes, and webhook events.
 
 ## Email
 
-- [ ] Configure `EMAIL_WEBHOOK_URL`, its bearer token, and a real from-domain.
-- [ ] Confirm production `/api/health` returns 503 when the email transport is
-  absent or non-HTTPS, and 200 only after the live transport is configured.
+- [ ] Onboard the sending domain in Cloudflare Email Service, then configure
+  `EMAIL_TRANSPORT=cloudflare`, the account ID, a scoped Email Sending API
+  token, and the real from-domain.
+- [ ] Confirm production `/api/health` returns 503 when the email transport or
+  any Cloudflare credential is absent, and 200 only after it is configured.
 - [ ] Publish and validate SPF, DKIM, and DMARC for the sending domain.
 - [ ] Deliver sign-in, verification, confirmation with `.ics`, move, cancel,
   reminder, billing, and summary emails to at least Gmail and Outlook.

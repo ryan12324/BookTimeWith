@@ -40,7 +40,10 @@ const requiredProductionEnvironment = {
   AUTH_TOKEN_SECRET: "a".repeat(32),
   CRON_SECRET: "c".repeat(32),
   DATABASE_URL: "postgresql://booktimewith:secret@db:5432/booktimewith",
-  EMAIL_WEBHOOK_URL: "https://email.example.test/send",
+  EMAIL_TRANSPORT: "cloudflare",
+  CLOUDFLARE_ACCOUNT_ID: "a".repeat(32),
+  CLOUDFLARE_EMAIL_API_TOKEN: "email-token",
+  EMAIL_FROM_DOMAIN: "mail.booktimewith.com",
   APP_URL: "https://app.example.test",
   BOOKING_URL: "https://book.example.test",
   NEXT_PUBLIC_APP_URL: "",
@@ -92,8 +95,8 @@ describe("production health readiness", () => {
     vi.restoreAllMocks();
   });
 
-  it("rejects production when EMAIL_WEBHOOK_URL is missing", async () => {
-    vi.stubEnv("EMAIL_WEBHOOK_URL", "");
+  it("rejects production when EMAIL_TRANSPORT is missing", async () => {
+    vi.stubEnv("EMAIL_TRANSPORT", "");
 
     const response = await GET();
 
@@ -101,7 +104,7 @@ describe("production health readiness", () => {
     await expect(response.json()).resolves.toEqual({ status: "error" });
     expect(response.headers.get("Cache-Control")).toBe("no-store");
     expect(configurationFailure().message).toContain(
-      "EMAIL_WEBHOOK_URL is required for passwordless production",
+      "EMAIL_TRANSPORT is not configured",
     );
     expect(mocks.getDb).not.toHaveBeenCalled();
   });
@@ -119,15 +122,15 @@ describe("production health readiness", () => {
     expect(mocks.getDb).not.toHaveBeenCalled();
   });
 
-  it("rejects a non-HTTPS EMAIL_WEBHOOK_URL in production", async () => {
-    vi.stubEnv("EMAIL_WEBHOOK_URL", "http://email.example.test/send");
+  it("rejects incomplete Cloudflare email credentials", async () => {
+    vi.stubEnv("CLOUDFLARE_EMAIL_API_TOKEN", "");
 
     const response = await GET();
 
     expect(response.status).toBe(503);
     await expect(response.json()).resolves.toEqual({ status: "error" });
     expect(configurationFailure().message).toContain(
-      "EMAIL_WEBHOOK_URL must use https in production",
+      "Cloudflare email transport is missing CLOUDFLARE_EMAIL_API_TOKEN",
     );
     expect(mocks.getDb).not.toHaveBeenCalled();
   });

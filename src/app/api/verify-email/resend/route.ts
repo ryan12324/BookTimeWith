@@ -7,6 +7,7 @@ import { sessionOwner } from "@/lib/authz";
 import { takeRateLimit } from "@/lib/rate-limit";
 import { canonicalAppUrl } from "@/lib/urls";
 import { withOwnerMutex } from "@/lib/keyed-mutex";
+import { isEmailTransportConfigured } from "@/emails/transports/factory";
 
 export const dynamic = "force-dynamic";
 
@@ -84,7 +85,7 @@ export async function POST(request: Request) {
   if (queuedId === "verified") {
     return NextResponse.json({ ok: true, alreadyVerified: true });
   }
-  if (queuedId && process.env.EMAIL_WEBHOOK_URL) {
+  if (queuedId && isEmailTransportConfigured()) {
     const deliveryId = queuedId;
     after(async () => {
       try {

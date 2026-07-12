@@ -20,8 +20,8 @@ Complete credential inventory:
 |---|---|
 | `AUTH_TOKEN_SECRET`, `CRON_SECRET`, `RATE_LIMIT_SECRET`, `CALENDAR_TOKEN_SECRET` | Generate locally with OpenSSL |
 | `DATABASE_URL` | Coolify/managed PostgreSQL connection details |
-| `EMAIL_WEBHOOK_URL` | HTTPS mail adapter you deploy |
-| `CLOUDFLARE_EMAIL_TOKEN` | Generate locally; configure the same bearer token on the adapter |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account overview |
+| `CLOUDFLARE_EMAIL_API_TOKEN` | Cloudflare API token with Email Sending: Edit |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google Cloud OAuth client |
 | `MICROSOFT_CLIENT_ID`, `MICROSOFT_CLIENT_SECRET` | Microsoft Entra app registration |
 | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | Cloudflare Turnstile widget |
@@ -31,7 +31,7 @@ Complete credential inventory:
 
 ## 1. Generate the application-owned secrets
 
-Run this from the repository root. It creates five independent 256-bit secrets
+Run this from the repository root. It creates four independent 256-bit secrets
 in `.env.production.local`, which Git already ignores. Do not reuse a value for
 more than one setting. It refuses to overwrite an existing file.
 
@@ -47,7 +47,6 @@ fi
   printf 'CRON_SECRET=%s\n' "$(openssl rand -hex 32)"
   printf 'RATE_LIMIT_SECRET=%s\n' "$(openssl rand -hex 32)"
   printf 'CALENDAR_TOKEN_SECRET=%s\n' "$(openssl rand -hex 32)"
-  printf 'CLOUDFLARE_EMAIL_TOKEN=%s\n' "$(openssl rand -hex 32)"
 } > "$SECRETS_FILE"
 chmod 600 "$SECRETS_FILE"
 ```
@@ -67,12 +66,11 @@ What each value does:
 | `CRON_SECRET` | Authenticates the three scheduled-task requests | Update all three Coolify tasks at the same time |
 | `RATE_LIMIT_SECRET` | Pseudonymizes rate-limit identities | Existing rate-limit buckets no longer match |
 | `CALENDAR_TOKEN_SECRET` | Encrypts Google/Microsoft tokens in PostgreSQL | Existing connections cannot be decrypted; preserve it across migrations/restores and plan reconnection before rotation |
-| `CLOUDFLARE_EMAIL_TOKEN` | Authenticates requests to your mail adapter | Update the adapter and Coolify together |
 
 `AUTH_TOKEN_SECRET` and `CRON_SECRET` are mandatory in production and must be
 at least 32 characters. `RATE_LIMIT_SECRET` and `CALENDAR_TOKEN_SECRET` have
 secure fallbacks, but independent values are strongly recommended for
-production. The email token is used only when your adapter validates it.
+production.
 
 ## 2. PostgreSQL
 
@@ -100,45 +98,40 @@ their defaults unless database monitoring shows a reason to tune them.
 
 ## 3. Outbound email transport
 
-Passwordless sign-in makes `EMAIL_WEBHOOK_URL` mandatory in production. This
-repository deliberately does **not** contain an email-provider credential or
-deploy the transport. `EMAIL_WEBHOOK_URL` must be the HTTPS URL of an adapter
-you deploy in front of your chosen transactional mail provider.
+Passwordless sign-in makes a working email transport mandatory in production.
+The application now calls Cloudflare Email Service's REST API directly through
+a provider-neutral transport interface and factory; no separate Worker, SMTP
+server, or webhook adapter is required.
 
-The adapter receives `POST` JSON shaped like MailChannels/Cloudflare Email
-Worker payloads:
+Cloudflare Email Service requires Cloudflare DNS. On a Workers Paid account:
 
-```json
-{
-  "personalizations": [{ "to": [{ "email": "recipient@example.com" }] }],
-  "from": { "email": "no-reply@mail.booktimewith.com", "name": "Book Time With" },
-  "reply_to": { "email": "owner@example.com" },
-  "subject": "Subject",
-  "content": [{ "type": "text/html", "value": "<p>Message</p>" }],
-  "attachments": []
-}
-```
-
-It can also receive an `Idempotency-Key` header. It must return a 2xx response
-only after the provider accepts the message. If you protect the adapter with a
-bearer token, generate it with:
-
-```bash
-openssl rand -hex 32
-```
-
-Configure the same value in the adapter and as `CLOUDFLARE_EMAIL_TOKEN`. The
-name is historical: it is simply the optional bearer token sent to the email
-webhook and does not have to come from Cloudflare. Configure:
+1. Open **Compute > Email Service > Email Sending** and select **Onboard
+   Domain**.
+2. Onboard `mail.booktimewith.com` (or the exact domain chosen below) and let
+   Cloudflare install/verify its return-path, SPF, and DKIM DNS records.
+3. Copy the 32-character account ID from the Cloudflare account overview.
+4. Create an account API token restricted to this account with only **Email
+   Sending: Edit**. Copy the token once into your secret manager.
+5. Add these runtime variables in Coolify:
 
 ```text
-EMAIL_WEBHOOK_URL=https://YOUR-MAIL-ADAPTER.example/send
+EMAIL_TRANSPORT=cloudflare
 EMAIL_FROM_DOMAIN=mail.booktimewith.com
-CLOUDFLARE_EMAIL_TOKEN=GENERATED_BEARER_TOKEN
+CLOUDFLARE_ACCOUNT_ID=YOUR_32_CHARACTER_ACCOUNT_ID
+CLOUDFLARE_EMAIL_API_TOKEN=YOUR_SCOPED_API_TOKEN
 ```
 
-Publish the SPF, DKIM, and DMARC records supplied by the actual mail provider
-for `mail.booktimewith.com`, and verify its sending domain before launch.
+The factory currently accepts `cloudflare`; another provider can be added by
+implementing `EmailTransport` and registering it in the factory without
+changing the outbox. The adapter sends HTML, Reply-To, calendar attachments,
+and a provider-visible delivery correlation header. The durable PostgreSQL
+outbox remains responsible for retries and deduplication.
+
+Cloudflare's official [Email Sending setup](https://developers.cloudflare.com/email-service/get-started/send-emails/)
+and [REST API guide](https://developers.cloudflare.com/email-service/api/send-emails/rest-api/)
+document domain onboarding, the required token permission, attachments, and
+current service limits. Publish a DMARC policy as well, then send real tests to
+Gmail and Outlook before launch.
 
 ## 4. Google Calendar OAuth
 
@@ -333,8 +326,7 @@ AUTH_TOKEN_SECRET
 CRON_SECRET
 RATE_LIMIT_SECRET
 CALENDAR_TOKEN_SECRET
-EMAIL_WEBHOOK_URL
-CLOUDFLARE_EMAIL_TOKEN
+CLOUDFLARE_EMAIL_API_TOKEN
 GOOGLE_CLIENT_SECRET
 MICROSOFT_CLIENT_SECRET
 TURNSTILE_SECRET_KEY
@@ -342,9 +334,10 @@ STRIPE_SECRET_KEY
 STRIPE_WEBHOOK_SECRET
 ```
 
-Client IDs, Turnstile's site key, Stripe price IDs, canonical URLs, and the
-email from-domain are identifiers/configuration, not credentials, but keeping
-them in the same Coolify environment is convenient.
+Cloudflare's account ID, OAuth client IDs, Turnstile's site key, Stripe price
+IDs, canonical URLs, and the email from-domain are identifiers/configuration,
+not credentials, but keeping them in the same Coolify environment is
+convenient.
 
 Configure these Coolify scheduled tasks against the running application
 container. The production image includes `wget`:

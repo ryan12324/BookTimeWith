@@ -73,7 +73,7 @@ npm run check        # lint + typecheck + tests + production build
 ```
 
 Local email stays in the PostgreSQL outbox and can be inspected at `/emails`;
-no external message is delivered unless `EMAIL_WEBHOOK_URL` is configured.
+no external message is delivered unless a complete email transport is configured.
 
 Useful routes:
 
@@ -97,8 +97,8 @@ database), then supply its connection string as `DATABASE_URL`; the application
 container does not need a persistent filesystem volume.
 
 Production readiness requires strong `AUTH_TOKEN_SECRET` and `CRON_SECRET`
-values plus an HTTPS outbound email transport (passwordless sign-in depends on
-it). Follow the provider-by-provider
+values plus the Cloudflare Email Service transport (passwordless sign-in depends
+on it). Follow the provider-by-provider
 [`docs/SECRETS_SETUP.md`](docs/SECRETS_SETUP.md), copy the relevant values from
 [`.env.example`](.env.example) into the Coolify environment, and complete
 [`docs/LAUNCH_CHECKLIST.md`](docs/LAUNCH_CHECKLIST.md).

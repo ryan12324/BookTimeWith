@@ -59,7 +59,7 @@ const booking = {
 describe("booking snapshot consumers", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.stubEnv("EMAIL_WEBHOOK_URL", "");
+    vi.stubEnv("EMAIL_TRANSPORT", "");
     mocks.bookingByManageToken.mockResolvedValue(booking);
     mocks.sessionOwner.mockResolvedValue(owner);
     mocks.routeDb = {

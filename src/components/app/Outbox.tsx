@@ -42,7 +42,7 @@ export function outboxDeliveryLabel(delivery: OutboxDelivery) {
 
 /**
  * The dev outbox: everything the email pipeline queued (in production
- * these go through the Cloudflare Email Worker; locally they spool to the DB).
+ * these go through the selected email transport; locally they spool to the DB).
  * Click a row to read the rendered email.
  */
 export function Outbox() {

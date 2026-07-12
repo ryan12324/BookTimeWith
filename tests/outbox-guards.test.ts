@@ -57,10 +57,31 @@ describe("outbox delivery guards", () => {
       stripeSubscriptionId: "sub_current",
       stripeHasManageableSubscription: true,
     });
-    vi.stubEnv("EMAIL_WEBHOOK_URL", "https://mail.example.test/send");
+    vi.stubEnv("EMAIL_TRANSPORT", "cloudflare");
+    vi.stubEnv("CLOUDFLARE_ACCOUNT_ID", "a".repeat(32));
+    vi.stubEnv("CLOUDFLARE_EMAIL_API_TOKEN", "email-token");
+    vi.stubEnv("EMAIL_FROM_DOMAIN", "mail.booktimewith.com");
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue(new Response("", { status: 202 })),
+      vi.fn().mockImplementation(async (input: string | URL | Request) => {
+        const body =
+          typeof input === "string" && input.includes("/email/sending/send")
+            ? {
+                success: true,
+                result: {
+                  message_id: "message-123",
+                  delivered: [
+                    "owner@example.test",
+                    "client@example.test",
+                    "pending@example.test",
+                  ],
+                  queued: [],
+                  permanent_bounces: [],
+                },
+              }
+            : { success: false };
+        return Response.json(body);
+      }),
     );
   });
 

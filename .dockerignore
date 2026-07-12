@@ -4,8 +4,8 @@ node_modules
 .git
 .github
 .agents
-.env
-.env.local
+.env*
+!.env.example
 chats
 project
 *.log

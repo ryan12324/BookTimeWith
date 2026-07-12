@@ -18,6 +18,7 @@ import { canAcceptBookings } from "@/lib/entitlements";
 import { isBillingCurrencyLocked } from "@/lib/billing";
 import { deriveOpaqueToken } from "@/lib/session";
 import { datePartsInZone, slotInstant } from "@/lib/timezone";
+import { isEmailTransportConfigured } from "@/emails/transports/factory";
 
 /** Owner-scoped data access. Public callers resolve a handle before entering here. */
 
@@ -76,7 +77,7 @@ export async function getOwnerConfig(db: Db, ownerId: string): Promise<OwnerConf
     activeEmail: owner.email,
     pendingEmail: owner.pendingEmail,
     emailVerified: owner.emailVerifiedAt !== null,
-    emailDeliveryConfigured: Boolean(process.env.EMAIL_WEBHOOK_URL),
+    emailDeliveryConfigured: isEmailTransportConfigured(),
     setupComplete: owner.setupCompletedAt !== null,
     planStatus: owner.planStatus,
     trialEndsAt: owner.trialEndsAt?.toISOString() ?? null,
