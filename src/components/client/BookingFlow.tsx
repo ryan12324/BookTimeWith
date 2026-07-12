@@ -32,7 +32,7 @@ interface ConfirmedBooking {
   endsAt: string;
   durationMinutes: number;
   service: string;
-  locationMode: "mine" | "theirs";
+  locationMode: "mine" | "theirs" | "virtual";
   location: string | null;
   meetingLink: string | null;
   emailDeliveryConfigured: boolean;
@@ -166,7 +166,7 @@ export function BookingFlow() {
     end: Date;
     durationMinutes: number;
     service: string;
-    locationMode: "mine" | "theirs";
+    locationMode: "mine" | "theirs" | "virtual";
     label: string;
     dayFull: string;
     location: string | null;
@@ -619,7 +619,11 @@ export function BookingFlow() {
               {booked.service} with {ownerFirst} · {booked.dayFull} at {booked.label}.
             </p>
             <p className="mt-[6px] font-sans text-[13px] text-body">
-              {booked.locationMode === "theirs"
+              {booked.locationMode === "virtual"
+                ? booked.meetingLink
+                  ? "Meet online using the link below."
+                  : `${ownerFirst} will send the meeting link before your appointment.`
+                : booked.locationMode === "theirs"
                 ? `${ownerFirst} comes to you: ${booked.location || address.trim() || "your address"}`
                 : booked.location
                   ? `At ${booked.location}.`

@@ -524,6 +524,7 @@ export async function GET() {
       serviceName: b.serviceNameSnapshot,
       locationMode: b.locationModeSnapshot,
       location: b.locationSnapshot,
+      meetingLink: b.meetingLink,
       status: b.status,
       calendarSyncStatus: b.calendarSyncStatus,
       moveOptions: open

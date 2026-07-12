@@ -67,6 +67,7 @@ export async function anonymizeExpiredClientPii(
         locationSnapshot: null,
         meetingLinkSnapshot: null,
         meetingLink: null,
+        meetingLinkOverride: null,
         lastActionKey: null,
         clientRequestKey: null,
         initialIntentHash: null,

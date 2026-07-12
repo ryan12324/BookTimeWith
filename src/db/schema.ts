@@ -19,7 +19,7 @@ import {
  * tests may exercise the same PostgreSQL dialect through an isolated adapter.
  */
 
-export const locationMode = pgEnum("location_mode", ["mine", "theirs"]);
+export const locationMode = pgEnum("location_mode", ["mine", "theirs", "virtual"]);
 export const bookingStatus = pgEnum("booking_status", ["confirmed", "moved", "cancelled"]);
 export const bookingActor = pgEnum("booking_actor", ["owner", "client"]);
 export const planStatus = pgEnum("plan_status", ["trialing", "active", "past_due", "paused", "cancelled"]);
@@ -140,8 +140,8 @@ export const bookings = pgTable(
     // appointments happen.
     serviceNameSnapshot: text("service_name_snapshot").notNull(),
     locationModeSnapshot: locationMode("location_mode_snapshot").notNull(),
-    // Resolved address for this appointment: the client's submitted address for
-    // `theirs`, or the owner's address at booking time for `mine`.
+    // Resolved address for in-person appointments. Virtual bookings keep this
+    // null and use the meeting-link fields below.
     locationSnapshot: text("location_snapshot"),
     // Immutable non-provider fallback. `meetingLink` below is the effective
     // link and may temporarily be replaced by Google Meet; disconnecting or
@@ -161,6 +161,9 @@ export const bookings = pgTable(
     lastActionKey: text("last_action_key"),
     // Auto Google Meet when calendar-connected; else the service's static link.
     meetingLink: text("meeting_link"),
+    // Owner-supplied link for this appointment only. It outranks both a
+    // provider-generated URL and the service-level default.
+    meetingLinkOverride: text("meeting_link_override"),
     // Browser-generated idempotency key. A retried confirm returns this booking
     // instead of creating a second appointment or surfacing a misleading 409.
     clientRequestKey: text("client_request_key"),

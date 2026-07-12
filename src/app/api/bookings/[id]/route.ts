@@ -14,6 +14,7 @@ import { sessionOwner } from "@/lib/authz";
 import { syncBookingCalendar } from "@/lib/booking-calendar";
 import { CalendarUnavailableError } from "@/lib/calendar";
 import { canonicalBookingUrl } from "@/lib/urls";
+import { isHttpUrl } from "@/lib/urls";
 import { withBookingMutex, withOwnerMutex } from "@/lib/keyed-mutex";
 import { assertSessionConfiguration } from "@/lib/session";
 import { isEmailTransportConfigured } from "@/emails/transports/factory";
@@ -22,6 +23,10 @@ export const dynamic = "force-dynamic";
 
 const actionKey = z.string().min(16).max(128);
 const reason = z.string().trim().max(500).optional();
+const meetingLink = z.union([
+  z.literal(""),
+  z.string().url().max(300).refine(isHttpUrl, "Meeting link must use http or https"),
+]);
 const ActionInput = z.discriminatedUnion("action", [
   z.object({
     action: z.literal("move"),
@@ -31,6 +36,7 @@ const ActionInput = z.discriminatedUnion("action", [
   }),
   z.object({ action: z.literal("cancel"), actionKey, reason }),
   z.object({ action: z.literal("restore"), actionKey }),
+  z.object({ action: z.literal("meeting_link"), actionKey, meetingLink }),
 ]);
 
 function matchesOwnerIntent(
@@ -43,6 +49,9 @@ function matchesOwnerIntent(
     existing.toStartsAt?.getTime() !== new Date(input.startsAt).getTime()
   ) {
     return false;
+  }
+  if (input.action === "meeting_link") {
+    return (existing.reason ?? "") === input.meetingLink;
   }
   return input.action === "restore"
     ? true
@@ -85,6 +94,18 @@ async function recoverOwnerActionSideEffects(
       })) ?? current;
   }
   if (!action.fromStartsAt) return false;
+
+  if (action.action === "meeting_link") {
+    const manageToken = await mintManageToken(db, notificationBooking.id);
+    return Boolean(await sendClientBookingConfirmation(db, {
+      owner,
+      booking: notificationBooking,
+      manageToken,
+      baseUrl: canonicalBookingUrl(requestUrl),
+      detailsUpdated: true,
+      actionKey: action.actionKey,
+    }, { deferDelivery: true }));
+  }
 
   const kind = action.action === "cancel" ? "cancelled" : "moved";
   const dedupeKey =
@@ -194,6 +215,7 @@ export async function PATCH(
       idempotent: true,
       startsAt: current?.startsAt.toISOString(),
       status: current?.status,
+      meetingLink: current?.meetingLink,
       emailDeliveryConfigured: isEmailTransportConfigured(),
       clientEmailQueued: Boolean(
         isEmailTransportConfigured() && clientNoticeQueued,
@@ -212,6 +234,66 @@ export async function PATCH(
   );
 
   try {
+    if (parsed.data.action === "meeting_link") {
+      if (booking.locationModeSnapshot !== "virtual") {
+        return NextResponse.json(
+          { error: "Meeting links can only be set for virtual bookings." },
+          { status: 409 },
+        );
+      }
+      const link = parsed.data.meetingLink.trim();
+      let updated = await withBookingMutex(id, () => db.transaction(async (tx) => {
+        await tx.insert(schema.bookingActions).values({
+          ownerId: owner.id,
+          bookingId: id,
+          actionKey: parsed.data.actionKey,
+          action: "meeting_link",
+          actor: "owner",
+          reason: link,
+          fromStartsAt: wasStart,
+          toStartsAt: wasStart,
+        });
+        const [row] = await tx
+          .update(schema.bookings)
+          .set({
+            meetingLinkOverride: link || null,
+            meetingLink: link || booking.meetingLinkSnapshot,
+            lastActionBy: "owner",
+            lastActionKey: parsed.data.actionKey,
+            mailRecoveryCheckedAt: null,
+          })
+          .where(and(
+            eq(schema.bookings.id, id),
+            eq(schema.bookings.ownerId, owner.id),
+            eq(schema.bookings.status, "confirmed"),
+          ))
+          .returning();
+        if (!row) throw new Error("ACTION_CONFLICT");
+        return row;
+      }));
+      if (updated.calendarProvider) {
+        await syncBookingCalendar(db, updated);
+        updated = (await db.query.bookings.findFirst({
+          where: eq(schema.bookings.id, updated.id),
+        })) ?? updated;
+      }
+      const manageToken = await mintManageToken(db, id);
+      const clientNotice = await sendClientBookingConfirmation(db, {
+        owner,
+        booking: updated,
+        manageToken,
+        baseUrl: canonicalBookingUrl(request.url),
+        detailsUpdated: true,
+        actionKey: parsed.data.actionKey,
+      }, { deferDelivery: true });
+      return NextResponse.json({
+        ok: true,
+        meetingLink: updated.meetingLink,
+        emailDeliveryConfigured: isEmailTransportConfigured(),
+        clientEmailQueued: Boolean(isEmailTransportConfigured() && clientNotice),
+      });
+    }
+
     if (parsed.data.action === "move") {
       const startsAt = new Date(parsed.data.startsAt);
       const ownerReason = parsed.data.reason;

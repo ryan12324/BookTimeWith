@@ -22,8 +22,8 @@ export function DurationStepper({
 
   const btn =
     size === "lg"
-      ? "px-[18px] py-3 text-[17px]"
-      : "px-[17px] py-[11px] text-base";
+      ? "min-w-[44px] px-[18px] py-3 text-[17px]"
+      : "min-w-[44px] px-[17px] py-[11px] text-base";
   const val =
     size === "lg"
       ? "min-w-[86px] px-2 py-3 text-[15px]"

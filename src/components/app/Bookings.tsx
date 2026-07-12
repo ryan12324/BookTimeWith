@@ -20,8 +20,9 @@ interface Row {
   clientEmail?: string;
   clientAddress?: string | null;
   serviceName: string;
-  locationMode: "mine" | "theirs";
+  locationMode: "mine" | "theirs" | "virtual";
   location: string | null;
+  meetingLink: string | null;
   status: "confirmed" | "cancelled";
   calendarSyncStatus: "none" | "pending" | "synced" | "failed" | "deleted";
   moveOptions: MoveOption[];
@@ -35,6 +36,7 @@ interface ActionResult {
   error?: string;
   emailDeliveryConfigured?: boolean;
   clientEmailQueued?: boolean;
+  meetingLink?: string | null;
 }
 
 interface BookingGroup {
@@ -85,7 +87,8 @@ export function Bookings() {
     payload:
       | { action: "move"; startsAt: string; reason?: string }
       | { action: "cancel"; reason?: string }
-      | { action: "restore" },
+      | { action: "restore" }
+      | { action: "meeting_link"; meetingLink: string },
     actionKey: string,
   ): Promise<ActionResult> => {
     try {
@@ -99,6 +102,7 @@ export function Bookings() {
             error?: string;
             emailDeliveryConfigured?: boolean;
             clientEmailQueued?: boolean;
+            meetingLink?: string | null;
           }
         | null;
       if (!res.ok) {
@@ -109,6 +113,7 @@ export function Bookings() {
         ok: true,
         emailDeliveryConfigured: data?.emailDeliveryConfigured,
         clientEmailQueued: data?.clientEmailQueued,
+        meetingLink: data?.meetingLink,
       };
     } catch {
       return { ok: false, error: "That change couldn't be sent. Check your connection." };
@@ -223,7 +228,8 @@ function BookingRow({
     payload:
       | { action: "move"; startsAt: string; reason?: string }
       | { action: "cancel"; reason?: string }
-      | { action: "restore" },
+      | { action: "restore" }
+      | { action: "meeting_link"; meetingLink: string },
     actionKey: string,
   ) => Promise<ActionResult>;
 }) {
@@ -231,11 +237,13 @@ function BookingRow({
   const cancelled = b.status === "cancelled";
   const strike = cancelled ? "line-through" : "none";
   const time = formatInTimeZone(new Date(b.startsAt), timezone, "h:mma").toLowerCase();
-  const [busy, setBusy] = useState<"move" | "cancel" | "restore" | null>(null);
+  const [busy, setBusy] = useState<"move" | "cancel" | "restore" | "meeting_link" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [reason, setReason] = useState("");
   const [confirmingCancel, setConfirmingCancel] = useState(false);
   const [deliveryNote, setDeliveryNote] = useState<string | null>(null);
+  const [editingLink, setEditingLink] = useState(false);
+  const [linkDraft, setLinkDraft] = useState(b.meetingLink ?? "");
   const actionIntent = useRef<{ fingerprint: string; key: string } | null>(null);
   const reasonId = useId();
 
@@ -250,7 +258,8 @@ function BookingRow({
     payload:
       | { action: "move"; startsAt: string; reason?: string }
       | { action: "cancel"; reason?: string }
-      | { action: "restore" },
+      | { action: "restore" }
+      | { action: "meeting_link"; meetingLink: string },
     onSuccess: (result: ActionResult) => void,
   ) => {
     if (busy) return;
@@ -296,10 +305,18 @@ function BookingRow({
               {deliveryNote}
             </div>
           )}
-          {(b.clientEmail || b.location) && (
+          {(b.clientEmail || b.location || b.meetingLink) && (
             <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 font-sans text-[11.5px] leading-[1.5] text-body">
               {b.clientEmail && <a className="break-all font-semibold text-bronze-ink" href={`mailto:${b.clientEmail}`}>{b.clientEmail}</a>}
               {b.location && <span className="break-words">At {b.location}</span>}
+              {b.locationMode === "virtual" && !b.meetingLink && (
+                <span>Virtual · link not added yet</span>
+              )}
+              {b.meetingLink && (
+                <a className="break-all font-semibold text-bronze-ink" href={b.meetingLink} target="_blank" rel="noreferrer">
+                  Open meeting link
+                </a>
+              )}
             </div>
           )}
         </div>
@@ -322,6 +339,20 @@ function BookingRow({
             >
               {busy === "cancel" ? "Cancelling…" : "Cancel"}
             </button>
+            {b.locationMode === "virtual" && (
+              <button
+                type="button"
+                disabled={Boolean(busy)}
+                onClick={() => {
+                  setError(null);
+                  setLinkDraft(b.meetingLink ?? "");
+                  setEditingLink(true);
+                }}
+                className="min-h-[44px] px-2 font-sans text-[12px] font-semibold text-bronze-ink"
+              >
+                {b.meetingLink ? "Change link" : "Add link"}
+              </button>
+            )}
           </div>
         )}
 
@@ -355,6 +386,68 @@ function BookingRow({
       {error && (
         <div role="alert" className="mx-4 mb-4 rounded-chip border border-line-soft bg-tint-warm px-4 py-3 font-sans text-[12px] text-body sm:mx-[22px]">
           {error}
+        </div>
+      )}
+
+      {!cancelled && editingLink && (
+        <div className="mx-4 mb-4 rounded-chip border border-line-soft bg-paper px-4 py-3 sm:mx-[22px]">
+          <label htmlFor={`${reasonId}-meeting-link`} className="block font-sans text-[12px] font-semibold text-body">
+            Meeting link for {first}
+          </label>
+          <input
+            id={`${reasonId}-meeting-link`}
+            type="url"
+            value={linkDraft}
+            onChange={(event) => setLinkDraft(event.target.value)}
+            placeholder="https://zoom.us/j/…"
+            className="mt-2 min-h-[44px] w-full rounded-input border border-line bg-paper px-3 font-sans text-[16px] text-ink outline-none"
+          />
+          <p className="mt-2 font-sans text-[12px] leading-[1.5] text-body">
+            This changes only this booking. {first} receives the updated details automatically.
+          </p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <button
+              type="button"
+              disabled={Boolean(busy)}
+              onClick={() => void run(
+                { action: "meeting_link", meetingLink: linkDraft.trim() },
+                (result) => {
+                  patch(b.id, { meetingLink: result.meetingLink ?? null });
+                  setDeliveryNote(noteFor(result));
+                  setEditingLink(false);
+                },
+              )}
+              className="min-h-[44px] rounded-input bg-ink px-4 font-sans text-[12px] font-semibold text-paper"
+            >
+              {busy === "meeting_link" ? "Saving…" : b.meetingLink ? "Update link" : "Save link"}
+            </button>
+            {b.meetingLink && (
+              <button
+                type="button"
+                disabled={Boolean(busy)}
+                onClick={() => void run(
+                  { action: "meeting_link", meetingLink: "" },
+                  (result) => {
+                    patch(b.id, { meetingLink: result.meetingLink ?? null });
+                    setDeliveryNote(noteFor(result));
+                    setLinkDraft("");
+                    setEditingLink(false);
+                  },
+                )}
+                className="min-h-[44px] px-3 font-sans text-[12px] font-semibold text-body"
+              >
+                {busy === "meeting_link" ? "Restoring…" : "Use automatic link"}
+              </button>
+            )}
+            <button
+              type="button"
+              disabled={Boolean(busy)}
+              onClick={() => setEditingLink(false)}
+              className="min-h-[44px] px-3 font-sans text-[12px] font-semibold text-body"
+            >
+              Never mind
+            </button>
+          </div>
         </div>
       )}
 

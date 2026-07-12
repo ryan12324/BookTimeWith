@@ -19,6 +19,7 @@ import { reconcileBillingCurrencyConflict } from "@/lib/store";
 import { T } from "@/lib/tokens";
 import { EMAILS } from "@/emails/registry";
 import {
+  ClientConfirmation,
   OwnerMorningSummary,
   OwnerNewBooking,
   PaymentFailed,
@@ -93,6 +94,22 @@ describe("UI accessibility contracts", () => {
     expect(days).toContain("min-h-[44px]");
     expect(slots).toContain('aria-pressed="true"');
     expect(slots).toContain("min-h-[44px]");
+  });
+
+  it("keeps virtual meeting choices and links explicit", () => {
+    const settings = readFileSync(
+      `${process.cwd()}/src/components/app/Settings.tsx`,
+      "utf8",
+    );
+    const confirmation = renderToStaticMarkup(
+      <ClientConfirmation meetingLink="https://meet.example/client-room" />,
+    );
+
+    expect(settings).toContain("We meet virtually");
+    expect(settings).toContain("Default meeting link");
+    expect(settings).toContain("add a different link to each booking later");
+    expect(confirmation).toContain("Open meeting link");
+    expect(confirmation).toContain("https://meet.example/client-room");
   });
 
   it("makes the full booking window reachable with accessible date paging", () => {

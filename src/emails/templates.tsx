@@ -44,6 +44,7 @@ export function ClientConfirmation({
   whenBold = "Tuesday, July 14",
   whenTimes = "10:00 – 10:50",
   whereLine = "Video call — the link arrives with your reminder",
+  meetingLink = null as string | null,
   handle = "dana",
 }: {
   manageUrl?: string;
@@ -53,6 +54,7 @@ export function ClientConfirmation({
   whenBold?: string;
   whenTimes?: string;
   whereLine?: string;
+  meetingLink?: string | null;
   handle?: string;
 } = {}) {
   return (
@@ -66,7 +68,16 @@ export function ClientConfirmation({
         <CardLine>
           <span style={bold}>{whenBold}</span> · {whenTimes}
         </CardLine>
-        <CardLine>{whereLine}</CardLine>
+        <CardLine>
+          {meetingLink ? (
+            <>
+              Online ·{" "}
+              <a href={meetingLink} style={{ color: "#695a41", fontWeight: 600 }}>
+                Open meeting link
+              </a>
+            </>
+          ) : whereLine}
+        </CardLine>
       </DetailCard>
       <ButtonRow>
         <Btn kind="ink" href={calendarUrl}>Add to calendar</Btn>

@@ -359,6 +359,7 @@ function StepService({ onNext }: { onNext: () => void }) {
   const locations = [
     { key: "mine", title: "Clients come to me", sub: "Your address goes in their confirmation" },
     { key: "theirs", title: "I go to clients", sub: "They give their address when booking" },
+    { key: "virtual", title: "We meet virtually", sub: "Use one link or set one per booking" },
   ] as const;
 
   // Every field is required: a named service, and an address when clients come
@@ -395,7 +396,7 @@ function StepService({ onNext }: { onNext: () => void }) {
         </div>
 
         <SectionLabel className="mb-2 mt-5">Where</SectionLabel>
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
           {locations.map((l) => {
             const on = config.location === l.key;
             return (
@@ -428,6 +429,24 @@ function StepService({ onNext }: { onNext: () => void }) {
             />
             <div className="mt-[7px] font-sans text-[11.5px] text-body">
               Only shared after someone books.
+            </div>
+          </div>
+        )}
+        {config.location === "virtual" && (
+          <div className="mt-3">
+            <label htmlFor="setup-meeting-link" className="mb-2 block font-sans text-[12.5px] font-semibold text-ink">
+              Default meeting link <span className="font-normal text-body">(optional)</span>
+            </label>
+            <input
+              id="setup-meeting-link"
+              type="url"
+              value={config.meetingLink}
+              onChange={(e) => update({ meetingLink: e.target.value })}
+              placeholder="https://zoom.us/j/…"
+              className="min-h-[44px] w-full rounded-chip border border-line bg-paper px-[15px] py-3 font-sans text-[16px] font-medium text-ink outline-none"
+            />
+            <div className="mt-2 font-sans text-[12px] leading-[1.5] text-body">
+              Connect a calendar later for unique links, or add a different link to each booking.
             </div>
           </div>
         )}

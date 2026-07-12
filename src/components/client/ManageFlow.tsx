@@ -29,6 +29,7 @@ interface ManagedBooking {
   status: string;
   durationMinutes: number;
   service: string;
+  locationMode: "mine" | "theirs" | "virtual";
   location: string | null;
   meetingLink: string | null;
 }
@@ -362,6 +363,11 @@ export function ManageFlow({ token }: { token: string }) {
                 >
                   Open meeting link
                 </a>
+              )}
+              {booking.locationMode === "virtual" && !booking.meetingLink && (
+                <div className="mt-2 font-sans text-[12.5px] leading-[1.5] text-body">
+                  Your meeting link will appear here when it is ready.
+                </div>
               )}
               <div className="mt-1 font-sans text-[11px] text-body">
                 Times in {zoneLabel(clientZone(), start ?? new Date())}

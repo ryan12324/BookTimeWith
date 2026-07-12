@@ -54,23 +54,27 @@ export function bookingCalendarEvent(
     | "endsAt"
     | "locationSnapshot"
     | "calendarRevision"
-  >,
+  > & { meetingLink?: string | null; meetingLinkOverride?: string | null },
 ) {
+  const joinUrl = booking.meetingLinkOverride ?? booking.meetingLink;
   return {
     title: `${booking.serviceNameSnapshot} · ${booking.clientName}`,
     start: booking.startsAt,
     end: booking.endsAt,
-    description: `Booked at ${bookingPage(owner.handle)}`,
+    description: `Booked at ${bookingPage(owner.handle)}${joinUrl ? `\nJoin online: ${joinUrl}` : ""}`,
     location: bookingCalendarLocation(booking),
     idempotencyKey: `${booking.id}-${booking.calendarRevision}`,
   };
 }
 
 export function effectiveBookingMeetingLink(
-  booking: Pick<Booking, "meetingLink" | "meetingLinkSnapshot">,
+  booking: Pick<Booking, "meetingLink" | "meetingLinkSnapshot"> & {
+    meetingLinkOverride?: string | null;
+  },
   mode: "upsert" | "cancel",
   result: Pick<CalendarWriteResult, "ok" | "meetingLink">,
 ) {
+  if (booking.meetingLinkOverride) return booking.meetingLinkOverride;
   if (mode === "cancel") return booking.meetingLinkSnapshot;
   return result.ok
     ? result.meetingLink ?? booking.meetingLinkSnapshot
@@ -94,7 +98,7 @@ async function syncBookingCalendarLocked(
         calendarSyncStatus: connection ? "failed" : "none",
         calendarSyncError: connection ? "Calendar owner was not found" : null,
         calendarUpdatedAt: new Date(),
-        meetingLink: booking.meetingLinkSnapshot,
+        meetingLink: booking.meetingLinkOverride ?? booking.meetingLinkSnapshot,
         mailRecoveryCheckedAt: null,
       })
       .where(eq(schema.bookings.id, booking.id));
@@ -104,7 +108,7 @@ async function syncBookingCalendarLocked(
         .set({ mailRecoveryCheckedAt: null })
         .where(eq(schema.bookingActions.actionKey, booking.lastActionKey));
     }
-    return { ok: !connection, meetingLink: booking.meetingLinkSnapshot };
+    return { ok: !connection, meetingLink: booking.meetingLinkOverride ?? booking.meetingLinkSnapshot };
   }
 
   await db
@@ -184,7 +188,10 @@ export async function syncBookingCalendar(
         where: eq(schema.bookings.id, booking.id),
       });
       if (!current) {
-        return { ok: false, meetingLink: booking.meetingLinkSnapshot };
+        return {
+          ok: false,
+          meetingLink: booking.meetingLinkOverride ?? booking.meetingLinkSnapshot,
+        };
       }
       return syncBookingCalendarLocked(
         db,
@@ -210,7 +217,7 @@ export async function queueOwnerCalendarReconciliation(
       calendarSyncStatus: "none",
       calendarSyncError: null,
       calendarUpdatedAt: now,
-      meetingLink: schema.bookings.meetingLinkSnapshot,
+      meetingLink: sql`coalesce(${schema.bookings.meetingLinkOverride}, ${schema.bookings.meetingLinkSnapshot})`,
     })
     .where(
       and(
@@ -223,7 +230,7 @@ export async function queueOwnerCalendarReconciliation(
     .set({
       calendarEventId: null,
       calendarRevision: sql`${schema.bookings.calendarRevision} + 1`,
-      meetingLink: schema.bookings.meetingLinkSnapshot,
+      meetingLink: sql`coalesce(${schema.bookings.meetingLinkOverride}, ${schema.bookings.meetingLinkSnapshot})`,
     })
     .where(
       and(
@@ -243,7 +250,7 @@ export async function queueOwnerCalendarReconciliation(
       // because an opaque id from the other API may be rejected before 404.
       calendarSyncStatus: "pending",
       calendarUpdatedAt: now,
-      meetingLink: schema.bookings.meetingLinkSnapshot,
+      meetingLink: sql`coalesce(${schema.bookings.meetingLinkOverride}, ${schema.bookings.meetingLinkSnapshot})`,
       mailRecoveryCheckedAt: null,
     })
     .where(
@@ -289,7 +296,7 @@ export async function clearOwnerCalendarState(db: Db, ownerId: string) {
       calendarSyncStatus: "none",
       calendarSyncError: null,
       calendarUpdatedAt: new Date(),
-      meetingLink: schema.bookings.meetingLinkSnapshot,
+      meetingLink: sql`coalesce(${schema.bookings.meetingLinkOverride}, ${schema.bookings.meetingLinkSnapshot})`,
     })
     .where(
       and(

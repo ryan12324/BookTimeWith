@@ -1,4 +1,4 @@
-type LocationMode = "mine" | "theirs";
+type LocationMode = "mine" | "theirs" | "virtual";
 
 type SnapshotService = {
   name: string;
@@ -18,8 +18,9 @@ export function snapshotBookingService(
   return {
     serviceNameSnapshot: service.name.trim(),
     locationModeSnapshot: service.locationMode,
-    locationSnapshot:
-      service.locationMode === "theirs"
+    locationSnapshot: service.locationMode === "virtual"
+      ? null
+      : service.locationMode === "theirs"
         ? normalizedClientAddress
         : normalizedOwnerAddress,
     meetingLinkSnapshot: normalizedMeetingLink,

@@ -13,7 +13,9 @@ Product intent and design principles live in [`PRODUCT.md`](PRODUCT.md).
 - Multi-owner signup and magic-link sign-in, with exact tenant scoping on every
   private read and write.
 - One service per owner, painted half-hour availability, away dates, owner
-  timezone, 4-hour notice, and a 60-day booking horizon.
+  timezone, 4-hour notice, and a configurable booking horizon.
+- In-person, client-location, or virtual appointments. Virtual services can
+  use a default link, provider-generated links, or a link set on one booking.
 - Public booking and tokenized client-manage flows with transactional overlap
   protection, idempotent actions, and a 24-hour change cutoff.
 - Durable email outbox with dedupe, retries, `.ics` confirmations, email

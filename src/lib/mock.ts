@@ -3,7 +3,7 @@ import type { CurrencyCode } from "./format";
 
 /** Shared owner-config contract for the API-backed owner and public surfaces. */
 
-export type LocationMode = "mine" | "theirs";
+export type LocationMode = "mine" | "theirs" | "virtual";
 
 /** "Away 3–10 Aug" — one control on the bookings page, blocks all slots. */
 export interface AwayPeriod {

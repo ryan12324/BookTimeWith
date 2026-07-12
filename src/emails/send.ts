@@ -643,9 +643,14 @@ function whereLine(booking: Booking): string {
   if (booking.locationModeSnapshot === "theirs") {
     return `At your address: ${booking.locationSnapshot ?? "the address you gave"}`;
   }
+  if (booking.locationModeSnapshot === "virtual") {
+    return booking.meetingLink
+      ? `Online: ${booking.meetingLink}`
+      : "Online. Your meeting link will arrive before the appointment";
+  }
   return booking.locationSnapshot
     ? `At ${booking.locationSnapshot}`
-    : "Video call — the link arrives with your reminder";
+    : "Location details will arrive before the appointment";
 }
 
 /* ── event senders ──────────────────────────────────────────────── */
@@ -659,6 +664,7 @@ export async function sendClientBookingConfirmation(
     manageToken: string;
     baseUrl: string;
     rescheduled?: boolean;
+    detailsUpdated?: boolean;
     actionKey?: string;
   },
   options: MailSendOptions = {},
@@ -678,8 +684,9 @@ export async function sendClientBookingConfirmation(
     title: `${booking.serviceNameSnapshot} with ${owner.name.split(",")[0]}`,
     start: booking.startsAt,
     end: booking.endsAt,
+    description: booking.meetingLink ? `Join online: ${booking.meetingLink}\nManage booking: ${manageUrl}` : undefined,
     location: booking.locationSnapshot ?? undefined,
-    url: manageUrl,
+    url: booking.meetingLink ?? manageUrl,
     uid: `${booking.id}@booktimewith.com`,
   };
   const calendarUrl = googleCalendarUrl(event);
@@ -688,7 +695,7 @@ export async function sendClientBookingConfirmation(
     to: booking.clientEmail,
     from: ownerFrom(owner),
     replyTo: owner.email,
-    subject: `${o.rescheduled ? "Your booking moved" : "You're booked"} — ${when} at ${clock(booking.startsAt, tz)}`,
+    subject: `${o.detailsUpdated ? "Your meeting link" : o.rescheduled ? "Your booking moved" : "You're booked"} — ${when} at ${clock(booking.startsAt, tz)}`,
     template: "client-confirmation",
     ownerId: owner.id,
     ownerRecipientVersion: owner.sessionVersion,
@@ -709,6 +716,7 @@ export async function sendClientBookingConfirmation(
       whenBold: when,
       whenTimes: times,
       whereLine: whereLine(booking),
+      meetingLink: booking.meetingLink,
       manageUrl,
       calendarUrl,
       handle: owner.handle,

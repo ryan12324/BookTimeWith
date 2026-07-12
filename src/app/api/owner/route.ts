@@ -83,7 +83,7 @@ const EditableConfig = z.object({
   name: z.string().trim().min(1).max(120),
   service: z.string().trim().min(1).max(120),
   duration: z.number().int().min(15).max(240).multipleOf(5),
-  location: z.enum(["mine", "theirs"]),
+  location: z.enum(["mine", "theirs", "virtual"]),
   ownerAddress: z.string().trim().max(240),
   meetingLink: z.union([
     z.literal(""),

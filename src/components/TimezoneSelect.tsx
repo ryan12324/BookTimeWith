@@ -72,7 +72,7 @@ export function TimezoneSelect({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         aria-describedby={descriptionId}
-        className="mt-2 min-h-[44px] w-full max-w-[420px] rounded-chip border border-line bg-white px-3 font-sans text-[14px] font-medium text-ink"
+        className="mt-2 min-h-[44px] w-full max-w-[420px] rounded-chip border border-line bg-paper px-3 font-sans text-[16px] font-medium text-ink outline-none transition-colors duration-200 ease-out hover:border-bronze"
       >
         {zones.map((zone) => (
           <option key={zone} value={zone}>
@@ -80,7 +80,7 @@ export function TimezoneSelect({
           </option>
         ))}
       </select>
-      <p id={descriptionId} className="mt-2 font-sans text-[11.5px] leading-[1.5] text-body">
+      <p id={descriptionId} className="mt-2 font-sans text-[12px] leading-[1.5] text-body">
         {description}
       </p>
     </div>

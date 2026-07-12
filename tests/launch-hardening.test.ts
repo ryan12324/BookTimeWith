@@ -1120,6 +1120,19 @@ describe("launch hardening", () => {
       meetingLinkSnapshot: null,
     });
     expect(
+      snapshotBookingService({
+        name: "Online consultation",
+        locationMode: "virtual",
+        ownerAddress: "20 Market Road",
+        meetingLink: " https://zoom.example/room ",
+      }),
+    ).toEqual({
+      serviceNameSnapshot: "Online consultation",
+      locationModeSnapshot: "virtual",
+      locationSnapshot: null,
+      meetingLinkSnapshot: "https://zoom.example/room",
+    });
+    expect(
       snapshotBookingService(
         {
           name: "Consultation",
@@ -1156,6 +1169,13 @@ describe("launch hardening", () => {
     expect(
       effectiveBookingMeetingLink(booking, "upsert", { ok: false }),
     ).toBe("https://meet.google.com/stale-provider-link");
+    expect(
+      effectiveBookingMeetingLink(
+        { ...booking, meetingLinkOverride: "https://whereby.example/client-room" },
+        "upsert",
+        { ok: true, meetingLink: "https://meet.google.com/provider-room" },
+      ),
+    ).toBe("https://whereby.example/client-room");
   });
 
   it("passes only the snapshotted address to calendar events", () => {

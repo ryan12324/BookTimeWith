@@ -27,21 +27,46 @@ function DisclosureSection({
   children: React.ReactNode;
 }) {
   return (
-    <details className="group border-b border-hairline py-1">
-      <summary className="flex min-h-[64px] cursor-pointer list-none items-center justify-between gap-4 py-3 marker:content-none [&::-webkit-details-marker]:hidden">
+    <details className="group border-b border-hairline">
+      <summary className="flex min-h-[68px] cursor-pointer list-none items-center justify-between gap-4 rounded-input px-2 py-3 transition-colors duration-200 ease-out marker:content-none hover:bg-paper [&::-webkit-details-marker]:hidden sm:-mx-2">
         <span className="font-sans text-[14px] font-semibold text-ink">{title}</span>
-        <span className="flex min-w-0 items-center gap-3">
-          <span className="truncate font-sans text-[12px] text-body">{summary}</span>
+        <span className="flex min-w-0 max-w-[58%] items-center gap-3 sm:max-w-[70%]">
+          <span className="break-words text-right font-sans text-[12px] leading-[1.45] text-body">{summary}</span>
           <span
             aria-hidden="true"
-            className="text-[17px] leading-none text-body transition-transform duration-200 ease-out group-open:rotate-45"
+            className="flex h-6 w-6 flex-none items-center justify-center text-[17px] leading-none text-body transition-transform duration-200 ease-out group-open:rotate-180"
           >
-            +
+            ⌄
           </span>
         </span>
       </summary>
-      <div className="pb-6 pt-1">{children}</div>
+      <div className="pb-7 pt-2">{children}</div>
     </details>
+  );
+}
+
+function SaveStatus({ state }: { state: "idle" | "saving" | "saved" | "error" }) {
+  const label = state === "saving"
+    ? "Saving changes…"
+    : state === "saved"
+      ? "Changes saved"
+      : state === "error"
+        ? "Changes not saved"
+        : "Changes autosave";
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className="flex min-h-[28px] items-center gap-2 font-sans text-[12px] text-body"
+    >
+      <span
+        aria-hidden="true"
+        className={`h-1.5 w-1.5 rounded-full ${
+          state === "error" ? "bg-body" : state === "saving" ? "bg-bronze" : "bg-bronze-ink"
+        }`}
+      />
+      {label}
+    </div>
   );
 }
 
@@ -152,7 +177,8 @@ function BookingHorizon({
           onKeyDown={(event) => {
             if (event.key === "Enter") (event.target as HTMLInputElement).blur();
           }}
-          className="min-h-[44px] min-w-0 rounded-chip border border-line px-[15px] font-sans text-[16px] font-medium text-ink outline-none"
+          aria-describedby="settings-booking-horizon-hint"
+          className="min-h-[44px] min-w-0 rounded-chip border border-line bg-paper px-[15px] font-sans text-[16px] font-medium text-ink outline-none transition-colors duration-200 ease-out hover:border-bronze"
         />
         <select
           aria-label="Booking window unit"
@@ -162,14 +188,15 @@ function BookingHorizon({
             setUnit(nextUnit);
             commit(amount, nextUnit);
           }}
-          className="min-h-[44px] min-w-0 rounded-chip border border-line bg-white px-[12px] font-sans text-[16px] font-medium text-ink outline-none"
+          aria-describedby="settings-booking-horizon-hint"
+          className="min-h-[44px] min-w-0 rounded-chip border border-line bg-paper px-[12px] font-sans text-[16px] font-medium text-ink outline-none transition-colors duration-200 ease-out hover:border-bronze"
         >
           <option value="days">days</option>
           <option value="weeks">weeks</option>
           <option value="months">months</option>
         </select>
       </div>
-      <p className="mt-1.5 font-sans text-[11.5px] leading-[1.5] text-body">
+      <p id="settings-booking-horizon-hint" className="mt-2 font-sans text-[12px] leading-[1.5] text-body">
         Times beyond this window stay hidden. A month is counted as 30 days.
       </p>
     </div>
@@ -211,23 +238,28 @@ function AwayControl({
           No times are offered during these dates
         </span>
       </div>
-      <div className="mt-3 flex flex-wrap items-center gap-2 font-sans text-[12.5px] text-body">
-        <input
-          type="date"
-          value={start}
-          onChange={(event) => apply(event.target.value, end)}
-          aria-label="Away from"
-          className="min-h-[44px] rounded-input border border-line bg-white px-2 font-sans text-[16px] text-ink outline-none"
-        />
-        <span>to</span>
-        <input
-          type="date"
-          value={end}
-          onChange={(event) => apply(start, event.target.value)}
-          aria-label="Away until"
-          className="min-h-[44px] rounded-input border border-line bg-white px-2 font-sans text-[16px] text-ink outline-none"
-        />
-        {away && (
+      <div className="mt-3 grid max-w-[420px] grid-cols-1 gap-3 font-sans text-body sm:grid-cols-2">
+        <label className="min-w-0 font-sans text-[12px] font-semibold text-body">
+          From
+          <input
+            type="date"
+            value={start}
+            onChange={(event) => apply(event.target.value, end)}
+            className="mt-1.5 min-h-[44px] w-full min-w-0 rounded-input border border-line bg-paper px-3 font-sans text-[16px] text-ink outline-none transition-colors duration-200 ease-out hover:border-bronze"
+          />
+        </label>
+        <label className="min-w-0 font-sans text-[12px] font-semibold text-body">
+          Until
+          <input
+            type="date"
+            value={end}
+            onChange={(event) => apply(start, event.target.value)}
+            className="mt-1.5 min-h-[44px] w-full min-w-0 rounded-input border border-line bg-paper px-3 font-sans text-[16px] text-ink outline-none transition-colors duration-200 ease-out hover:border-bronze"
+          />
+        </label>
+      </div>
+      {away && (
+        <div className="mt-1 flex min-h-[44px] items-center">
           <button
             type="button"
             onClick={() => apply("", "")}
@@ -235,8 +267,8 @@ function AwayControl({
           >
             Clear dates
           </button>
-        )}
-      </div>
+        </div>
+      )}
       {invalidRange && (
         <p role="alert" className="mt-2 font-sans text-[12px] text-body">
           The end date must be on or after the start date.
@@ -246,7 +278,7 @@ function AwayControl({
   );
 }
 
-/** "£6 a month · free trial ends 3 August" — the plan line, from real state. */
+/** "£6 a month · free trial ends 3 August", the plan line from real state. */
 export function PlanSection({
   planStatus,
   trialEndsAt,
@@ -286,12 +318,12 @@ export function PlanSection({
       <>
         {PRICES[currency]} a month ·{" "}
         <span className="text-body">
-          card didn&apos;t go through — your page works until {day(graceUntil) ?? "the retry window ends"}
+          card didn&apos;t go through. Your page works until {day(graceUntil) ?? "the retry window ends"}
         </span>
       </>
     ),
-    paused: <span className="text-body">Paused — add a card and your page comes straight back.</span>,
-    cancelled: <span className="text-body">Cancelled — bookings already made still happen.</span>,
+    paused: <span className="text-body">Paused. Add a card and your page comes straight back.</span>,
+    cancelled: <span className="text-body">Cancelled. Bookings already made still happen.</span>,
   };
   const summary: Record<string, string> = {
     trialing: `${PRICES[currency]} a month`,
@@ -449,7 +481,7 @@ export function PlanSection({
 }
 
 /**
- * The owner's notification address. Commits on blur (not per keystroke) — a
+ * The owner's notification address. Commits on blur (not per keystroke); a
  * changed email un-verifies and triggers the one-click confirmation email.
  */
 function OwnerEmail({
@@ -500,8 +532,7 @@ function OwnerEmail({
         aria-label="Where booking emails go"
         aria-invalid={invalid}
         aria-describedby={hintId}
-        className="min-w-[220px] flex-1 rounded-chip border border-line px-[15px] py-[11px] font-medium text-ink outline-none"
-        style={{ fontSize: 13.5 }}
+        className="min-h-[44px] min-w-[220px] flex-1 rounded-chip border border-line bg-paper px-[15px] py-[11px] font-sans text-[16px] font-medium text-ink outline-none transition-colors duration-200 ease-out hover:border-bronze"
       />
       <div className="min-w-0 flex-1" aria-live="polite">
         <span
@@ -581,7 +612,7 @@ function OwnerHandle({
 
   return (
     <>
-      <div className="focus-group flex max-w-[420px] items-center overflow-hidden rounded-chip border border-line">
+      <div className="focus-group flex min-h-[44px] max-w-[420px] items-center overflow-hidden rounded-chip border border-line bg-paper transition-colors duration-200 ease-out hover:border-bronze">
         <span className="flex-none py-[13px] pl-[15px] font-sans text-[14.5px] text-body">
           booktimewith.link/
         </span>
@@ -637,7 +668,7 @@ function OwnerHandle({
 
 /**
  * The whole product promise: one settings page. Sections divided by hairlines,
- * autosave (changes persist to the store immediately — no Save button).
+ * autosave (changes persist to the store immediately, with no Save button).
  */
 export function Settings() {
   const {
@@ -664,10 +695,10 @@ export function Settings() {
     const flag = query.get("calendar");
     if (flag === "unconfigured") {
       setCalNote(
-        "Calendar sync isn't configured in this environment — set the Google or Microsoft OAuth keys.",
+        "Calendar sync isn't configured in this environment. Set the Google or Microsoft OAuth keys.",
       );
     } else if (flag === "failed") {
-      setCalNote("That connection didn't complete — try again.");
+      setCalNote("That connection didn't complete. Try again.");
     }
     if (query.get("verified") === "expired") {
       setPageNote("That email confirmation link expired. Your address is still unverified.");
@@ -728,7 +759,7 @@ export function Settings() {
 
   if (!hydrated || retryingLoad) {
     return (
-      <div role="status" className="mx-auto mt-9 max-w-[680px] rounded-card border border-line-soft bg-white px-6 py-10 text-center font-sans text-[13.5px] text-body shadow-card">
+      <div role="status" className="mx-auto mt-9 max-w-[680px] rounded-card border border-line-soft bg-paper px-6 py-10 text-center font-sans text-[13.5px] text-body shadow-card">
         Loading your settings…
       </div>
     );
@@ -736,7 +767,7 @@ export function Settings() {
 
   if (loadError) {
     return (
-      <div role="alert" className="mx-auto mt-9 max-w-[680px] rounded-card border border-line-soft bg-white px-6 py-10 text-center shadow-card">
+      <div role="alert" className="mx-auto mt-9 max-w-[680px] rounded-card border border-line-soft bg-paper px-6 py-10 text-center shadow-card">
         <h1 className="font-serif text-[24px] tracking-[-.01em]">Your settings couldn&apos;t load.</h1>
         <p className="mt-2 font-sans text-[13.5px] leading-[1.6] text-body">{loadError}</p>
         <button
@@ -754,13 +785,25 @@ export function Settings() {
   }
 
   return (
-    <div className="mx-auto mt-9 max-w-[680px]">
-      <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-line-soft pb-5">
+    <div className="mx-auto mt-7 max-w-[680px] sm:mt-9">
+      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b border-line-soft pb-5">
         <h1 className="font-serif text-[28px] tracking-[-.01em]">Settings</h1>
-        <div className="font-sans text-[12px] text-body">Changes save automatically</div>
+        <SaveStatus state={saveState} />
       </div>
+      {saveState === "error" && (
+        <div role="alert" className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-chip border border-line-soft bg-tint-warm px-4 py-3 font-sans text-[12.5px] text-body">
+          <span>{saveError ?? "Changes could not be saved."}</span>
+          <button
+            type="button"
+            onClick={retrySave}
+            className="min-h-[44px] px-2 font-semibold text-bronze-ink"
+          >
+            Try again
+          </button>
+        </div>
+      )}
       {pageNote && (
-        <div role="status" className="mt-3 rounded-chip border border-line-soft bg-white px-4 py-3 font-sans text-[12.5px] text-body">
+        <div role="status" className="mt-3 rounded-chip border border-line-soft bg-paper px-4 py-3 font-sans text-[12.5px] text-body">
           {pageNote}
         </div>
       )}
@@ -781,7 +824,7 @@ export function Settings() {
         >
           <SectionLabel className="mb-[10px] mt-5">Your link</SectionLabel>
           <OwnerHandle handle={config.handle} onCommit={(handle) => update({ handle })} />
-          <SectionLabel as="label" htmlFor="settings-name" className="mb-2 mt-5 block">
+          <SectionLabel as="label" htmlFor="settings-name" className="mb-2 mt-6 block">
             Public name
           </SectionLabel>
           <input
@@ -790,7 +833,7 @@ export function Settings() {
             onChange={(event) => update({ name: event.target.value })}
             maxLength={120}
             autoComplete="name"
-            className="w-full max-w-[420px] rounded-chip border border-line px-[15px] py-[13px] font-medium text-ink outline-none"
+            className="min-h-[44px] w-full max-w-[420px] rounded-chip border border-line bg-paper px-[15px] py-[12px] font-sans text-[16px] font-medium text-ink outline-none transition-colors duration-200 ease-out hover:border-bronze"
           />
         {/* YOUR SERVICE */}
         <div className="pt-6">
@@ -799,17 +842,16 @@ export function Settings() {
             id="settings-service"
             value={config.service}
             onChange={(e) => update({ service: e.target.value })}
-            className="w-full max-w-[420px] rounded-chip border border-line px-[15px] py-[13px] font-medium text-ink outline-none"
-            style={{ fontSize: 14.5 }}
+            className="min-h-[44px] w-full max-w-[420px] rounded-chip border border-line bg-paper px-[15px] py-[12px] font-sans text-[16px] font-medium text-ink outline-none transition-colors duration-200 ease-out hover:border-bronze"
           />
-          <div className="mt-[14px] flex flex-wrap items-center gap-[14px]">
+          <div className="mt-[14px]">
             <DurationStepper
               minutes={config.duration}
               onChange={(m) => update({ duration: m })}
               size="sm"
             />
-            <div className="grid w-full flex-1 grid-cols-1 gap-2 sm:grid-cols-2">
-              {(["mine", "theirs"] as const).map((key) => {
+            <div className="mt-4 grid w-full max-w-[520px] grid-cols-1 gap-2 sm:grid-cols-3" role="group" aria-label="Where appointments happen">
+              {(["mine", "theirs", "virtual"] as const).map((key) => {
                 const on = config.location === key;
                 return (
                   <button
@@ -818,38 +860,49 @@ export function Settings() {
                     onClick={() => update({ location: key })}
                     aria-pressed={on}
                     className="min-h-[44px] rounded-input border px-[14px] py-[11px] font-sans text-[12.5px] font-semibold text-ink"
-                    style={{ borderColor: on ? T.ink : T.line, background: on ? T.tintWarm : "#fff" }}
+                    style={{ borderColor: on ? T.ink : T.line, background: on ? T.tintWarm : T.paper }}
                   >
-                    {key === "mine" ? "Clients come to me" : "I go to clients"}
+                    {key === "mine"
+                      ? "Clients come to me"
+                      : key === "theirs"
+                        ? "I go to clients"
+                        : "We meet virtually"}
                   </button>
                 );
               })}
             </div>
           </div>
           {config.location === "mine" && (
-            <div className="mt-3">
-              <label htmlFor="settings-address" className="sr-only">Your address</label>
+            <div className="mt-5">
+              <label htmlFor="settings-address" className="mb-2 block font-sans text-[12.5px] font-semibold text-ink">Where clients meet you</label>
               <input
                 id="settings-address"
                 value={config.ownerAddress}
                 onChange={(e) => update({ ownerAddress: e.target.value })}
-                placeholder="Your address, e.g. 12 Harley Street, London"
-                className="w-full max-w-[420px] rounded-chip border border-line px-[15px] py-3 font-medium text-ink outline-none"
-                style={{ fontSize: 16 }}
+                placeholder="12 Harley Street, London"
+                className="min-h-[44px] w-full max-w-[420px] rounded-chip border border-line bg-paper px-[15px] py-3 font-sans text-[16px] font-medium text-ink outline-none transition-colors duration-200 ease-out hover:border-bronze"
               />
             </div>
           )}
-          <label htmlFor="settings-meeting-link" className="sr-only">Meeting link</label>
-          <input
-            id="settings-meeting-link"
-            type="url"
-            value={config.meetingLink}
-            onChange={(e) => update({ meetingLink: e.target.value })}
-            placeholder="Meeting link (optional) — your Zoom/Meet URL, sent in reminders"
-            aria-label="Meeting link"
-            className="mt-3 w-full max-w-[420px] rounded-chip border border-line px-[15px] py-3 font-medium text-ink outline-none"
-            style={{ fontSize: 13.5 }}
-          />
+          {(config.location === "virtual" || config.meetingLink) && (
+          <div className="mt-5 max-w-[420px]">
+            <label htmlFor="settings-meeting-link" className="mb-2 block font-sans text-[12.5px] font-semibold text-ink">Default meeting link <span className="font-normal text-body">(optional)</span></label>
+            <input
+              id="settings-meeting-link"
+              type="url"
+              value={config.meetingLink}
+              onChange={(e) => update({ meetingLink: e.target.value })}
+              placeholder="https://zoom.us/j/…"
+              aria-describedby="settings-meeting-link-hint"
+              className="min-h-[44px] w-full rounded-chip border border-line bg-paper px-[15px] py-3 font-sans text-[16px] font-medium text-ink outline-none transition-colors duration-200 ease-out hover:border-bronze"
+            />
+            <p id="settings-meeting-link-hint" className="mt-2 font-sans text-[12px] leading-[1.5] text-body">
+              {config.calendar
+                ? "Your calendar can create a unique link for each booking. This is the fallback if it does not."
+                : "Use this for every booking, or leave it blank and add a different link to each booking later."}
+            </p>
+          </div>
+          )}
         </div>
         </DisclosureSection>
 
@@ -884,11 +937,11 @@ export function Settings() {
               className="flex min-h-[44px] items-center gap-[9px] rounded-input border px-[13px] py-2"
               style={{
                 borderColor: g.weekends ? T.bronze : T.line,
-                background: g.weekends ? T.tintWarm : "#fff",
+                background: g.weekends ? T.tintWarm : T.paper,
               }}
             >
               <Toggle on={g.weekends} />
-              <span className="font-sans text-[12px] font-semibold text-ink">We&apos;re open weekends</span>
+              <span className="font-sans text-[12px] font-semibold text-ink">Open weekends</span>
             </button>
             <button
               type="button"
@@ -920,7 +973,7 @@ export function Settings() {
           {!config.calendar ? (
             <>
               <p className="mb-[14px] font-sans text-[13px] leading-[1.5] text-body">
-                Connect your calendar and busy time blocks itself — both ways.
+                Connect your calendar and busy time blocks itself in both places.
               </p>
               {calNote && (
                 <p role="alert" className="mb-3 font-sans text-[12px] text-body">{calNote}</p>
@@ -962,8 +1015,8 @@ export function Settings() {
                   </div>
                   <div className="font-sans text-[12px] text-body">
                     {config.calendarStatus === "degraded"
-                      ? config.calendarError ?? "Calendar sync is delayed. Reconnect to resume updates."
-                      : "Busy events block booking slots · bookings appear in your calendar"}
+                        ? config.calendarError ?? "Calendar sync is delayed. Reconnect to resume updates."
+                        : "Busy events block booking slots · bookings appear in your calendar"}
                   </div>
                   {config.calendarLastSyncedAt && (
                     <div className="mt-1 font-sans text-[11px] text-body">
@@ -1053,26 +1106,6 @@ export function Settings() {
         />
       </div>
 
-      {saveState === "error" ? (
-        <div role="alert" className="mt-[14px] rounded-chip border border-line-soft bg-tint-warm px-4 py-3 text-center font-sans text-[12px] text-body">
-          <span>{saveError ?? "Changes could not be saved."}</span>{" "}
-          <button
-            type="button"
-            onClick={retrySave}
-            className="min-h-[44px] px-2 font-semibold text-bronze-ink"
-          >
-            Try again
-          </button>
-        </div>
-      ) : (
-        <p role="status" aria-live="polite" className="mt-[14px] text-center font-sans text-[11.5px] text-body">
-          {saveState === "saving"
-            ? "Saving changes…"
-            : saveState === "saved"
-              ? "Changes saved."
-              : "Changes save as you make them."}
-        </p>
-      )}
     </div>
   );
 }

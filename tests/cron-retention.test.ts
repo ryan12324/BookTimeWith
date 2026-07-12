@@ -69,6 +69,7 @@ async function retentionDatabase(options: { rejectRedaction?: boolean } = {}) {
       "location_snapshot" text,
       "meeting_link_snapshot" text,
       "meeting_link" text,
+      "meeting_link_override" text,
       "last_action_key" text,
       "client_request_key" text,
       "initial_intent_hash" text,
@@ -107,7 +108,7 @@ const bookingValues = (
   '${id}', '2024-07-10T09:00:00Z', '${endsAt}', 'Consultation', 'cancelled',
   'Alex Client', 'alex@example.com', 'America/New_York', '4 Private Road',
   '4 Private Road', 'https://zoom.example/private', 'https://meet.example/private',
-  'action-private', 'request-private', 'hash-private', 'google', 'event-private',
+  'https://whereby.example/private', 'action-private', 'request-private', 'hash-private', 'google', 'event-private',
   4, 'failed', 'client address in provider error', '2024-07-10T10:00:00Z',
   ${anonymizedAt ? `'${anonymizedAt}'` : "NULL"}
 )`;
@@ -223,6 +224,7 @@ describe("active-client PII retention", () => {
         location_snapshot: null,
         meeting_link_snapshot: null,
         meeting_link: null,
+        meeting_link_override: null,
         last_action_key: null,
         client_request_key: null,
         initial_intent_hash: null,

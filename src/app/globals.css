@@ -92,7 +92,7 @@
   }
   /* Half-hour controls are full touch targets on phones, compact on desktop. */
   .availability-hour {
-    height: 90px;
+    height: 92px;
   }
 }
 
