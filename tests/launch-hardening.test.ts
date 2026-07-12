@@ -12,6 +12,7 @@ import {
   openStripeCheckoutUrl,
   retrieveStripeSubscription,
   stripeCancellationNoticeKey,
+  stripeBillingPortalUrl,
   stripeCurrencyCode,
   stripeOwnerReference,
   stripePaymentFailureTiming,
@@ -78,6 +79,23 @@ describe("launch hardening", () => {
     expect(checkHandle("-dana")).toBe("invalid");
     expect(checkHandle("dana--w")).toBe("invalid");
     expect(checkHandle("ab")).toBe("too-short");
+  });
+
+  it("uses only the configured Stripe-hosted billing portal", () => {
+    expect(stripeBillingPortalUrl()).toBe(
+      "https://billing.stripe.com/p/login/4gM2898yg0NpchadFb43S00",
+    );
+    vi.stubEnv(
+      "STRIPE_BILLING_PORTAL_URL",
+      "https://billing.stripe.com/p/login/custom-portal",
+    );
+    expect(stripeBillingPortalUrl()).toBe(
+      "https://billing.stripe.com/p/login/custom-portal",
+    );
+    vi.stubEnv("STRIPE_BILLING_PORTAL_URL", "https://example.com/phishing");
+    expect(() => stripeBillingPortalUrl()).toThrow(
+      "must be an HTTPS billing.stripe.com URL",
+    );
   });
 
   it("trusts forwarded client addresses only behind an explicit sanitized edge", () => {

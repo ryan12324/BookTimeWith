@@ -11,6 +11,28 @@
 export const stripeConfigured = () =>
   Boolean(process.env.STRIPE_SECRET_KEY?.trim());
 
+const DEFAULT_STRIPE_BILLING_PORTAL_URL =
+  "https://billing.stripe.com/p/login/4gM2898yg0NpchadFb43S00";
+
+/** Stripe-hosted login portal used for owners with an existing subscription. */
+export function stripeBillingPortalUrl(): string {
+  const configured =
+    process.env.STRIPE_BILLING_PORTAL_URL?.trim() ||
+    DEFAULT_STRIPE_BILLING_PORTAL_URL;
+  let url: URL;
+  try {
+    url = new URL(configured);
+  } catch {
+    throw new Error("STRIPE_BILLING_PORTAL_URL must be a valid URL");
+  }
+  if (url.protocol !== "https:" || url.hostname !== "billing.stripe.com") {
+    throw new Error(
+      "STRIPE_BILLING_PORTAL_URL must be an HTTPS billing.stripe.com URL",
+    );
+  }
+  return url.toString();
+}
+
 type BillingCurrencyOwner = {
   stripeCustomerId: string | null;
   stripeSubscriptionId?: string | null;

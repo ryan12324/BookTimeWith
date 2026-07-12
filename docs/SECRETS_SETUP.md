@@ -27,6 +27,7 @@ Complete credential inventory:
 | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | Cloudflare Turnstile widget |
 | `STRIPE_SECRET_KEY` | Stripe live API-key page |
 | `STRIPE_WEBHOOK_SECRET` | The live Stripe webhook endpoint |
+| `STRIPE_BILLING_PORTAL_URL` | Stripe Dashboard customer-portal login link |
 | `STRIPE_PRICE_GBP`, `STRIPE_PRICE_USD`, `STRIPE_PRICE_EUR`, `STRIPE_PRICE_AUD` | Stripe recurring Price objects |
 
 ## 1. Generate the application-owned secrets

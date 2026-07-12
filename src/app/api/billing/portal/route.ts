@@ -7,7 +7,7 @@ import {
   appOwnedStripeSubscriptions,
   aggregateStripeEntitlement,
   createCheckoutSession,
-  createPortalSession,
+  stripeBillingPortalUrl,
   createStripeCustomer,
   deleteStripeCustomer,
   listOpenStripeCheckoutSessions,
@@ -235,7 +235,7 @@ export async function POST(request: Request) {
       return decision.kind === "checkout_url"
         ? decision.url
         : decision.kind === "portal"
-          ? createPortalSession({ customerId: decision.customerId, baseUrl })
+          ? stripeBillingPortalUrl()
           : createCheckoutSession({
               ownerId: decision.ownerId,
               customerId: decision.customerId,
