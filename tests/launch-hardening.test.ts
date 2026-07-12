@@ -45,6 +45,7 @@ import {
   generateSlots,
   openIntervalsForDay,
   subtractBusy,
+  withinHorizon,
 } from "../src/lib/scheduling";
 import {
   createSession,
@@ -108,6 +109,13 @@ describe("launch hardening", () => {
       { start: 10 * 60, end: 11 * 60 },
     ]);
     expect(generateSlots(free, 50)).toEqual([10 * 60]);
+  });
+
+  it("enforces the owner's booking horizon at the exact boundary", () => {
+    const now = new Date("2026-07-12T10:00:00Z");
+    expect(withinHorizon(new Date("2026-07-14T10:00:00Z"), now, 2)).toBe(true);
+    expect(withinHorizon(new Date("2026-07-14T10:00:01Z"), now, 2)).toBe(false);
+    expect(withinHorizon(new Date("2026-07-19T10:00:00Z"), now, 7)).toBe(true);
   });
 
   it("materializes owner wall time correctly on both sides of UK DST", () => {

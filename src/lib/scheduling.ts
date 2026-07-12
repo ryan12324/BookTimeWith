@@ -7,7 +7,7 @@ import type { Cells } from "./availability";
  */
 
 export const MIN_NOTICE_HOURS = 4; // no booking less than 4h ahead (v1 default)
-export const HORIZON_DAYS = 60; // bookable up to 60 days out
+export const MAX_HORIZON_DAYS = 730;
 export const SLOT_STEP_MINUTES = 30; // slot starts snap to :00 / :30
 
 export interface Interval {
@@ -82,7 +82,7 @@ export function meetsMinNotice(slotStart: Date, now: Date): boolean {
 }
 
 /** True if a slot is within the booking horizon. */
-export function withinHorizon(slotStart: Date, now: Date): boolean {
+export function withinHorizon(slotStart: Date, now: Date, horizonDays = MAX_HORIZON_DAYS): boolean {
   const daysAhead = (slotStart.getTime() - now.getTime()) / 86_400_000;
-  return daysAhead <= HORIZON_DAYS;
+  return daysAhead <= horizonDays;
 }

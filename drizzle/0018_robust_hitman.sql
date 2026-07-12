@@ -1,0 +1,1 @@
+ALTER TABLE "owners" ADD COLUMN "booking_horizon_days" smallint DEFAULT 60 NOT NULL;

@@ -54,6 +54,8 @@ export const owners = pgTable(
     // notification prefs
     notifyOnChange: boolean("notify_on_change").notNull().default(true),
     notifyMorningSummary: boolean("notify_morning_summary").notNull().default(true),
+    // Furthest into the future a client can choose a slot.
+    bookingHorizonDays: smallint("booking_horizon_days").notNull().default(60),
     // billing
     // The remote customer is created and bound before Checkout. This lets
     // account deletion cancel even a Checkout session that has not completed.

@@ -68,6 +68,7 @@ export async function getOwnerConfig(db: Db, ownerId: string): Promise<OwnerConf
     meetingLink: service.meetingLink ?? "",
     notifyBook: owner.notifyOnChange,
     notifyMorning: owner.notifyMorningSummary,
+    bookingHorizonDays: owner.bookingHorizonDays,
     timezone: owner.timezone,
     currency: owner.currency as OwnerConfig["currency"],
     billingCurrencyLocked: isBillingCurrencyLocked(owner),
@@ -186,6 +187,9 @@ async function applyOwnerConfigPatch(
   }
   if (patch.notifyBook !== undefined) ownerPatch.notifyOnChange = patch.notifyBook;
   if (patch.notifyMorning !== undefined) ownerPatch.notifyMorningSummary = patch.notifyMorning;
+  if (patch.bookingHorizonDays !== undefined) {
+    ownerPatch.bookingHorizonDays = patch.bookingHorizonDays;
+  }
   if (patch.timezone !== undefined) ownerPatch.timezone = patch.timezone;
   if (patch.currency !== undefined && patch.currency !== owner.currency) {
     if (isBillingCurrencyLocked(owner)) throw new Error("BILLING_CURRENCY_LOCKED");
@@ -277,6 +281,7 @@ export async function busySpansFor(
   ownerId: string,
   excludeBookingId?: string,
   includeCalendar = true,
+  horizonDays = 60,
 ): Promise<BusySpan[]> {
   const rows = await db.query.bookings.findMany({
     where: and(
@@ -299,7 +304,12 @@ export async function busySpansFor(
   if (connection && includeCalendar) {
     const now = new Date();
     spans.push(
-      ...(await calendarBusy(connection, now, new Date(now.getTime() + 61 * 86_400_000), db)),
+      ...(await calendarBusy(
+        connection,
+        now,
+        new Date(now.getTime() + (horizonDays + 1) * 86_400_000),
+        db,
+      )),
     );
   }
   return spans;
@@ -314,7 +324,7 @@ export async function slotsFor(
   viewerTz?: string,
 ): Promise<DaySlots[]> {
   const cfg = await getOwnerConfig(db, ownerId);
-  const busy = await busySpansFor(db, ownerId);
+  const busy = await busySpansFor(db, ownerId, undefined, true, cfg.bookingHorizonDays);
   return bookableDays(cfg, busy, now, count, viewerTz ?? cfg.timezone);
 }
 
@@ -338,6 +348,7 @@ export async function isBookableInstant(
     ownerId,
     excludeBookingId,
     includeCalendar,
+    cfg.bookingHorizonDays,
   );
   return isSlotBookable(cfg, busy, target, now);
 }

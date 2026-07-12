@@ -100,6 +100,7 @@ const EditableConfig = z.object({
   calendar: z.string().nullable(),
   notifyBook: z.boolean(),
   notifyMorning: z.boolean(),
+  bookingHorizonDays: z.number().int().min(1).max(730),
   timezone: z.string().min(1).max(100).refine(isIanaZone, "Invalid IANA timezone"),
   currency: z.enum(["GBP", "USD", "EUR", "AUD"]),
   away: Away.nullable(),
@@ -222,6 +223,7 @@ async function createOwner(db: Db, config: LiveOwnerConfig) {
         currency: config.currency,
         notifyOnChange: config.notifyBook,
         notifyMorningSummary: config.notifyMorning,
+        bookingHorizonDays: config.bookingHorizonDays,
         setupCompletedAt: now,
         trialEndsAt: new Date(now.getTime() + 30 * 86_400_000),
       })

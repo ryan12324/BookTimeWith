@@ -17,6 +17,96 @@ const PROVIDERS = [
   { key: "outlook", name: "Outlook", dot: "#0f6cbd" },
 ];
 
+type HorizonUnit = "days" | "weeks" | "months";
+
+const HORIZON_UNITS: Record<HorizonUnit, { days: number; max: number }> = {
+  days: { days: 1, max: 730 },
+  weeks: { days: 7, max: 104 },
+  months: { days: 30, max: 24 },
+};
+
+function horizonParts(days: number): { amount: number; unit: HorizonUnit } {
+  if (days % 30 === 0) return { amount: days / 30, unit: "months" };
+  if (days % 7 === 0) return { amount: days / 7, unit: "weeks" };
+  return { amount: days, unit: "days" };
+}
+
+function BookingHorizon({
+  days,
+  onChange,
+}: {
+  days: number;
+  onChange: (days: number) => void;
+}) {
+  const parts = horizonParts(days);
+  const [unit, setUnit] = useState<HorizonUnit>(parts.unit);
+  const [amount, setAmount] = useState(String(parts.amount));
+
+  useEffect(() => {
+    const next = horizonParts(days);
+    setUnit(next.unit);
+    setAmount(String(next.amount));
+  }, [days]);
+
+  const commit = (nextAmount: string, nextUnit = unit) => {
+    const value = Number(nextAmount);
+    if (!Number.isInteger(value) || value < 1) {
+      const current = horizonParts(days);
+      setUnit(current.unit);
+      setAmount(String(current.amount));
+      return;
+    }
+    const rule = HORIZON_UNITS[nextUnit];
+    const clamped = Math.min(value, rule.max);
+    setAmount(String(clamped));
+    onChange(clamped * rule.days);
+  };
+
+  return (
+    <div className="mt-4 max-w-[420px]">
+      <label
+        htmlFor="settings-booking-horizon"
+        className="block font-sans text-[12.5px] font-semibold text-ink"
+      >
+        How far ahead people can book
+      </label>
+      <div className="mt-2 grid grid-cols-[minmax(0,1fr)_minmax(120px,0.8fr)] gap-2">
+        <input
+          id="settings-booking-horizon"
+          type="number"
+          inputMode="numeric"
+          min={1}
+          max={HORIZON_UNITS[unit].max}
+          value={amount}
+          onChange={(event) => setAmount(event.target.value)}
+          onBlur={() => commit(amount)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") (event.target as HTMLInputElement).blur();
+          }}
+          className="min-h-[44px] min-w-0 rounded-chip border border-line px-[15px] font-sans text-[16px] font-medium text-ink outline-none"
+        />
+        <select
+          aria-label="Booking window unit"
+          value={unit}
+          onChange={(event) => {
+            const nextUnit = event.target.value as HorizonUnit;
+            setUnit(nextUnit);
+            commit(amount, nextUnit);
+          }}
+          className="min-h-[44px] min-w-0 rounded-chip border border-line bg-white px-[12px] font-sans text-[16px] font-medium text-ink outline-none"
+        >
+          <option value="days">days</option>
+          <option value="weeks">weeks</option>
+          <option value="months">months</option>
+        </select>
+      </div>
+      <p className="mt-1.5 font-sans text-[11.5px] leading-[1.5] text-body">
+        Times beyond this window stay hidden. A month is counted as 30 days.
+      </p>
+    </div>
+  );
+}
+
 /** "£6 a month · free trial ends 3 August" — the plan line, from real state. */
 export function PlanSection({
   planStatus,
@@ -614,6 +704,10 @@ export function Settings() {
             value={config.timezone}
             onChange={(timezone) => update({ timezone })}
             className="mt-4"
+          />
+          <BookingHorizon
+            days={config.bookingHorizonDays}
+            onChange={(bookingHorizonDays) => update({ bookingHorizonDays })}
           />
           <div className="mt-[14px] flex flex-wrap items-center gap-[10px]">
             <button

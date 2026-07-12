@@ -31,6 +31,7 @@ export interface OwnerConfig {
   calendarLastSyncedAt?: string | null;
   notifyBook: boolean;
   notifyMorning: boolean;
+  bookingHorizonDays: number; // 1–730 days from now
   timezone: string; // IANA; availability is painted in this zone
   currency: CurrencyCode; // plan display + Stripe price selection
   // True once Stripe owns the subscription price. The selector becomes display-
@@ -77,6 +78,7 @@ export const DEFAULT_OWNER: OwnerConfig = {
   calendar: null,
   notifyBook: true,
   notifyMorning: true,
+  bookingHorizonDays: 60,
   timezone: "Europe/London",
   currency: "GBP",
   billingCurrencyLocked: false,

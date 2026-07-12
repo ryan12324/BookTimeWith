@@ -1,7 +1,6 @@
 import { formatInTimeZone } from "date-fns-tz";
 import type { OwnerConfig } from "./mock";
 import {
-  HORIZON_DAYS,
   generateSlots,
   meetsMinNotice,
   openIntervalsForDay,
@@ -121,7 +120,7 @@ export function bookableDays(
 
   // Iterate one bucket past `count`: a viewer-local day can straddle two owner
   // days, so the last bucket may still be filling — we drop it below.
-  for (let plus = 0; plus <= HORIZON_DAYS && buckets.size <= count; plus++) {
+  for (let plus = 0; plus <= cfg.bookingHorizonDays && buckets.size <= count; plus++) {
     const { y, m, d, col } = datePartsInZone(now, tz, plus);
     if (isAwayDate(cfg.away, y, m, d)) continue;
 
@@ -132,7 +131,7 @@ export function bookableDays(
     for (const mins of generateSlots(free, cfg.duration)) {
       const start = validSlotInstant(y, m, d, mins, tz);
       if (!start) continue;
-      if (!meetsMinNotice(start, now) || !withinHorizon(start, now)) continue;
+      if (!meetsMinNotice(start, now) || !withinHorizon(start, now, cfg.bookingHorizonDays)) continue;
 
       // Bucket and label in the VIEWER's timezone — the booking page renders
       // these verbatim under "Times in {their zone}", so they must be built
@@ -175,7 +174,7 @@ export function isSlotBookable(
 ): boolean {
   const tz = cfg.timezone;
   if (isAwayNow(cfg.away, now, tz)) return false;
-  if (!meetsMinNotice(target, now) || !withinHorizon(target, now)) return false;
+  if (!meetsMinNotice(target, now) || !withinHorizon(target, now, cfg.bookingHorizonDays)) return false;
 
   const { y, m, d, col } = datePartsInZone(target, tz, 0);
   if (isAwayDate(cfg.away, y, m, d)) return false;
