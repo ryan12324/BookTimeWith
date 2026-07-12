@@ -1,4 +1,5 @@
 import { after, NextResponse } from "next/server";
+import { log } from "@/lib/logger";
 import { render } from "react-email";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
@@ -130,7 +131,7 @@ export async function POST(request: Request) {
     // Preserve the same response for known and unknown addresses. Operators
     // still get a server-side error signal without turning this into an
     // account-enumeration endpoint.
-    console.error("Sign-in email could not be queued", error);
+    log.error("auth.signin.email_queue_failed", { error });
   }
 
   if (queuedId && isEmailTransportConfigured()) {
@@ -141,7 +142,7 @@ export async function POST(request: Request) {
       } catch (error) {
         // The committed pending row remains retryable by cron after a worker or
         // transport failure.
-        console.error("Sign-in email delivery could not finish", error);
+        log.error("auth.signin.email_delivery_failed", { error });
       }
     });
   }

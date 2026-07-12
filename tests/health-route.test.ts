@@ -71,12 +71,22 @@ function stubProductionEnvironment() {
   }
 }
 
-function configurationFailure(): Error {
+function configurationFailure(): { message: string } {
   expect(console.error).toHaveBeenCalledOnce();
-  const [message, error] = vi.mocked(console.error).mock.calls[0] ?? [];
-  expect(message).toBe("Health check failed");
-  expect(error).toBeInstanceOf(Error);
-  return error as Error;
+  const [line] = vi.mocked(console.error).mock.calls[0] ?? [];
+  expect(typeof line).toBe("string");
+  const entry = JSON.parse(line as string) as {
+    level?: string;
+    event?: string;
+    error?: { type?: string; message?: string };
+  };
+  expect(entry).toMatchObject({
+    level: "error",
+    event: "health.check.failed",
+    error: { type: "Error" },
+  });
+  expect(entry.error?.message).toEqual(expect.any(String));
+  return { message: entry.error!.message! };
 }
 
 describe("production health readiness", () => {

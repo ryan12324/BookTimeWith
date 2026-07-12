@@ -49,7 +49,7 @@ interface BookingGroup {
  * system-written polite email lands in the outbox at /emails.
  */
 export function Bookings() {
-  const { config, update } = useOwnerConfig();
+  const { config } = useOwnerConfig();
   const [rows, setRows] = useState<Row[]>([]);
   const [loadState, setLoadState] = useState<"loading" | "ready" | "error">("loading");
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -186,8 +186,6 @@ export function Bookings() {
         ))}
       </div>
 
-      <AwayControl away={config.away} onChange={(away) => update({ away })} />
-
       <p className="mt-4 text-center font-sans text-[11.5px] leading-[1.6] text-body text-pretty">
         When email delivery is configured, moving or cancelling sends the client a
         polite update automatically.
@@ -207,90 +205,6 @@ function bookingGroupInZone(start: Date, now: Date, timezone: string): BookingGr
     return { key: startKey, label: `TOMORROW · ${label}` };
   }
   return { key: startKey, label };
-}
-
-/** "3–10 Aug" / "28 Jul – 2 Aug" */
-function fmtAwayRange(start: string, end: string): string {
-  const dateOnly = (value: string) => {
-    const [year, month, day] = value.split("-").map(Number);
-    return new Date(Date.UTC(year, month - 1, day));
-  };
-  const [s, e] = [dateOnly(start), dateOnly(end)];
-  const mon = (d: Date) =>
-    d.toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" });
-  if (s.getUTCMonth() === e.getUTCMonth() && s.getUTCFullYear() === e.getUTCFullYear()) {
-    return `${s.getUTCDate()}–${e.getUTCDate()} ${mon(e)}`;
-  }
-  return `${s.getUTCDate()} ${mon(s)} – ${e.getUTCDate()} ${mon(e)}`;
-}
-
-/**
- * The one time-off control (README "Scheduling engine rules"): a date range,
- * nothing else — no half-day rules, no recurring holidays.
- */
-function AwayControl({
-  away,
-  onChange,
-}: {
-  away: { start: string; end: string } | null;
-  onChange: (away: { start: string; end: string } | null) => void;
-}) {
-  const [start, setStart] = useState(away?.start ?? "");
-  const [end, setEnd] = useState(away?.end ?? "");
-  const invalidRange = Boolean(start && end && start > end);
-  useEffect(() => {
-    setStart(away?.start ?? "");
-    setEnd(away?.end ?? "");
-  }, [away]);
-
-  const apply = (s: string, e: string) => {
-    setStart(s);
-    setEnd(e);
-    if (s && e && s <= e) onChange({ start: s, end: e });
-    else if (!s && !e) onChange(null);
-  };
-
-  const dateInput = (value: string, set: (v: string) => void, label: string) => (
-    <input
-      type="date"
-      value={value}
-      onChange={(e) => set(e.target.value)}
-      aria-label={label}
-      className="min-h-[44px] rounded-input border border-line bg-white px-2 font-sans text-[12.5px] text-ink outline-none"
-    />
-  );
-
-  return (
-    <div className="mt-6 rounded-card border border-line-soft bg-white px-[22px] py-4 shadow-card">
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-        <SectionLabel>Away</SectionLabel>
-        <div className="flex flex-wrap items-center gap-2 font-sans text-[12.5px] text-body">
-          {dateInput(start, (v) => apply(v, end), "Away from")}
-          <span>to</span>
-          {dateInput(end, (v) => apply(start, v), "Away until")}
-          {away && (
-            <button
-              type="button"
-              onClick={() => apply("", "")}
-              className="min-h-[44px] px-2 font-sans text-[12px] font-semibold text-body hover:text-ink"
-            >
-              clear
-            </button>
-          )}
-        </div>
-      </div>
-      {away && !invalidRange && (
-        <div className="mt-2 font-sans text-[12px] text-bronze-ink">
-          Away {fmtAwayRange(away.start, away.end)} · clients see nothing available
-        </div>
-      )}
-      {invalidRange && (
-        <div role="alert" className="mt-2 font-sans text-[12px] text-body">
-          The end date must be on or after the start date.
-        </div>
-      )}
-    </div>
-  );
 }
 
 function BookingRow({

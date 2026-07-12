@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { log, requestId } from "@/lib/logger";
 import { z } from "zod";
 import { eq, inArray, sql } from "drizzle-orm";
 import { formatInTimeZone } from "date-fns-tz";
@@ -146,6 +147,9 @@ function bookingResponse(
  * with the friendly "that time just went" message.
  */
 export async function POST(request: Request) {
+  const correlationId = requestId(request.headers);
+  const started = performance.now();
+  log.info("booking.create.received", { requestId: correlationId });
   // A booking response always needs a stable, signed manage capability. Fail
   // before reserving a slot if production token signing is misconfigured.
   try {
@@ -213,6 +217,12 @@ export async function POST(request: Request) {
     windowMs: 60 * 60_000,
   });
   if (!ipLimit.allowed || !emailLimit.allowed) {
+    log.warn("booking.create.rate_limited", {
+      requestId: correlationId,
+      ownerId: owner.id,
+      ipLimitAllowed: ipLimit.allowed,
+      emailLimitAllowed: emailLimit.allowed,
+    });
     const turnstileConfigured = Boolean(
       process.env.TURNSTILE_SECRET_KEY?.trim() &&
         (process.env.TURNSTILE_SITE_KEY?.trim() ||
@@ -390,6 +400,11 @@ export async function POST(request: Request) {
     booking = created.booking;
     notificationOwner = created.owner;
   } catch (e) {
+    log.warn("booking.create.persistence_conflict", {
+      requestId: correlationId,
+      ownerId: owner.id,
+      error: e,
+    });
     if (parsed.data.clientRequestKey) {
       const existing = await db.query.bookings.findFirst({
         where: eq(schema.bookings.clientRequestKey, parsed.data.clientRequestKey),
@@ -457,6 +472,14 @@ export async function POST(request: Request) {
     manageToken,
     baseUrl: canonicalBookingUrl(request.url),
   }, { deferDelivery: true });
+
+  log.info("booking.create.completed", {
+    requestId: correlationId,
+    ownerId: owner.id,
+    bookingId: booking.id,
+    calendarSyncStatus: booking.calendarSyncStatus,
+    durationMs: Math.round(performance.now() - started),
+  });
 
   return NextResponse.json(
     {

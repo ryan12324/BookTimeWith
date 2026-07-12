@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { log, requestId } from "@/lib/logger";
 import { and, eq, lt } from "drizzle-orm";
 import { formatInTimeZone } from "date-fns-tz";
 import * as schema from "@/db/schema";
@@ -104,6 +105,8 @@ const money = (total: number | undefined, currency: string | undefined) => {
  * and use the whsec it prints.)
  */
 export async function POST(request: Request) {
+  const correlationId = requestId(request.headers);
+  const started = performance.now();
   const whsec = process.env.STRIPE_WEBHOOK_SECRET?.trim();
   if (!whsec) {
     return NextResponse.json(
@@ -117,8 +120,10 @@ export async function POST(request: Request) {
     request.headers.get("stripe-signature"),
     whsec,
   );
-  if (!ok)
+  if (!ok) {
+    log.warn("billing.webhook.signature_rejected", { requestId: correlationId });
     return NextResponse.json({ error: "Bad signature" }, { status: 400 });
+  }
 
   let event: StripeEvent;
   try {
@@ -128,6 +133,12 @@ export async function POST(request: Request) {
   }
 
   const obj = event.data?.object ?? {};
+  log.info("billing.webhook.received", {
+    requestId: correlationId,
+    stripeEventId: event.id,
+    stripeEventType: event.type,
+    created: event.created,
+  });
   if (!event.id || !event.created) {
     return NextResponse.json(
       { error: "Invalid Stripe event" },
@@ -722,6 +733,13 @@ export async function POST(request: Request) {
   // commit; provider reconciliation above never held that transaction open.
   for (const id of outcome.queuedIds) await deliverQueuedEmail(db, id);
 
+  log.info("billing.webhook.completed", {
+    requestId: correlationId,
+    stripeEventId: event.id,
+    stripeEventType: event.type,
+    ownerId,
+    durationMs: Math.round(performance.now() - started),
+  });
   return NextResponse.json({
     received: true,
     ...(outcome.ignored ? { ignored: true } : {}),

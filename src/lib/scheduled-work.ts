@@ -61,7 +61,7 @@ export async function runScheduledOwnerBatch(
     try {
       await onError?.(owner, error, phase);
     } catch (reportingError) {
-      console.error("Scheduled owner error reporting failed", reportingError);
+      log.error("scheduled_work.error_reporting_failed", { phase, ownerId: owner.id, error: reportingError });
     }
   };
 
@@ -86,3 +86,4 @@ export async function runScheduledOwnerBatch(
 
   return { processed: owners.length, failed, cursorFailed };
 }
+import { log } from "@/lib/logger";

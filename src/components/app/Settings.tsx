@@ -176,6 +176,76 @@ function BookingHorizon({
   );
 }
 
+/** One date range blocks all booking availability while the owner is away. */
+function AwayControl({
+  away,
+  onChange,
+}: {
+  away: { start: string; end: string } | null;
+  onChange: (away: { start: string; end: string } | null) => void;
+}) {
+  const [start, setStart] = useState(away?.start ?? "");
+  const [end, setEnd] = useState(away?.end ?? "");
+  const invalidRange = Boolean(start && end && start > end);
+
+  useEffect(() => {
+    setStart(away?.start ?? "");
+    setEnd(away?.end ?? "");
+  }, [away]);
+
+  const apply = (nextStart: string, nextEnd: string) => {
+    setStart(nextStart);
+    setEnd(nextEnd);
+    if (nextStart && nextEnd && nextStart <= nextEnd) {
+      onChange({ start: nextStart, end: nextEnd });
+    } else if (!nextStart && !nextEnd) {
+      onChange(null);
+    }
+  };
+
+  return (
+    <div className="mt-5 max-w-[520px] border-t border-hairline pt-5">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <SectionLabel>Time away</SectionLabel>
+        <span className="font-sans text-[11.5px] text-body">
+          No times are offered during these dates
+        </span>
+      </div>
+      <div className="mt-3 flex flex-wrap items-center gap-2 font-sans text-[12.5px] text-body">
+        <input
+          type="date"
+          value={start}
+          onChange={(event) => apply(event.target.value, end)}
+          aria-label="Away from"
+          className="min-h-[44px] rounded-input border border-line bg-white px-2 font-sans text-[16px] text-ink outline-none"
+        />
+        <span>to</span>
+        <input
+          type="date"
+          value={end}
+          onChange={(event) => apply(start, event.target.value)}
+          aria-label="Away until"
+          className="min-h-[44px] rounded-input border border-line bg-white px-2 font-sans text-[16px] text-ink outline-none"
+        />
+        {away && (
+          <button
+            type="button"
+            onClick={() => apply("", "")}
+            className="min-h-[44px] px-2 font-sans text-[12px] font-semibold text-bronze-ink"
+          >
+            Clear dates
+          </button>
+        )}
+      </div>
+      {invalidRange && (
+        <p role="alert" className="mt-2 font-sans text-[12px] text-body">
+          The end date must be on or after the start date.
+        </p>
+      )}
+    </div>
+  );
+}
+
 /** "£6 a month · free trial ends 3 August" — the plan line, from real state. */
 export function PlanSection({
   planStatus,
@@ -800,6 +870,10 @@ export function Settings() {
           <BookingHorizon
             days={config.bookingHorizonDays}
             onChange={(bookingHorizonDays) => update({ bookingHorizonDays })}
+          />
+          <AwayControl
+            away={config.away}
+            onChange={(away) => update({ away })}
           />
           <div className="mt-[14px] flex flex-wrap items-center gap-[10px]">
             <button

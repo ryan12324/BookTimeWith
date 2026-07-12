@@ -1,5 +1,6 @@
 import { and, eq, inArray } from "drizzle-orm";
 import { after, NextResponse } from "next/server";
+import { log } from "@/lib/logger";
 import * as schema from "@/db/schema";
 import { getDb } from "@/db/client";
 import { deliverQueuedEmail, sendVerification } from "@/emails/send";
@@ -91,7 +92,7 @@ export async function POST(request: Request) {
       try {
         await deliverQueuedEmail(db, deliveryId);
       } catch (error) {
-        console.error("Verification email handoff failed", error);
+        log.error("email.verification.delivery_failed", { error });
       }
     });
   }

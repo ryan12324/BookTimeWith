@@ -1,5 +1,6 @@
 import { isNotNull, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import { log } from "@/lib/logger";
 import { getDb } from "@/db/client";
 import * as schema from "@/db/schema";
 import {
@@ -148,7 +149,7 @@ export async function GET() {
     }
     return NextResponse.json({ status: "ok" }, { headers });
   } catch (error) {
-    console.error("Health check failed", error);
+    log.error("health.check.failed", { error });
     return NextResponse.json({ status: "error" }, { status: 503, headers });
   }
 }

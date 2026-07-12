@@ -4,6 +4,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 import * as schema from "./schema";
+import { log, loggedOperation } from "@/lib/logger";
 
 /** Driver-agnostic PostgreSQL query surface; production uses node-postgres. */
 export type Db = PgDatabase<PgQueryResultHKT, typeof schema>;
@@ -83,11 +84,13 @@ async function migrateDatabase(pool: Pool): Promise<void> {
   const client = await pool.connect();
   let locked = false;
   try {
+    log.debug("database.migration_lock.waiting");
     await client.query("select pg_advisory_lock($1, $2)", [
       MIGRATION_LOCK_NAMESPACE,
       MIGRATION_LOCK_KEY,
     ]);
     locked = true;
+    log.debug("database.migration_lock.acquired");
     const migrationDb = drizzle(client, { schema });
     await migrate(migrationDb, {
       migrationsFolder: path.join(process.cwd(), "drizzle"),
@@ -100,7 +103,7 @@ async function migrateDatabase(pool: Pool): Promise<void> {
           MIGRATION_LOCK_KEY,
         ])
         .catch((error) => {
-          console.error("PostgreSQL migration lock release failed", error);
+          log.error("database.migration_lock.release_failed", { error });
         });
     }
     client.release();
@@ -108,20 +111,30 @@ async function migrateDatabase(pool: Pool): Promise<void> {
 }
 
 async function init(): Promise<Db> {
-  const pool = new Pool(poolConfig());
+  const config = poolConfig();
+  log.info("database.pool.initializing", {
+    maxConnections: config.max,
+    connectionTimeoutMs: config.connectionTimeoutMillis,
+    idleTimeoutMs: config.idleTimeoutMillis,
+  });
+  const pool = new Pool(config);
   g.__btwPool = pool;
   pool.on("error", (error) => {
-    console.error("Unexpected idle PostgreSQL client error", error);
+    log.error("database.pool.idle_client_error", { error });
   });
+  pool.on("connect", () => log.debug("database.pool.client_connected", { total: pool.totalCount, idle: pool.idleCount, waiting: pool.waitingCount }));
+  pool.on("remove", () => log.debug("database.pool.client_removed", { total: pool.totalCount, idle: pool.idleCount, waiting: pool.waitingCount }));
 
   try {
-    await migrateDatabase(pool);
+    await loggedOperation("database.migrations", {}, () => migrateDatabase(pool));
     const db = drizzle(pool, { schema });
     await pool.query("select 1");
     const { hardenCalendarTokens } = await import("@/lib/calendar");
     await hardenCalendarTokens(db);
+    log.info("database.ready", { total: pool.totalCount, idle: pool.idleCount });
     return db;
   } catch (error) {
+    log.error("database.initialization_failed", { error });
     if (g.__btwPool === pool) delete g.__btwPool;
     await pool.end().catch(() => undefined);
     throw error;

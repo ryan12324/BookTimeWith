@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { log } from "@/lib/logger";
 import { cookies } from "next/headers";
 import { and, eq, inArray, notInArray, sql } from "drizzle-orm";
 import * as schema from "@/db/schema";
@@ -61,7 +62,7 @@ export async function POST(request: Request) {
         }),
       );
     } catch (error) {
-      console.error("Sign-out session revocation failed", error);
+      log.error("auth.signout.session_revocation_failed", { error });
       return NextResponse.json(
         { error: "Sign-out could not be completed. Try again shortly." },
         { status: 503 },

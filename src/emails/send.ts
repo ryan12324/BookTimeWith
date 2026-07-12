@@ -28,6 +28,7 @@ import {
   isEmailTransportConfigured,
 } from "./transports/factory";
 import type { EmailAttachment } from "./transports/types";
+import { log } from "@/lib/logger";
 
 /**
  * The outbound-email pipeline. Locally there are no SMTP credentials, so the
@@ -155,11 +156,13 @@ async function deliver(
 ): Promise<{ status: "delivered" | "failed" | "skipped"; error?: string }> {
   const configuration = emailTransportConfiguration();
   if (!configuration.configured) {
+    log.warn("email.delivery.skipped", { reason: configuration.error });
     return { status: "skipped", error: configuration.error };
   }
   const transport = createEmailTransport();
   if (!transport) return { status: "failed", error: "Email transport factory failed" };
-  return transport.send({
+  const started = performance.now();
+  const result = await transport.send({
     to: env.to,
     from: {
       address: `no-reply@${process.env.EMAIL_FROM_DOMAIN!.trim()}`,
@@ -171,6 +174,10 @@ async function deliver(
     attachments: env.attachments,
     idempotencyKey: env.idempotencyKey,
   });
+  const fields = { status: result.status, durationMs: Math.round(performance.now() - started), hasAttachments: Boolean(env.attachments?.length) };
+  if (result.status === "delivered") log.info("email.delivery.completed", fields);
+  else log.error("email.delivery.failed", { ...fields, error: result.error });
+  return result;
 }
 
 export async function spool(
@@ -179,6 +186,7 @@ export async function spool(
   options: { deferDelivery?: boolean } = {},
 ): Promise<string | false> {
   const html = await render(env.element);
+  log.debug("email.spool.started", { template: env.template, ownerId: env.ownerId, bookingId: env.bookingId, deferred: Boolean(options.deferDelivery) });
   const queuedAt = new Date();
   const configuration = emailTransportConfiguration();
   const delivery = configuration.configured ? "pending" : "skipped";
@@ -230,7 +238,11 @@ export async function spool(
     }
   }
 
-  if (!queued) return false;
+  if (!queued) {
+    log.info("email.spool.deduplicated", { template: env.template, ownerId: env.ownerId, bookingId: env.bookingId });
+    return false;
+  }
+  log.info("email.spool.queued", { outboxId: queued.id, template: env.template, ownerId: env.ownerId, bookingId: env.bookingId, delivery });
   if (configuration.configured && !options.deferDelivery) {
     await deliverQueuedEmail(db, queued.id);
   }
@@ -243,6 +255,7 @@ export async function deliverQueuedEmail(
   id: string,
   at?: Date,
 ): Promise<boolean> {
+  log.debug("email.outbox.delivery_started", { outboxId: id });
   const deliverClaim = async (): Promise<boolean> => {
     // Compute after acquiring owner/booking mutexes. A queued auth row can wait
     // behind another provider call; its token must be valid at actual handoff.

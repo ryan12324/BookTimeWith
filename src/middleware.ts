@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { RESERVED_HANDLES } from "@/lib/handles";
 import { SESSION_COOKIE, verifySession } from "@/lib/session";
+import { log, requestId } from "@/lib/logger";
 
 /**
  * Domain split enforcement (README "Domain architecture").
@@ -88,11 +89,23 @@ function securityPathname(pathname: string): string | null {
 }
 
 export async function middleware(req: NextRequest) {
+  const id = requestId(req.headers);
+  const started = Date.now();
   const host = (req.headers.get("host") ?? "").split(":", 1)[0].toLowerCase();
   const rawPathname = req.nextUrl.pathname;
   const pathname = securityPathname(rawPathname);
   const { search } = req.nextUrl;
+  log.info("request.received", {
+    requestId: id,
+    method: req.method,
+    host,
+    path: rawPathname,
+    hasQuery: Boolean(search),
+    userAgent: req.headers.get("user-agent"),
+    forwardedFor: req.headers.get("x-forwarded-for")?.split(",", 1)[0],
+  });
   if (!pathname) {
+    log.warn("request.rejected", { requestId: id, reason: "invalid_path", status: 400, durationMs: Date.now() - started });
     return NextResponse.json({ error: "invalid path" }, { status: 400 });
   }
 
@@ -115,6 +128,7 @@ export async function middleware(req: NextRequest) {
           (!a.methods || a.methods.includes(requestedMethod)),
       );
       if (!allowed) {
+        log.warn("request.rejected", { requestId: id, reason: "domain_api_allowlist", status: 404, method: req.method, path: pathname });
         return withCors(
           req,
           NextResponse.json({ error: "not found" }, { status: 404 }),
@@ -126,8 +140,11 @@ export async function middleware(req: NextRequest) {
       // The .link domain only ever gets the public config subset.
       if (pathname === "/api/owner") {
         const headers = new Headers(req.headers);
+        headers.set("x-request-id", id);
         headers.set("x-btw-public", "1");
-        return withCors(req, NextResponse.next({ request: { headers } }));
+        const response = withCors(req, NextResponse.next({ request: { headers } }));
+        response.headers.set("x-request-id", id);
+        return response;
       }
       return withCors(req, NextResponse.next());
     }

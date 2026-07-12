@@ -82,7 +82,7 @@ export async function recoverMissingBookingMail(
       });
       recovered += 1;
     } catch (error) {
-      console.error("Initial booking mail recovery failed", {
+      log.error("email.booking_recovery.initial_failed", {
         bookingId: booking.id,
         error,
       });
@@ -208,7 +208,7 @@ export async function recoverMissingBookingMail(
         }
       }
     } catch (error) {
-      console.error("Booking action mail recovery failed", {
+      log.error("email.booking_recovery.action_failed", {
         actionId: action.id,
         error,
       });
@@ -222,3 +222,4 @@ export async function recoverMissingBookingMail(
 
   return { inspected, recovered };
 }
+import { log } from "@/lib/logger";
