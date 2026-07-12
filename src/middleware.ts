@@ -37,6 +37,29 @@ const LINK_APIS: { re: RegExp; methods?: string[] }[] = [
 const HANDLE_PATH = /^\/([a-z0-9-]{3,30})\/?$/i;
 const SECURITY_PATH_BASE = new URL("https://security.invalid");
 const UNRESERVED_PATH_BYTE = /^[A-Za-z0-9._~-]$/;
+const CORS_ORIGINS = new Set([
+  "https://booktimewith.com",
+  "https://www.booktimewith.com",
+  "https://booktimewith.link",
+  "https://www.booktimewith.link",
+]);
+const CORS_METHODS = "GET, POST, PATCH, DELETE, OPTIONS";
+
+function corsOrigin(req: NextRequest): string | null {
+  const origin = req.headers.get("origin");
+  return origin && CORS_ORIGINS.has(origin) ? origin : null;
+}
+
+function withCors(req: NextRequest, response: NextResponse): NextResponse {
+  const origin = corsOrigin(req);
+  if (!origin) return response;
+  response.headers.set("Access-Control-Allow-Origin", origin);
+  response.headers.set("Access-Control-Allow-Methods", CORS_METHODS);
+  response.headers.set("Access-Control-Allow-Headers", "Content-Type");
+  response.headers.set("Access-Control-Max-Age", "86400");
+  response.headers.append("Vary", "Origin");
+  return response;
+}
 
 /**
  * Next routes some percent-encoded page segments after decoding them, while the
@@ -82,19 +105,31 @@ export async function middleware(req: NextRequest) {
       if (pathname !== rawPathname) {
         return NextResponse.json({ error: "invalid path" }, { status: 400 });
       }
+      const requestedMethod = req.method === "OPTIONS"
+        ? req.headers.get("access-control-request-method")?.toUpperCase()
+        : req.method;
       const allowed = LINK_APIS.some(
-        (a) => a.re.test(pathname) && (!a.methods || a.methods.includes(req.method)),
+        (a) =>
+          a.re.test(pathname) &&
+          requestedMethod !== undefined &&
+          (!a.methods || a.methods.includes(requestedMethod)),
       );
       if (!allowed) {
-        return NextResponse.json({ error: "not found" }, { status: 404 });
+        return withCors(
+          req,
+          NextResponse.json({ error: "not found" }, { status: 404 }),
+        );
+      }
+      if (req.method === "OPTIONS") {
+        return withCors(req, new NextResponse(null, { status: 204 }));
       }
       // The .link domain only ever gets the public config subset.
       if (pathname === "/api/owner") {
         const headers = new Headers(req.headers);
         headers.set("x-btw-public", "1");
-        return NextResponse.next({ request: { headers } });
+        return withCors(req, NextResponse.next({ request: { headers } }));
       }
-      return NextResponse.next();
+      return withCors(req, NextResponse.next());
     }
     // Owner/product pages (and the marketing root) belong on .com.
     if (pathname === "/" || OWNER_PAGES.some((re) => re.test(pathname))) {
@@ -109,6 +144,9 @@ export async function middleware(req: NextRequest) {
   }
 
   if (isCom) {
+    if (pathname.startsWith("/api/") && req.method === "OPTIONS") {
+      return withCors(req, new NextResponse(null, { status: 204 }));
+    }
     // UGC belongs on .link: client manage links and public booking pages.
     if (PUBLIC_PAGES.some((re) => re.test(pathname))) {
       return NextResponse.redirect(new URL(pathname + search, "https://booktimewith.link"));
@@ -149,7 +187,9 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(canonical);
   }
 
-  return NextResponse.next();
+  return pathname.startsWith("/api/")
+    ? withCors(req, NextResponse.next())
+    : NextResponse.next();
 }
 
 export const config = {

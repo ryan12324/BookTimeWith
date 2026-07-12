@@ -7,6 +7,51 @@ describe("production domain routing", () => {
     vi.unstubAllEnvs();
   });
 
+  it("allows API calls between product domains without sharing credentials", async () => {
+    const request = new NextRequest("https://booktimewith.link/api/slots?handle=dana", {
+      headers: {
+        host: "booktimewith.link",
+        origin: "https://booktimewith.com",
+      },
+    });
+
+    const response = await middleware(request);
+
+    expect(response.headers.get("access-control-allow-origin")).toBe(
+      "https://booktimewith.com",
+    );
+    expect(response.headers.get("access-control-allow-methods")).toContain("GET");
+    expect(response.headers.get("access-control-allow-credentials")).toBeNull();
+    expect(response.headers.get("vary")).toContain("Origin");
+  });
+
+  it("answers valid preflights and does not trust other origins", async () => {
+    const preflight = new NextRequest("https://booktimewith.link/api/bookings", {
+      method: "OPTIONS",
+      headers: {
+        host: "booktimewith.link",
+        origin: "https://booktimewith.com",
+        "access-control-request-method": "POST",
+        "access-control-request-headers": "content-type",
+      },
+    });
+    const untrusted = new NextRequest("https://booktimewith.link/api/slots", {
+      headers: {
+        host: "booktimewith.link",
+        origin: "https://evil.example",
+      },
+    });
+
+    const preflightResponse = await middleware(preflight);
+    const untrustedResponse = await middleware(untrusted);
+
+    expect(preflightResponse.status).toBe(204);
+    expect(preflightResponse.headers.get("access-control-allow-origin")).toBe(
+      "https://booktimewith.com",
+    );
+    expect(untrustedResponse.headers.get("access-control-allow-origin")).toBeNull();
+  });
+
   it("moves an uppercase public handle off the owner-cookie domain", async () => {
     const request = new NextRequest("https://booktimewith.com/DANA?from=email", {
       headers: { host: "booktimewith.com" },
