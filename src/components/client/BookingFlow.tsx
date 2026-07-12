@@ -46,6 +46,29 @@ interface BookingResponse {
   siteKey?: string | null;
 }
 
+export function UnverifiedBookingPage({
+  ownerName,
+  serviceLine,
+}: {
+  ownerName: string;
+  serviceLine: string;
+}) {
+  return (
+    <div className="mx-auto flex justify-center px-0 pt-0 sm:px-6 sm:pt-9">
+      <CardShell ownerName={ownerName} serviceLine={serviceLine}>
+        <div className="px-[26px] py-[42px] text-center">
+          <h1 className="font-serif text-[20px] leading-[1.4] text-ink">
+            This booking page isn&apos;t live yet.
+          </h1>
+          <p className="mx-auto mt-2 max-w-[32ch] font-sans text-[13.5px] leading-[1.6] text-body">
+            The owner needs to verify their email before anyone can book.
+          </p>
+        </div>
+      </CardShell>
+    </div>
+  );
+}
+
 export function CalendarDownloadLinks({ event }: { event: CalendarEvent }) {
   return (
     <div
@@ -339,14 +362,18 @@ export function BookingFlow() {
     );
   }
 
-  // Paused (grace expired / trial lapsed): the page keeps the card chrome but
-  // takes no bookings (README "Public booking page extras").
+  // Unverified pages are unpublished, not simply empty. Say why so an owner
+  // previewing their link knows the next action and does not blame availability.
   if (cfg.paused) {
+    const unverified = cfg.entitlementReason === "email_unverified";
+    if (unverified) {
+      return <UnverifiedBookingPage ownerName={ownerName} serviceLine={serviceLine} />;
+    }
     return (
       <div className="mx-auto flex justify-center px-0 pt-0 sm:px-6 sm:pt-9">
         <CardShell ownerName={ownerName} serviceLine={serviceLine}>
           <div className="px-[26px] py-[42px] text-center">
-            <h1 className="font-serif text-[20px] leading-[1.5] text-body">
+            <h1 className="font-serif text-[20px] leading-[1.4] text-ink">
               {ownerFirst} isn&apos;t taking bookings right now.
             </h1>
           </div>

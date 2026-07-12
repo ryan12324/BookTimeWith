@@ -41,6 +41,13 @@ export interface OwnerConfig {
   // Billing-driven page state (grace expired / trial lapsed), set by Stripe
   // webhooks; the booking page renders its paused state from this value.
   paused: boolean;
+  entitlementReason?:
+    | "email_unverified"
+    | "trial_expired"
+    | "payment_grace_expired"
+    | "subscription_ended"
+    | "paused"
+    | null;
   // Address displayed in the editor (the pending replacement when one exists).
   email: string;
   // Trusted notification/sign-in identity until `email` is confirmed.
@@ -84,6 +91,7 @@ export const DEFAULT_OWNER: OwnerConfig = {
   billingCurrencyLocked: false,
   away: null,
   paused: false,
+  entitlementReason: null,
   email: "",
   activeEmail: "",
   pendingEmail: null,

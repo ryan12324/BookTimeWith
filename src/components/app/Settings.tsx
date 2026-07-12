@@ -17,6 +17,47 @@ const PROVIDERS = [
   { key: "outlook", name: "Outlook", dot: "#0f6cbd" },
 ];
 
+export function VerificationBanner({
+  email,
+  busy,
+  note,
+  onResend,
+}: {
+  email: string;
+  busy: boolean;
+  note: string | null;
+  onResend: () => void;
+}) {
+  return (
+    <div
+      role="alert"
+      className="mt-4 rounded-card border border-line bg-tint-warm px-5 py-4 sm:flex sm:items-center sm:justify-between sm:gap-5"
+    >
+      <div>
+        <h2 className="font-serif text-[19px] leading-[1.35] text-ink">
+          Verify your email to publish your booking page
+        </h2>
+        <p className="mt-1 max-w-[52ch] font-sans text-[12.5px] leading-[1.55] text-body">
+          Your hours are saved, but nobody can see or book them until you confirm {email}.
+        </p>
+        {note && (
+          <p className="mt-1 font-sans text-[12px] leading-[1.5] text-body" aria-live="polite">
+            {note}
+          </p>
+        )}
+      </div>
+      <button
+        type="button"
+        onClick={onResend}
+        disabled={busy}
+        className="mt-3 min-h-[44px] flex-none rounded-input bg-ink px-4 font-sans text-[12.5px] font-semibold text-paper disabled:opacity-60 sm:mt-0"
+      >
+        {busy ? "Sending…" : "Resend verification"}
+      </button>
+    </div>
+  );
+}
+
 type HorizonUnit = "days" | "weeks" | "months";
 
 const HORIZON_UNITS: Record<HorizonUnit, { days: number; max: number }> = {
@@ -614,6 +655,14 @@ export function Settings() {
         <div role="status" className="mt-3 rounded-chip border border-line-soft bg-white px-4 py-3 font-sans text-[12.5px] text-body">
           {pageNote}
         </div>
+      )}
+      {!config.emailVerified && (
+        <VerificationBanner
+          email={config.email}
+          busy={verifyBusy}
+          note={verifyNote}
+          onResend={() => void resendVerification()}
+        />
       )}
 
       <div className="mt-5 rounded-card border border-line-soft bg-white px-6 pb-8 pt-2 shadow-card md:px-9">

@@ -5,11 +5,14 @@ import RootLayout from "@/app/layout";
 import PublicLayout from "@/app/(public)/layout";
 import { DurationStepper } from "@/components/DurationStepper";
 import { outboxDeliveryLabel } from "@/components/app/Outbox";
-import { PlanSection } from "@/components/app/Settings";
+import { PlanSection, VerificationBanner } from "@/components/app/Settings";
 import { CardShell } from "@/components/client/CardShell";
 import { DayTabs, SlotGrid } from "@/components/client/Picker";
 import { RouteError } from "@/components/RouteError";
-import { CalendarDownloadLinks } from "@/components/client/BookingFlow";
+import {
+  CalendarDownloadLinks,
+  UnverifiedBookingPage,
+} from "@/components/client/BookingFlow";
 import { PricingCard } from "@/components/landing/PricingCard";
 import { DEFAULT_OWNER } from "@/lib/mock";
 import { reconcileBillingCurrencyConflict } from "@/lib/store";
@@ -141,6 +144,31 @@ describe("UI accessibility contracts", () => {
     expect(links).toContain("Google");
     expect(links).toContain("Outlook");
     expect(links).toContain(".ics file");
+  });
+
+  it("makes unpublished email-verification state explicit to owners and visitors", () => {
+    const ownerBanner = renderToStaticMarkup(
+      <VerificationBanner
+        email="dana@example.test"
+        busy={false}
+        note={null}
+        onResend={vi.fn()}
+      />,
+    );
+    const publicPage = renderToStaticMarkup(
+      <UnverifiedBookingPage
+        ownerName="Dana Whitfield"
+        serviceLine="Therapy · 50 min"
+      />,
+    );
+
+    expect(ownerBanner).toContain('role="alert"');
+    expect(ownerBanner).toContain("Verify your email to publish your booking page");
+    expect(ownerBanner).toContain("nobody can see or book them");
+    expect(ownerBanner).toContain("Resend verification");
+    expect(ownerBanner).toContain("min-h-[44px]");
+    expect(publicPage).toContain("This booking page isn&#x27;t live yet");
+    expect(publicPage).toContain("verify their email before anyone can book");
   });
 
   it("rolls back Stripe-owned currency without losing a newer unrelated edit", () => {
