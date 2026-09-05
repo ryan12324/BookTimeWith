@@ -430,7 +430,7 @@ export function BookingFlow() {
           <div className="px-[26px] pb-[26px] pt-5">
             {conflict && (
               <div role="alert" className="mb-4 rounded-chip border border-line-soft bg-tint-warm px-[15px] py-[11px] font-sans text-[12.5px] text-body">
-                That time just went — here&apos;s what&apos;s still open.
+                That time just went. Here&apos;s what&apos;s still open.
               </div>
             )}
             {days === null && (
