@@ -25,6 +25,7 @@ import { log, requestId } from "@/lib/logger";
  */
 const OWNER_PAGES = [
   /^\/app(\/|$)/,
+  /^\/admin(\/|$)/,
   /^\/emails(\/|$)/,
   /^\/signin(\/|$)/,
   /^\/privacy(\/|$)/,
@@ -189,8 +190,12 @@ export async function middleware(req: NextRequest) {
   // owner API enforce "account exists → sign in" themselves (needs the DB).
   // The email outbox/gallery is session-gated in production too: it contains
   // live sign-in and manage links; in dev it's the mail-catcher.
+  // Admin routes require a session; additional ADMIN_EMAILS check happens in
+  // the route handlers themselves since we need a DB lookup for the email.
   const needsSession =
     (/^\/app(\/|$)/.test(pathname) && !/^\/app\/setup(\/|$)/.test(pathname)) ||
+    /^\/admin(\/|$)/.test(pathname) ||
+    /^\/api\/admin(\/|$)/.test(pathname) ||
     (process.env.NODE_ENV === "production" &&
       (/^\/emails(\/|$)/.test(pathname) || pathname === "/api/outbox"));
   if (needsSession) {
