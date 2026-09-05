@@ -54,7 +54,7 @@ export function SignInForm() {
           <p className="mt-2 font-sans text-[13.5px] leading-[1.6] text-body">
             {expired
               ? "That link had expired — they only live 15 minutes. Enter your email and we'll send a fresh one."
-              : "No password — we email you a link and that's the whole login."}
+              : "No password. We email you a link and that's the whole login."}
           </p>
           <form onSubmit={submit}>
             <input
