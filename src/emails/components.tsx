@@ -4,6 +4,7 @@ import {
   Head,
   Hr,
   Html,
+  Img,
   Preview,
   Section,
   Text,
@@ -38,6 +39,12 @@ const footerStrip: CSSProperties = {
   color: "#71695d",
   fontFamily: SANS,
 };
+const logoHeader: CSSProperties = {
+  padding: "28px 40px 0",
+  textAlign: "center",
+};
+
+const LOGO_URL = "https://booktimewith.com/images/btw_logo.png";
 
 export function EmailLayout({
   preview,
@@ -54,6 +61,14 @@ export function EmailLayout({
       <Preview>{preview}</Preview>
       <Body style={main}>
         <Container style={container}>
+          <Section style={logoHeader}>
+            <Img
+              src={LOGO_URL}
+              width={140}
+              alt="Book Time With"
+              style={{ display: "block", margin: "0 auto" }}
+            />
+          </Section>
           <Section style={bodyPad}>{children}</Section>
           <Section style={footerStrip}>{footer}</Section>
         </Container>
