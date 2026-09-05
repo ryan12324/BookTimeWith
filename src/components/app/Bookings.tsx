@@ -162,7 +162,7 @@ export function Bookings() {
           <div className="rounded-card border border-line-soft bg-white px-6 py-9 text-center shadow-card">
             <h2 className="font-serif text-[20px] text-ink">No bookings yet.</h2>
             <p className="mt-2 font-sans text-[13px] leading-[1.6] text-body">
-              Share booktimewith.link/{config.handle}; new appointments will appear here.
+              Share booktimewith.link/{config.handle}. New bookings will appear here.
             </p>
           </div>
         )}
@@ -192,8 +192,7 @@ export function Bookings() {
       </div>
 
       <p className="mt-4 text-center font-sans text-[11.5px] leading-[1.6] text-body text-pretty">
-        When email delivery is configured, moving or cancelling sends the client a
-        polite update automatically.
+        When email delivery is configured, moving or cancelling sends the client an update.
       </p>
     </div>
   );
@@ -403,7 +402,7 @@ function BookingRow({
             className="mt-2 min-h-[44px] w-full rounded-input border border-line bg-paper px-3 font-sans text-[16px] text-ink outline-none"
           />
           <p className="mt-2 font-sans text-[12px] leading-[1.5] text-body">
-            This changes only this booking. {first} receives the updated details automatically.
+            This changes only this booking. {first} receives the updated details.
           </p>
           <div className="mt-2 flex flex-wrap gap-2">
             <button
@@ -535,7 +534,7 @@ function BookingRow({
             disabled={Boolean(busy)}
             className="ml-1 min-h-[44px] px-2 font-sans text-[12px] font-semibold text-body"
           >
-            never mind
+            Never mind
           </button>
           {b.moveOptions.length === 0 && (
             <span className="font-sans text-[12px] text-body">No alternative times are open right now.</span>

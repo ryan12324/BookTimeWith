@@ -243,7 +243,7 @@ export async function PATCH(
     return NextResponse.json(
       {
         error:
-          "Less than 24 hours to go — changes are locked. Reply to your confirmation email if something's come up.",
+          "Less than 24 hours to go. Changes are locked. Reply to your confirmation email if something's come up.",
       },
       { status: 403 },
     );
@@ -258,7 +258,7 @@ export async function PATCH(
       const startsAt = new Date(parsed.data.startsAt);
       if (!(await isBookableInstant(db, owner.id, startsAt, new Date(), booking.id))) {
         return NextResponse.json(
-          { error: "That time isn't available — pick another." },
+          { error: "That time isn't available. Pick another." },
           { status: 422 },
         );
       }
@@ -454,14 +454,14 @@ export async function PATCH(
       return NextResponse.json(
         {
           error:
-            "Less than 24 hours to go — changes are locked. Reply to your confirmation email if something's come up.",
+            "Less than 24 hours to go. Changes are locked. Reply to your confirmation email if something's come up.",
         },
         { status: 403 },
       );
     }
     if (error instanceof Error && error.message === "ACTION_CONFLICT") {
       return NextResponse.json(
-        { error: "That booking changed in another request — refresh and try again." },
+        { error: "That booking changed in another request. Refresh and try again." },
         { status: 409 },
       );
     }
@@ -479,7 +479,7 @@ export async function PATCH(
     }
     if (isSlotTaken(error)) {
       return NextResponse.json(
-        { error: "That time just went — here's what's still open." },
+        { error: "That time just went. Here's what's still open." },
         { status: 409 },
       );
     }

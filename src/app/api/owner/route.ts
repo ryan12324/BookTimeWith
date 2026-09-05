@@ -425,7 +425,7 @@ export async function PATCH(request: Request) {
       const message = error instanceof Error ? error.message : "";
       if (message.includes("EMAIL_TAKEN") || message.includes("owners_email")) {
         return NextResponse.json(
-          { error: "That email already has an account — sign in instead" },
+          { error: "That email already has an account. Sign in instead." },
           { status: 409 },
         );
       }

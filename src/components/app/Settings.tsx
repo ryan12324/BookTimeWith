@@ -309,7 +309,7 @@ export function PlanSection({
       <>
         {PRICES[currency]} a month ·{" "}
         <span className="text-body">
-          free trial{trialEndsAt ? ` ends ${day(trialEndsAt)}` : " starts when you go live"}
+          free trial{trialEndsAt ? ` ends ${day(trialEndsAt)}` : " starts when you publish"}
         </span>
       </>
     ),
@@ -411,7 +411,7 @@ export function PlanSection({
           </div>
           {billingCurrencyLocked && (
             <p id={currencyNoteId} className="mt-1 max-w-[34ch] font-sans text-[11.5px] leading-[1.5] text-body">
-              Currency is fixed for this Stripe subscription. Manage billing to update billing details.
+              Currency is locked on this subscription. Use Manage billing to change card or details.
             </p>
           )}
         </div>
@@ -450,10 +450,8 @@ export function PlanSection({
       {deleteConfirm && (
         <div className="mt-4 rounded-chip border border-line bg-paper px-4 py-3 font-sans text-[12.5px] leading-[1.6] text-body">
           <p>
-            Delete your link, bookings, settings, tokens, and queued email data?
-            Local calendar credentials are removed and any Stripe
-            customer/subscription is closed first. If billing cleanup fails,
-            nothing local is deleted.
+            Delete your link, bookings, settings, and queued email? We close Stripe and
+            drop calendar credentials first. If billing cleanup fails, nothing else is deleted.
           </p>
           <div className="mt-2 flex flex-wrap gap-3">
             <button
@@ -605,7 +603,7 @@ function OwnerHandle({
   };
 
   const hintText = !syntacticallyValid
-    ? "Use 3–30 letters, numbers, or dashes."
+    ? "Use 3 to 30 letters, numbers, or dashes."
     : !hint
       ? "Checking availability…"
       : hint.msg;
@@ -898,7 +896,7 @@ export function Settings() {
             />
             <p id="settings-meeting-link-hint" className="mt-2 font-sans text-[12px] leading-[1.5] text-body">
               {config.calendar
-                ? "Your calendar can create a unique link for each booking. This is the fallback if it does not."
+                ? "If your calendar creates a unique link per booking, that wins. This is the fallback."
                 : "Use this for every booking, or leave it blank and add a different link to each booking later."}
             </p>
           </div>
@@ -973,7 +971,7 @@ export function Settings() {
           {!config.calendar ? (
             <>
               <p className="mb-[14px] font-sans text-[13px] leading-[1.5] text-body">
-                Connect your calendar and busy time blocks itself in both places.
+                Connect Google or Outlook if you want busy time to block itself in both places.
               </p>
               {calNote && (
                 <p role="alert" className="mb-3 font-sans text-[12px] text-body">{calNote}</p>

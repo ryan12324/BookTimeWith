@@ -34,7 +34,7 @@ export function outboxDeliveryLabel(delivery: OutboxDelivery) {
     case "failed":
       return "✗ delivery failed";
     case "skipped":
-      return "not delivered — no transport configured";
+      return "not delivered. No transport configured.";
     case "expired":
       return "expired or superseded before delivery";
   }
@@ -63,8 +63,8 @@ export function Outbox() {
       <h2 className="font-sans text-[13px] font-semibold text-ink">Outbox</h2>
       <p className="mb-[14px] mt-1 font-sans text-[12px] text-faint">
         {emails.length
-          ? "Every email the app queued, newest first — book something and watch it progress."
-          : "Nothing queued yet — finish setup or book a time on your page and the emails land here."}
+          ? "Every email the app queued, newest first. Book something and watch it progress."
+          : "Nothing queued yet. Finish setup or book a time on your page and the emails land here."}
       </p>
       <div className="flex max-w-[720px] flex-col gap-2">
         {emails.map((e) => {

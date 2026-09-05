@@ -305,7 +305,7 @@ export async function PATCH(
       }
       if (!(await isFreeForOwner(db, owner.id, startsAt, durationMinutes, id))) {
         return NextResponse.json(
-          { error: "That overlaps another booking — pick another time." },
+          { error: "That overlaps another booking. Pick another time." },
           { status: 409 },
         );
       }
@@ -589,7 +589,7 @@ export async function PATCH(
     }
     if (error instanceof Error && error.message === "ACTION_CONFLICT") {
       return NextResponse.json(
-        { error: "That booking changed in another request — refresh and try again." },
+        { error: "That booking changed in another request. Refresh and try again." },
         { status: 409 },
       );
     }
@@ -607,7 +607,7 @@ export async function PATCH(
     }
     if (isSlotTaken(error)) {
       return NextResponse.json(
-        { error: "That time just went — pick another." },
+        { error: "That time just went. Pick another." },
         { status: 409 },
       );
     }

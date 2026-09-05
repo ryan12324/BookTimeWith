@@ -60,7 +60,7 @@ export async function GET(request: Request) {
   const message: Record<typeof status, string> = {
     available: `booktimewith.link/${handle} is available`,
     "too-short": "Handles are at least 3 characters.",
-    reserved: "That one's taken — try another.",
+    reserved: "That one's taken. Try another.",
     invalid: "Letters, numbers and dashes only.",
   };
 
