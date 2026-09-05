@@ -4,11 +4,11 @@ import { Wordmark } from "@/components/ui";
 import { PricingCard } from "@/components/landing/PricingCard";
 
 export const metadata: Metadata = {
-  title: "Book Time With — Booking for Independent Coaches",
+  title: "Book Time With | Booking for Independent Coaches",
   description:
     "The booking page that stays out of your way. Share one link, clients book, you keep coaching instead of admin. £6/mo after 30 days free.",
   openGraph: {
-    title: "Book Time With — Booking for Coaches",
+    title: "Book Time With | Booking for Coaches",
     description:
       "One link. Clients book. You keep coaching, not admin. Paint your week, share booktimewith.link/you, done.",
     type: "website",
@@ -16,11 +16,11 @@ export const metadata: Metadata = {
 };
 
 const FEATURES = [
-  "Paint weekly availability — your schedule, visualised",
+  "Paint weekly availability. Your schedule, visualised.",
   "No client logins or accounts to manage",
   "Sync Google or Outlook when connected",
-  "Reminders that stop no-shows",
-  "£6/mo after 30 days free — no card needed",
+  "Reminders before the appointment",
+  "£6/mo after 30 days free, no card needed",
 ];
 
 export default function CoachesPage() {
@@ -89,7 +89,7 @@ export default function CoachesPage() {
           </h2>
           <p className="mt-5 max-w-[480px] font-sans text-[15px] leading-[1.7] text-paper-muted text-pretty">
             If you don&apos;t need workflows, round-robin, or a second mortgage
-            of features — this is enough.
+            of features, this is enough.
             <br />
             <br />
             One booking page. Calendar sync. Reminders. Done.

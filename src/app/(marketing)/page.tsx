@@ -17,7 +17,7 @@ const STEPS = [
   {
     n: "01",
     title: "Claim your link",
-    body: "booktimewith.link/you — your own page, on its own domain. Name your service, set the length. That's the “onboarding.”",
+    body: "booktimewith.link/you. Your own page. Name the service, set the length. That's the whole onboarding.",
   },
   {
     n: "02",
@@ -75,7 +75,7 @@ export default function LandingPage() {
             <span className="font-semibold text-ink">Five</span> minutes to set
             up. <span className="font-semibold text-ink">One</span> settings
             page. <span className="font-semibold text-ink">Zero</span> accounts
-            for your clients — and zero features you&apos;ll never use.
+            for your clients, and zero features you&apos;ll never use.
           </div>
         </div>
         <HeroBookingCard />
@@ -99,10 +99,10 @@ export default function LandingPage() {
               <span className="text-bronze-light">✓</span> Clients book time slots
             </div>
             <div>
-              <span className="text-bronze-light">✓</span> Calendar sync, both ways
+              <span className="text-bronze-light">✓</span> Calendar sync when you connect Google or Outlook
             </div>
             <div>
-              <span className="text-bronze-light">✓</span> Reminders that stop no-shows
+              <span className="text-bronze-light">✓</span> Reminders before the appointment
             </div>
           </div>
         </div>
@@ -128,19 +128,6 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* QUOTE */}
-      <div className="mx-auto max-w-[1080px] px-6 pb-20 md:px-10">
-        <div className="max-w-[680px] border-t border-line-soft pt-14">
-          <blockquote className="font-serif text-[25px] font-normal leading-[1.45] tracking-[-.005em] text-pretty">
-            &ldquo;I spent a weekend trying to configure the last one. This took
-            the time between two clients.&rdquo;
-          </blockquote>
-          <div className="mt-4 font-sans text-[13px] font-medium text-body">
-            Marcus Okafor · Leadership coach
-          </div>
-        </div>
-      </div>
-
       {/* PRICING */}
       <div
         id="pricing"
@@ -153,7 +140,7 @@ export default function LandingPage() {
           <PricingCard />
           <div className="mt-5 font-sans text-[12.5px] text-faint">
             Starts with 30 days free. No credit card, no &ldquo;talk to
-            sales,&rdquo; no feature grid — there aren&apos;t enough features to
+            sales,&rdquo; no feature grid. There aren&apos;t enough features to
             make a grid.
           </div>
         </div>
@@ -162,7 +149,7 @@ export default function LandingPage() {
       {/* FOOTER CTA */}
       <div className="mx-auto max-w-[1080px] px-6 pb-[72px] pt-20 text-center md:px-10">
         <h2 className="font-serif text-[30px] font-normal leading-[1.15] tracking-[-.015em] text-balance md:text-[38px]">
-          Boring software that just works.
+          Boring software that does the job.
         </h2>
         <div className="mt-6">
           <ClaimInput center />

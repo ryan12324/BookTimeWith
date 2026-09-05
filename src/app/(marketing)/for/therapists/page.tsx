@@ -4,11 +4,11 @@ import { Wordmark } from "@/components/ui";
 import { PricingCard } from "@/components/landing/PricingCard";
 
 export const metadata: Metadata = {
-  title: "Book Time With — Booking for Therapists & Counsellors",
+  title: "Book Time With | Booking for Therapists & Counsellors",
   description:
     "A booking link therapists can actually send. Paint your session hours, clients pick a slot. No client accounts, no CRM bloat. £6/mo after 30 days free.",
   openGraph: {
-    title: "Book Time With — Booking for Therapists",
+    title: "Book Time With | Booking for Therapists",
     description:
       "One link. Clients book. You don't chase. Paint your session hours, share your link, done.",
     type: "website",
@@ -19,7 +19,7 @@ const FEATURES = [
   "One link in your email signature or directory bio",
   "Clients book without signing up",
   "Control your week on a calendar, not a maze",
-  "£6/mo after 30 days free — no card needed",
+  "£6/mo after 30 days free, no card needed",
 ];
 
 export default function TherapistsPage() {
@@ -105,7 +105,7 @@ export default function TherapistsPage() {
           </h2>
           <PricingCard />
           <div className="mt-5 font-sans text-[12.5px] text-faint">
-            30 days free, no credit card. No &ldquo;talk to sales&rdquo; — there
+            30 days free, no credit card. No &ldquo;talk to sales.&rdquo; There
             aren&apos;t enough features to warrant a call.
           </div>
         </div>
