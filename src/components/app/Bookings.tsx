@@ -402,7 +402,7 @@ function BookingRow({
             className="mt-2 min-h-[44px] w-full rounded-input border border-line bg-paper px-3 font-sans text-[16px] text-ink outline-none"
           />
           <p className="mt-2 font-sans text-[12px] leading-[1.5] text-body">
-            This changes only this booking. {first} receives the updated details automatically.
+            This changes only this booking. {first} receives the updated details.
           </p>
           <div className="mt-2 flex flex-wrap gap-2">
             <button
