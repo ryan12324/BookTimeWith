@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useOwnerConfig } from "@/lib/store";
 import { openHours } from "@/lib/availability";
@@ -676,12 +677,12 @@ function StepVerify({
           </button>
         </div>
         <div className="mt-[26px]">
-          <a
+          <Link
             href="/app/bookings"
             className="inline-block rounded-input bg-ink px-6 py-[13px] font-sans text-[14px] font-semibold text-paper hover:bg-ink-soft hover:text-paper"
           >
             Go to your bookings →
-          </a>
+          </Link>
         </div>
       </div>
     );
@@ -741,12 +742,12 @@ function StepVerify({
       </div>
 
       <div className="mt-5 text-center">
-        <a
+        <Link
           href="/app/settings"
           className="font-sans text-[12.5px] font-semibold text-bronze-ink"
         >
           Wrong email? Change it in Settings →
-        </a>
+        </Link>
       </div>
     </div>
   );
