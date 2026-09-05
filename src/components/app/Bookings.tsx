@@ -192,8 +192,7 @@ export function Bookings() {
       </div>
 
       <p className="mt-4 text-center font-sans text-[11.5px] leading-[1.6] text-body text-pretty">
-        When email delivery is configured, moving or cancelling sends the client a
-        polite update automatically.
+        When email delivery is configured, moving or cancelling sends the client an update.
       </p>
     </div>
   );
@@ -535,7 +534,7 @@ function BookingRow({
             disabled={Boolean(busy)}
             className="ml-1 min-h-[44px] px-2 font-sans text-[12px] font-semibold text-body"
           >
-            never mind
+            Never mind
           </button>
           {b.moveOptions.length === 0 && (
             <span className="font-sans text-[12px] text-body">No alternative times are open right now.</span>

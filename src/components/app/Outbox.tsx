@@ -34,7 +34,7 @@ export function outboxDeliveryLabel(delivery: OutboxDelivery) {
     case "failed":
       return "✗ delivery failed";
     case "skipped":
-      return "not delivered (no transport configured)";
+      return "not delivered. No transport configured.";
     case "expired":
       return "expired or superseded before delivery";
   }
