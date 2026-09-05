@@ -149,7 +149,7 @@ export default function LandingPage() {
       {/* FOOTER CTA */}
       <div className="mx-auto max-w-[1080px] px-6 pb-[72px] pt-20 text-center md:px-10">
         <h2 className="font-serif text-[30px] font-normal leading-[1.15] tracking-[-.015em] text-balance md:text-[38px]">
-          Boring software that does the job.
+          Boring software that just works.
         </h2>
         <div className="mt-6">
           <ClaimInput center />
