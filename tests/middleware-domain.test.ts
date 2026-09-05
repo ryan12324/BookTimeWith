@@ -130,6 +130,33 @@ describe("production domain routing", () => {
     );
   });
 
+  it("redirects reserved legal pages from .link to .com", async () => {
+    for (const path of ["/privacy", "/terms"]) {
+      const request = new NextRequest(`https://booktimewith.link${path}`, {
+        headers: { host: "booktimewith.link" },
+      });
+
+      const response = await middleware(request);
+
+      expect(response.status, path).toBe(307);
+      expect(response.headers.get("location"), path).toBe(
+        `https://booktimewith.com${path}`,
+      );
+    }
+  });
+
+  it("keeps reserved legal pages on .com without redirect", async () => {
+    for (const path of ["/privacy", "/terms"]) {
+      const request = new NextRequest(`https://booktimewith.com${path}`, {
+        headers: { host: "booktimewith.com" },
+      });
+
+      const response = await middleware(request);
+
+      expect(response.headers.get("location"), path).toBeNull();
+    }
+  });
+
   it("rejects encoded backslash, control, and double-encoded path forms", async () => {
     for (const pathname of ["/%5cemails", "/%0aemails", "/%2565mails"]) {
       const request = new NextRequest(`https://booktimewith.com${pathname}`, {
