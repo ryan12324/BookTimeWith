@@ -728,7 +728,7 @@ function StepVerify({
           disabled={checkingVerified}
           className="rounded-input bg-ink px-5 py-[12px] font-sans text-[13.5px] font-semibold text-paper hover:bg-ink-soft disabled:opacity-60"
         >
-          {checkingVerified ? "Checking…" : "I've verified — continue"}
+          {checkingVerified ? "Checking…" : "Done. Continue"}
         </button>
         <button
           type="button"

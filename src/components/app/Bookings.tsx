@@ -162,7 +162,7 @@ export function Bookings() {
           <div className="rounded-card border border-line-soft bg-white px-6 py-9 text-center shadow-card">
             <h2 className="font-serif text-[20px] text-ink">No bookings yet.</h2>
             <p className="mt-2 font-sans text-[13px] leading-[1.6] text-body">
-              Share booktimewith.link/{config.handle}; new appointments will appear here.
+              Share booktimewith.link/{config.handle}. New bookings will appear here.
             </p>
           </div>
         )}

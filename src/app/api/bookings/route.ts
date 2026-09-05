@@ -307,7 +307,7 @@ export async function POST(request: Request) {
   }
   if (!bookable) {
     return NextResponse.json(
-      { error: "That time can't be booked — pick another." },
+      { error: "That time can't be booked. Pick another." },
       { status: 422 },
     );
   }
@@ -448,7 +448,7 @@ export async function POST(request: Request) {
     }
     if (isSlotTaken(e)) {
       return NextResponse.json(
-        { error: "That time just went — here's what's still open." },
+        { error: "That time just went. Here's what's still open." },
         { status: 409 },
       );
     }

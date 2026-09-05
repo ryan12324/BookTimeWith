@@ -309,7 +309,7 @@ export function PlanSection({
       <>
         {PRICES[currency]} a month ·{" "}
         <span className="text-body">
-          free trial{trialEndsAt ? ` ends ${day(trialEndsAt)}` : " starts when you go live"}
+          free trial{trialEndsAt ? ` ends ${day(trialEndsAt)}` : " starts when you publish"}
         </span>
       </>
     ),
@@ -605,7 +605,7 @@ function OwnerHandle({
   };
 
   const hintText = !syntacticallyValid
-    ? "Use 3–30 letters, numbers, or dashes."
+    ? "Use 3 to 30 letters, numbers, or dashes."
     : !hint
       ? "Checking availability…"
       : hint.msg;
