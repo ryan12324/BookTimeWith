@@ -167,7 +167,27 @@ export default function LandingPage() {
         <div className="mt-6">
           <ClaimInput center />
         </div>
-        <footer className="mt-[52px] flex flex-col items-center justify-between gap-3 border-t border-line-soft pt-6 font-sans text-[12px] text-faint sm:flex-row">
+
+        {/* BUILT FOR */}
+        <div className="mt-14 flex flex-wrap items-center justify-center gap-x-1 gap-y-1 font-sans text-[13px] text-faint">
+          <span>Built for</span>
+          <Link
+            href="/for/therapists"
+            className="inline-flex min-h-[44px] items-center px-1 text-body underline decoration-line-soft underline-offset-4 hover:text-ink"
+          >
+            therapists
+          </Link>
+          <span>·</span>
+          <Link
+            href="/for/coaches"
+            className="inline-flex min-h-[44px] items-center px-1 text-body underline decoration-line-soft underline-offset-4 hover:text-ink"
+          >
+            coaches
+          </Link>
+          <span>· and anyone with a calendar and clients.</span>
+        </div>
+
+        <footer className="mt-[38px] flex flex-col items-center justify-between gap-3 border-t border-line-soft pt-6 font-sans text-[12px] text-faint sm:flex-row">
           <div>© 2026 booktimewith.com</div>
           <div className="flex gap-5">
             <Link href="#pricing" className="inline-flex min-h-[44px] items-center text-faint">

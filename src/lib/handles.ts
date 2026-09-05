@@ -7,7 +7,7 @@ export const RESERVED_HANDLES = new Set([
   "www", "api", "app", "admin", "help", "billing", "mail", "manage",
   "settings", "setup", "bookings", "login", "signin", "signup", "account",
   "support", "status", "about", "pricing", "terms", "privacy", "static",
-  "assets", "public", "dashboard", "emails",
+  "assets", "public", "dashboard", "emails", "for",
 ]);
 
 // Conservative exact-token list. Production operations should still review
