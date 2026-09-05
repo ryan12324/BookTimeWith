@@ -29,6 +29,7 @@ const OWNER_PAGES = [
   /^\/signin(\/|$)/,
   /^\/privacy(\/|$)/,
   /^\/terms(\/|$)/,
+  /^\/for(\/|$)/,
 ];
 const PUBLIC_PAGES = [/^\/manage(\/|$)/];
 // The only API surface the .link domain exposes:
