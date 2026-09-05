@@ -384,7 +384,7 @@ function StepService({ onNext }: { onNext: () => void }) {
     <div>
       <h2 id="setup-step-heading" tabIndex={-1} className="font-serif text-[26px] tracking-[-.01em]">Name your service</h2>
       <p className="mt-2 max-w-[400px] font-sans text-[13.5px] leading-[1.6] text-body">
-        One service, deliberately. Name the thing clients come here to book.
+        One service. Name the thing clients come here to book.
       </p>
       <div className="mt-6 max-w-[440px]">
         <SectionLabel as="label" htmlFor="setup-service" className="mb-2 block">Service</SectionLabel>
@@ -563,10 +563,10 @@ function StepHours({
           className="rounded-input px-6 py-[13px] font-sans text-[14px] font-semibold text-paper hover:bg-bronze-hover"
           style={{ background: ready && !publishing ? T.bronzeHover : T.disabled }}
         >
-          {publishing ? "Publishing your page…" : "You’re done — go live"}
+          {publishing ? "Publishing your page…" : "You're done. Publish when you're ready."}
         </button>
         <span className="font-sans text-[12.5px] text-body">
-          Connect Google or Outlook later; busy time blocks itself.
+          Connect Google or Outlook later if you want busy time to block itself.
         </span>
       </div>
       {publishError && (
@@ -663,7 +663,7 @@ function StepVerify({
         <div className="mx-auto grid h-[52px] w-[52px] place-items-center rounded-full bg-bronze-hover font-serif text-2xl text-paper">
           ✓
         </div>
-        <h2 id="setup-step-heading" tabIndex={-1} className="mt-5 font-serif text-[30px] tracking-[-.01em]">You&apos;re live.</h2>
+        <h2 id="setup-step-heading" tabIndex={-1} className="mt-5 font-serif text-[30px] tracking-[-.01em]">Your page is live.</h2>
         <p className="mt-[10px] font-sans text-[14px] leading-[1.6] text-body">{summary}</p>
         <div className="mt-[22px] inline-flex items-center gap-[10px] rounded-chip border border-line bg-paper px-[18px] py-[13px] font-sans text-[14.5px] font-medium">
           booktimewith.link/{handleShown}
