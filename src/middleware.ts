@@ -23,7 +23,13 @@ import { log, requestId } from "@/lib/logger";
  * header in tests). The public handle server page consults `handle_redirects`,
  * so a changed handle keeps a 301 from the old handle for 90 days.
  */
-const OWNER_PAGES = [/^\/app(\/|$)/, /^\/emails(\/|$)/, /^\/signin(\/|$)/];
+const OWNER_PAGES = [
+  /^\/app(\/|$)/,
+  /^\/emails(\/|$)/,
+  /^\/signin(\/|$)/,
+  /^\/privacy(\/|$)/,
+  /^\/terms(\/|$)/,
+];
 const PUBLIC_PAGES = [/^\/manage(\/|$)/];
 // The only API surface the .link domain exposes:
 const LINK_APIS: { re: RegExp; methods?: string[] }[] = [

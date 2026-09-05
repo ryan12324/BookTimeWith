@@ -176,6 +176,12 @@ export default function LandingPage() {
             <Link href="#how" className="inline-flex min-h-[44px] items-center text-faint">
               How it works
             </Link>
+            <Link href="https://booktimewith.com/privacy" className="inline-flex min-h-[44px] items-center text-faint">
+              Privacy
+            </Link>
+            <Link href="https://booktimewith.com/terms" className="inline-flex min-h-[44px] items-center text-faint">
+              Terms
+            </Link>
           </div>
         </footer>
       </div>
