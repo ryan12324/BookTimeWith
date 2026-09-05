@@ -28,7 +28,7 @@ export function Onboarding() {
     retrySave,
   } = useOwnerConfig();
   const [step, setStep] = useState<Step>(1);
-  const [furthestStep, setFurthestStep] = useState<1 | 2 | 3>(1);
+  const [furthestStep, setFurthestStep] = useState<1 | 2 | 3 | 4>(1);
   const [publishing, setPublishing] = useState(false);
   const [retryingLoad, setRetryingLoad] = useState(false);
   const params = useSearchParams();
@@ -45,11 +45,17 @@ export function Onboarding() {
   }, [step]);
 
   // Returning owners should resume their work, not re-enter the signup wizard.
+  // If unverified, they stay on step 4 to complete verification.
   useEffect(() => {
     if (hydrated && !loadError && !publishing && config.setupComplete && step !== 4) {
-      router.replace("/app/bookings");
+      if (config.emailVerified) {
+        router.replace("/app/bookings");
+      } else {
+        setStep(4);
+        setFurthestStep(4);
+      }
     }
-  }, [config.setupComplete, hydrated, loadError, publishing, router, step]);
+  }, [config.setupComplete, config.emailVerified, hydrated, loadError, publishing, router, step]);
 
   // Setup is only live after the server acknowledges the complete config.
   // Until then, keep the owner on the final editable step with honest status.
@@ -91,7 +97,7 @@ export function Onboarding() {
 
   const advance = (next: Step) => {
     setStep(next);
-    if (next <= 3) setFurthestStep((current) => Math.max(current, next) as 1 | 2 | 3);
+    setFurthestStep((current) => Math.max(current, next) as 1 | 2 | 3 | 4);
   };
 
   const handleShown = (config.handle || "yourname").trim() || "yourname";
@@ -101,6 +107,7 @@ export function Onboarding() {
     { num: "01", title: "Claim your link", sub: `booktimewith.link/${handleShown}` },
     { num: "02", title: "Name your service", sub: `${serviceShown} · ${fmtDuration(config.duration)}` },
     { num: "03", title: "Paint your hours", sub: `${fmtHours(openHours(config.cells))} open / week` },
+    { num: "04", title: "Verify email", sub: config.emailVerified ? "Confirmed" : "Check your inbox" },
   ];
 
   if (!hydrated || retryingLoad) {
@@ -130,7 +137,7 @@ export function Onboarding() {
     );
   }
 
-  if (!publishing && config.setupComplete && step !== 4) {
+  if (!publishing && config.setupComplete && config.emailVerified && step !== 4) {
     return (
       <div role="status" className="mx-auto mt-9 max-w-[680px] rounded-card border border-line-soft bg-white px-6 py-10 text-center font-sans text-[13.5px] text-body shadow-card">
         Opening your bookings…
@@ -170,9 +177,6 @@ export function Onboarding() {
             </button>
           );
         })}
-        <div className="mt-[18px] border-t border-line px-[14px] py-[14px] font-sans text-[12px] leading-[1.6] text-faint text-pretty">
-          This is the whole setup. There is no step 4.
-        </div>
       </div>
 
       {/* step rail — mobile progress strip */}
@@ -216,7 +220,15 @@ export function Onboarding() {
             }}
           />
         )}
-        {step === 4 && <StepLive handleShown={handleShown} />}
+        {step === 4 && (
+          <StepVerify
+            handleShown={handleShown}
+            onVerified={() => {
+              // Let the verified view render briefly before redirecting
+              setTimeout(() => router.push("/app/bookings"), 1500);
+            }}
+          />
+        )}
       </div>
     </div>
   );
@@ -573,9 +585,18 @@ function StepHours({
   );
 }
 
-function StepLive({ handleShown }: { handleShown: string }) {
-  const { config } = useOwnerConfig();
+function StepVerify({
+  handleShown,
+  onVerified,
+}: {
+  handleShown: string;
+  onVerified: () => void;
+}) {
+  const { config, refresh } = useOwnerConfig();
   const [copied, setCopied] = useState(false);
+  const [verifyBusy, setVerifyBusy] = useState(false);
+  const [verifyNote, setVerifyNote] = useState<string | null>(null);
+  const [checkingVerified, setCheckingVerified] = useState(false);
   const hours = openHours(config.cells);
   const summary = `${config.service.trim() || "Session"} · ${fmtDuration(config.duration)} · ${fmtHours(hours)} bookable a week.`;
 
@@ -589,29 +610,142 @@ function StepLive({ handleShown }: { handleShown: string }) {
     }
   };
 
-  return (
-    <div className="py-9 text-center">
-      <div className="mx-auto grid h-[52px] w-[52px] place-items-center rounded-full bg-bronze-hover font-serif text-2xl text-paper">
-        ✓
+  const resendVerification = async () => {
+    if (verifyBusy) return;
+    setVerifyBusy(true);
+    setVerifyNote(null);
+    try {
+      const res = await fetch("/api/verify-email/resend", { method: "POST" });
+      const data = (await res.json().catch(() => null)) as
+        | { error?: string; alreadyVerified?: boolean }
+        | null;
+      if (!res.ok) {
+        setVerifyNote(data?.error ?? "The confirmation email couldn't be sent. Try again.");
+      } else if (data?.alreadyVerified) {
+        await refresh();
+        setVerifyNote("This address is already verified.");
+        onVerified();
+      } else {
+        setVerifyNote(
+          config.emailDeliveryConfigured
+            ? "Confirmation email sent. Check your inbox for a fresh link."
+            : "Confirmation link saved to the outbox. Email delivery is not configured.",
+        );
+      }
+    } catch {
+      setVerifyNote("The confirmation email couldn't be sent. Check your connection.");
+    } finally {
+      setVerifyBusy(false);
+    }
+  };
+
+  const checkVerified = async () => {
+    if (checkingVerified) return;
+    setCheckingVerified(true);
+    setVerifyNote(null);
+    try {
+      await refresh();
+    } catch {
+      setVerifyNote("Couldn't check verification status. Try again.");
+    }
+    setCheckingVerified(false);
+  };
+
+  useEffect(() => {
+    if (config.emailVerified) {
+      onVerified();
+    }
+  }, [config.emailVerified, onVerified]);
+
+  if (config.emailVerified) {
+    return (
+      <div className="py-9 text-center">
+        <div className="mx-auto grid h-[52px] w-[52px] place-items-center rounded-full bg-bronze-hover font-serif text-2xl text-paper">
+          ✓
+        </div>
+        <h2 id="setup-step-heading" tabIndex={-1} className="mt-5 font-serif text-[30px] tracking-[-.01em]">You&apos;re live.</h2>
+        <p className="mt-[10px] font-sans text-[14px] leading-[1.6] text-body">{summary}</p>
+        <div className="mt-[22px] inline-flex items-center gap-[10px] rounded-chip border border-line bg-paper px-[18px] py-[13px] font-sans text-[14.5px] font-medium">
+          booktimewith.link/{handleShown}
+          <button
+            type="button"
+            onClick={copy}
+            className="min-h-[44px] px-2 font-sans text-[11px] font-semibold tracking-label text-bronze-ink"
+          >
+            {copied ? "COPIED" : "COPY"}
+          </button>
+        </div>
+        <div className="mt-[26px]">
+          <a
+            href="/app/bookings"
+            className="inline-block rounded-input bg-ink px-6 py-[13px] font-sans text-[14px] font-semibold text-paper hover:bg-ink-soft hover:text-paper"
+          >
+            Go to your bookings →
+          </a>
+        </div>
       </div>
-      <h2 id="setup-step-heading" tabIndex={-1} className="mt-5 font-serif text-[30px] tracking-[-.01em]">You&apos;re live.</h2>
-      <p className="mt-[10px] font-sans text-[14px] leading-[1.6] text-body">{summary}</p>
-      <div className="mt-[22px] inline-flex items-center gap-[10px] rounded-chip border border-line bg-paper px-[18px] py-[13px] font-sans text-[14.5px] font-medium">
-        booktimewith.link/{handleShown}
+    );
+  }
+
+  return (
+    <div className="py-6">
+      <div className="mx-auto grid h-[48px] w-[48px] place-items-center rounded-full bg-tint-warm font-serif text-xl text-bronze">
+        ✉
+      </div>
+      <h2 id="setup-step-heading" tabIndex={-1} className="mt-5 text-center font-serif text-[26px] tracking-[-.01em]">
+        One last step: verify your email
+      </h2>
+      <p className="mx-auto mt-3 max-w-[420px] text-center font-sans text-[13.5px] leading-[1.6] text-body">
+        We sent a confirmation link to <strong className="font-semibold text-ink">{config.email}</strong>.
+        Click it to prove it&apos;s you.
+      </p>
+
+      <div
+        role="alert"
+        className="mx-auto mt-6 max-w-[440px] rounded-card border border-line-soft bg-tint-warm px-5 py-4"
+      >
+        <p className="font-sans text-[13px] leading-[1.55] text-body">
+          <strong className="font-semibold text-ink">Your page won&apos;t take bookings yet.</strong>{" "}
+          Clients who visit booktimewith.link/{handleShown} will see your hours,
+          but the booking form stays hidden until you verify your email.
+        </p>
+      </div>
+
+      <p className="mx-auto mt-4 max-w-[420px] text-center font-sans text-[13px] leading-[1.6] text-body">
+        {summary}
+      </p>
+
+      {verifyNote && (
+        <p className="mx-auto mt-4 max-w-[420px] text-center font-sans text-[12.5px] leading-[1.5] text-body" aria-live="polite">
+          {verifyNote}
+        </p>
+      )}
+
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
         <button
           type="button"
-          onClick={copy}
-          className="min-h-[44px] px-2 font-sans text-[11px] font-semibold tracking-label text-bronze-ink"
+          onClick={checkVerified}
+          disabled={checkingVerified}
+          className="rounded-input bg-ink px-5 py-[12px] font-sans text-[13.5px] font-semibold text-paper hover:bg-ink-soft disabled:opacity-60"
         >
-          {copied ? "COPIED" : "COPY"}
+          {checkingVerified ? "Checking…" : "I've verified — continue"}
+        </button>
+        <button
+          type="button"
+          onClick={resendVerification}
+          disabled={verifyBusy}
+          className="min-h-[44px] px-4 font-sans text-[13px] font-semibold text-bronze-ink disabled:opacity-60"
+        >
+          {verifyBusy ? "Sending…" : "Resend verification"}
         </button>
       </div>
-      <div className="mt-[26px]">
+
+      <div className="mt-5 text-center">
         <a
-          href={`/${handleShown}`}
-          className="inline-block rounded-input bg-ink px-6 py-[13px] font-sans text-[14px] font-semibold text-paper hover:bg-ink-soft hover:text-paper"
+          href="/app/settings"
+          className="font-sans text-[12.5px] font-semibold text-bronze-ink"
         >
-          See what clients see →
+          Wrong email? Change it in Settings →
         </a>
       </div>
     </div>
