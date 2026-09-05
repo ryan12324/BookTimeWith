@@ -430,7 +430,7 @@ export function ManageFlow({ token }: { token: string }) {
             <div className="mt-3 text-center font-sans text-[11.5px] text-body">
               {canChange
                 ? "Free to change until 24 hours before."
-                : "Less than 24 hours to go — changes are locked. Reply to your confirmation email if something's come up."}
+                : "Less than 24 hours to go. Changes are locked. Reply to your confirmation email if something's come up."}
             </div>
           </div>
         )}
