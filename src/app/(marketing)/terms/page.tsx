@@ -84,6 +84,15 @@ export default function TermsPage() {
             not transferable.
           </p>
 
+          <h3>Email verification</h3>
+          <p>
+            When you publish your booking page, we send a verification link to your
+            email address. Your public booking page will not accept client bookings
+            until you verify your email. If you change your email address, we send a
+            new verification link. You can resend the verification link from Settings
+            at any time.
+          </p>
+
           <h3>Client bookings</h3>
           <p>
             Clients who book through your page do not need to create an account. They

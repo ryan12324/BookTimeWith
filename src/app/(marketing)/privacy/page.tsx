@@ -116,6 +116,7 @@ export default function PrivacyPage() {
             <li>Cloudflare Turnstile challenge tokens (to prevent automated abuse on booking forms)</li>
             <li>Email delivery status and logs (stored temporarily)</li>
             <li>Session tokens (signed, stateless cookies for owner authentication)</li>
+            <li>Email verification tokens (single-use links to confirm owner email addresses)</li>
           </ul>
         </Section>
 
@@ -125,6 +126,12 @@ export default function PrivacyPage() {
           <h3>To provide the booking service (contract)</h3>
           <ul>
             <li>Creating and managing owner accounts</li>
+            <li>
+              Verifying owner email addresses — we send a verification link when you
+              publish your booking page and when you change your email address; your
+              public booking page does not accept client bookings until your email is
+              verified (you can resend the verification link from Settings)
+            </li>
             <li>Publishing booking pages and handling appointments</li>
             <li>Sending confirmation emails, reminders, and schedule change notifications</li>
             <li>Syncing with connected calendars</li>
