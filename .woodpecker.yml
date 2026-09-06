@@ -1,0 +1,58 @@
+# Woodpecker CI configuration
+# Mirrors the GitHub Actions workflow in .github/workflows/ci.yml
+#
+# GHA job mapping:
+#   check         → steps: install, check, migration-drift, audit
+#   release-image → steps: build-image (depends on check steps)
+
+when:
+  - event: pull_request
+  - event: push
+    branch: main
+
+steps:
+  # --- Job: check ---
+  # Equivalent to GHA's `check` job: lint, typecheck, test, build, migration drift, audit
+
+  install:
+    image: node:22-alpine
+    commands:
+      - npm ci
+
+  check:
+    image: node:22-alpine
+    commands:
+      - npm run check
+    depends_on:
+      - install
+
+  migration-drift:
+    image: node:22-alpine
+    commands:
+      - apk add --no-cache git
+      - npm run db:generate
+      - test -z "$(git status --porcelain -- drizzle)"
+    depends_on:
+      - install
+
+  audit:
+    image: node:22-alpine
+    commands:
+      - npm audit --omit=dev
+    depends_on:
+      - install
+
+  # --- Job: release-image ---
+  # Equivalent to GHA's `release-image` job: docker build (no push)
+  # Uses docker:cli with docker.sock access (Woodpecker agent docker backend)
+
+  build-image:
+    image: docker:cli
+    commands:
+      - docker build --tag booktimewith:ci .
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - check
+      - migration-drift
+      - audit
